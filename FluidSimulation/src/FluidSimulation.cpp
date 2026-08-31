@@ -1,6 +1,8 @@
 #include <glad.h>
 #include <glfw3.h>
 #include <iostream>
+#include "Log.h"
+
 
 GLFWwindow* initGLFW();
 void initGLAD();
@@ -11,7 +13,10 @@ int main()
 {
     GLFWwindow* window = initGLFW();
     initGLAD();
-    
+
+    Log::init();
+    SPHCRITICAL("Hello");
+
     glViewport(0, 0, 800, 600);
 
     while (!glfwWindowShouldClose(window))
