@@ -18,7 +18,6 @@ int main()
     {
         processInput(window);
 
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
