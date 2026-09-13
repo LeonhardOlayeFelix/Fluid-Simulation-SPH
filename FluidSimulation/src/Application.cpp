@@ -16,7 +16,6 @@ int main()
     GLFWwindow* window = Initialiser::initApplication();
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
-    float aspect = (float)800 / 600;
 
     Renderer renderer;
 
@@ -41,7 +40,6 @@ int main()
 
     ShaderProgram shader("resources/shaders/TestShader.shader");
     shader.SetUniformMat4f("u_Model", glm::scale(glm::mat4(1), glm::vec3(0.2)));
-    shader.SetUniformMat4f("u_Proj", glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f));
 
     ShaderProgram quadShader("resources/shaders/QuadShader.shader");
     quadShader.SetUniform1i("u_QuadTexture", 0);
@@ -68,6 +66,7 @@ int main()
         ImGui::NewFrame();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::ShowDemoWindow();
+        ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
         fbo.Bind();
         renderer.Clear();
@@ -77,13 +76,19 @@ int main()
 
         renderer.Clear();
 
-        resolveFbo.GetColorTexture().Bind(0);
-        quadShader.SetUniform1i("u_QuadTexture", 0);
-        glDisable(GL_DEPTH_TEST);
-        renderer.DrawElements(quadVao, quadShader);
+        ImGui::Begin("Viewport");
+
+        ImGui::Image(reinterpret_cast<void*>(resolveFbo.GetColorTexture().GetId()), viewportPanelSize);
+        float aspect = (float)viewportPanelSize.x / viewportPanelSize.y;
+        shader.SetUniformMat4f("u_Proj", glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f));
+        ImGui::End();
+
+
+        //resolveFbo.GetColorTexture().Bind(0);
+        //quadShader.SetUniform1i("u_QuadTexture", 0);
+        //glDisable(GL_DEPTH_TEST);
+        //renderer.DrawElements(quadVao, quadShader);
          
-        //renderer.Clear();
-        //renderer.DrawElements(circleVao, shader);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
