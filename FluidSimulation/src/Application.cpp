@@ -1,11 +1,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include "debug/Log.h"
 #include "vendor/imgui/imgui.h"
 #include "vendor/imgui/imgui_impl_glfw.h"
 #include "vendor/imgui/imgui_impl_opengl3.h"
 #include "initialisation/Initialiser.h"
+#include "abstraction/Includes.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -14,10 +14,21 @@ void processInput(GLFWwindow* window);
 int main()
 {
     GLFWwindow* window = Initialiser::initApplication();
-
-    float vertexData [] = {1, 2, 3};
-
     glViewport(0, 0, 800, 600);
+
+    std::vector<float> vertices = {
+         0.5f,  0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        -0.5f,  0.5f, 0.0f,
+    };
+
+    unsigned int indicies[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+
+    VertexBuffer vbo{ vertices };
 
     while (!glfwWindowShouldClose(window))
     {
@@ -25,6 +36,8 @@ int main()
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

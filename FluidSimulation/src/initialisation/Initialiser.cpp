@@ -1,19 +1,21 @@
 #include "Initialiser.h"
-#include "debug/Log.h"
-#include "vendor/imgui/imgui.h"
-#include "vendor/imgui/imgui_impl_glfw.h"
-#include "vendor/imgui/imgui_impl_opengl3.h"
+#include "../debug/Log.h"
+#include "../vendor/imgui/imgui.h"
+#include "../vendor/imgui/imgui_impl_glfw.h"
+#include "../vendor/imgui/imgui_impl_opengl3.h"
 
 GLFWwindow* Initialiser::m_Window = nullptr;
 bool Initialiser::m_Initialised = false;
 
 GLFWwindow* Initialiser::initApplication()
 {
+    initLogger();
+
     m_Window = initGLFW();
     initGLAD();
     initImGui(m_Window);
-    initLogger();
-    m_Initialised = true;
+
+    m_Initialised = m_Window != nullptr;
     return m_Window;
 }
 
