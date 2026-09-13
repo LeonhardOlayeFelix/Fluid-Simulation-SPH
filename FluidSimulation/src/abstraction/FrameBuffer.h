@@ -12,7 +12,7 @@ enum class AttachmentTarget {
 	Color, Depth, Stencil, DepthStencil
 };
 enum class AttachmentStorage {
-	Texture, RenderBuffer, CubeMap
+	Texture, RenderBuffer, CubeMap, None
 };
 
 class FrameBuffer
@@ -43,6 +43,7 @@ public:
 	bool Validate();
 	void Blit(const FrameBuffer& target) const;
 	void MarkAsNoColorBuffer();
+	void Resize(int width, int height);
 	const Texture& GetColorTexture(int colorIndex = 0) const;
 	const Texture& GetDepthTexture() const;
 	const CubeMap& GetDepthCubeMap() const;
@@ -59,5 +60,9 @@ public:
 	inline unsigned int GetWidth() const { return m_Width; };
 	inline unsigned int GetHeight() const { return m_Height; };
 
+private:
+	GLenum ToGLAttachmentPoint(AttachmentTarget target, int colorIndex);
+	GLenum ToGLInternalFormat(AttachmentTarget target);
+	AttachmentStorage ToAttachmentStorage(const std::variant<Texture, RenderBuffer, CubeMap>& storage);
 };
 

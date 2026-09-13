@@ -7,15 +7,12 @@
 #include "initialisation/Initialiser.h"
 #include "abstraction/Includes.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
 
 int main()
 {
     GLFWwindow* window = Initialiser::initApplication();
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    
 
     Renderer renderer;
 
@@ -54,40 +51,37 @@ int main()
 
 
 
-
+    ImVec2 lastViewPortSize{0, 0};
 
     while (!glfwWindowShouldClose(window))
     {
-        processInput(window);
-
-
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::ShowDemoWindow();
+
+        ImGui::Begin("Viewport");
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+        if (viewportPanelSize.x != lastViewPortSize.x || viewportPanelSize.y != lastViewPortSize.y) 
+        {
+            SPHINFO("Gui size changed, new size: (" + std::to_string(viewportPanelSize.x) + ", " + std::to_string(viewportPanelSize.y) + ")");
+            lastViewPortSize = viewportPanelSize;
+            glViewport(0, 0, (int)viewportPanelSize.x, (int)viewportPanelSize.y);
+            fbo.Resize(viewportPanelSize.x, viewportPanelSize.y);
+            resolveFbo.Resize(viewportPanelSize.x, viewportPanelSize.y);
+        }
 
         fbo.Bind();
         renderer.Clear();
         renderer.DrawElements(circleVao, shader);
         fbo.Blit(resolveFbo);
         fbo.Unbind();
-
         renderer.Clear();
-
-        ImGui::Begin("Viewport");
-
         ImGui::Image(reinterpret_cast<void*>(resolveFbo.GetColorTexture().GetId()), viewportPanelSize);
         float aspect = (float)viewportPanelSize.x / viewportPanelSize.y;
         shader.SetUniformMat4f("u_Proj", glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f));
         ImGui::End();
-
-
-        //resolveFbo.GetColorTexture().Bind(0);
-        //quadShader.SetUniform1i("u_QuadTexture", 0);
-        //glDisable(GL_DEPTH_TEST);
-        //renderer.DrawElements(quadVao, quadShader);
          
 
         ImGui::Render();
@@ -103,13 +97,3 @@ int main()
     return 0;
 }
 
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}

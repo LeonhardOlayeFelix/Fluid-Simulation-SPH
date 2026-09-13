@@ -1,32 +1,6 @@
 #include "FrameBuffer.h"
 #include "../debug/Log.h"
 
-namespace {
-	GLenum ToGLAttachmentPoint(AttachmentTarget target, int colorIndex)
-	{
-		switch (target)
-		{
-		case AttachmentTarget::Color:        return GL_COLOR_ATTACHMENT0 + colorIndex;
-		case AttachmentTarget::Depth:        return GL_DEPTH_ATTACHMENT;
-		case AttachmentTarget::Stencil:      return GL_STENCIL_ATTACHMENT;
-		case AttachmentTarget::DepthStencil: return GL_DEPTH_STENCIL_ATTACHMENT;
-		}
-		return 0;
-	}
-
-	GLenum ToGLInternalFormat(AttachmentTarget target)
-	{
-		switch (target)
-		{
-		case AttachmentTarget::Color:        return GL_RGBA8;
-		case AttachmentTarget::Depth:        return GL_DEPTH_COMPONENT24;
-		case AttachmentTarget::Stencil:      return GL_STENCIL_INDEX8;
-		case AttachmentTarget::DepthStencil: return GL_DEPTH24_STENCIL8;
-		}
-		return 0;
-	}
-}
-
 FrameBuffer::FrameBuffer(int width, int height, int samples) : m_Width(width), m_Height(height), m_MSAASamples(samples)
 {
     glGenFramebuffers(1, &m_RendererId);
@@ -106,6 +80,17 @@ void FrameBuffer::MarkAsNoColorBuffer()
 	Unbind();
 }
 
+void FrameBuffer::Resize(int width, int height)
+{
+	FrameBuffer newFbo(width, height, m_MSAASamples);
+
+	for (Attachment& a: m_Attachments) {
+		newFbo.AddAttachment(a.target, ToAttachmentStorage(a.storage), a.colorIndex);
+	}
+
+	*this = std::move(newFbo);
+}
+
 const Texture& FrameBuffer::GetColorTexture(int colorIndex) const
 {
 	for (const Attachment& a : m_Attachments)
@@ -162,4 +147,40 @@ FrameBuffer& FrameBuffer::operator=(FrameBuffer && other) noexcept
 	other.m_RendererId = 0;
 
 	return *this;
+}
+
+GLenum FrameBuffer::ToGLAttachmentPoint(AttachmentTarget target, int colorIndex)
+{
+	switch (target)
+	{
+	case AttachmentTarget::Color:        return GL_COLOR_ATTACHMENT0 + colorIndex;
+	case AttachmentTarget::Depth:        return GL_DEPTH_ATTACHMENT;
+	case AttachmentTarget::Stencil:      return GL_STENCIL_ATTACHMENT;
+	case AttachmentTarget::DepthStencil: return GL_DEPTH_STENCIL_ATTACHMENT;
+	}
+	SPHERROR("Attachment target not recognised.");
+	return 0;
+}
+
+GLenum FrameBuffer::ToGLInternalFormat(AttachmentTarget target)
+{
+	switch (target)
+	{
+	case AttachmentTarget::Color:        return GL_RGBA8;
+	case AttachmentTarget::Depth:        return GL_DEPTH_COMPONENT24;
+	case AttachmentTarget::Stencil:      return GL_STENCIL_INDEX8;
+	case AttachmentTarget::DepthStencil: return GL_DEPTH24_STENCIL8;
+	}
+	SPHERROR("Attachment target not recognised.");
+	return 0;
+}
+
+AttachmentStorage FrameBuffer::ToAttachmentStorage(const std::variant<Texture, RenderBuffer, CubeMap>& storage)
+{
+	if (std::holds_alternative<Texture>(storage)) return AttachmentStorage::Texture;
+	if (std::holds_alternative<RenderBuffer>(storage)) return AttachmentStorage::RenderBuffer;
+	if (std::holds_alternative<CubeMap>(storage)) return AttachmentStorage::CubeMap;
+	SPHERROR("Attachment storage not recognised.");
+	return AttachmentStorage::None;
+
 }
