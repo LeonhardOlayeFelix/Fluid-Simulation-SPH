@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
 
-VertexBuffer::VertexBuffer(const void* data, size_t size)
+VertexBuffer::VertexBuffer(const void* data, size_t size) : m_Size(size)
 {
     glCreateBuffers(1, &m_RendererId);
     glNamedBufferData(m_RendererId, size, data, GL_STATIC_DRAW);
@@ -15,10 +15,10 @@ VertexBuffer::~VertexBuffer()
 VertexBuffer::VertexBuffer(VertexBuffer && other) noexcept
 {
     m_RendererId = other.m_RendererId;
-    m_Count = other.m_Count;
+    m_Size = other.m_Size;
 
     other.m_RendererId = 0;
-    other.m_Count = 0;
+    other.m_Size = 0;
 }
 
 VertexBuffer& VertexBuffer::operator=(VertexBuffer && other) noexcept
@@ -28,10 +28,10 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer && other) noexcept
     if (m_RendererId != 0) glDeleteBuffers(1, &m_RendererId);
 
     m_RendererId = other.m_RendererId;
-    m_Count = other.m_Count;
+    m_Size = other.m_Size;
 
     other.m_RendererId = 0;
-    other.m_Count = 0;
+    other.m_Size = 0;
 
     return *this;
 }

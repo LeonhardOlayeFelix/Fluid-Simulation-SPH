@@ -28,10 +28,17 @@ int main()
         0, 2, 3
     };
 
+    VertexArray vao;
     VertexBuffer vbo{ vertices };
+    VertexBufferLayout vbl;
     IndexBuffer ibo{ indicies };
-
     ShaderProgram("resources/shaders/TestShader.shader");
+
+    vbl.push<float>(3);
+    vao.RecordVBOLayout(vbo, vbl);
+    vao.RecordIndexBuffer(ibo);
+
+
 
 
 

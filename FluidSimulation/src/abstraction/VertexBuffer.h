@@ -8,7 +8,7 @@ class VertexBuffer
 {
 private:
 	unsigned int m_RendererId{};
-	unsigned int m_Count{};
+	unsigned int m_Size{};
 
 public:
 	VertexBuffer() = default;
@@ -27,7 +27,7 @@ public:
 	VertexBuffer(VertexBuffer&& other) noexcept;
 	VertexBuffer& operator=(VertexBuffer&& other) noexcept;
 
-	inline unsigned int GetCount() const { return m_Count; };
+	inline unsigned int GetSize() const { return m_Size; };
 	inline unsigned int GetId() const { return m_RendererId; };
 };
 

@@ -105,6 +105,8 @@
     <ClCompile Include="src\vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\abstraction\VertexBuffer.cpp" />
+    <ClCompile Include="src\abstraction\VertexArray.cpp" />
+    <ClCompile Include="src\abstraction\VertexBufferLayout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\abstraction\IndexBuffer.h" />
@@ -123,6 +125,8 @@
     <ClInclude Include="src\vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="src\vendor\imgui\imstb_truetype.h" />
     <ClInclude Include="src\abstraction\VertexBuffer.h" />
+    <ClInclude Include="src\abstraction\VertexArray.h" />
+    <ClInclude Include="src\abstraction\VertexBufferLayout.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

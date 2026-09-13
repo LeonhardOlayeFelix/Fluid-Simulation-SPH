@@ -1,6 +1,6 @@
 #include "IndexBuffer.h"
 
-IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count)
+IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count) : m_Count(count)
 {
 	glCreateBuffers(1, &m_RendererId);
 	glNamedBufferData(m_RendererId, count * sizeof(unsigned int), data, GL_STATIC_DRAW);
