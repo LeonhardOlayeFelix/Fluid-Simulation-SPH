@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <array>
+#include "Primitives.h"
 
 class IndexBuffer
 {
@@ -12,6 +13,7 @@ private:
 public:
 	IndexBuffer() = default;
 	IndexBuffer(const unsigned int* data, unsigned int count);
+	IndexBuffer(const Primitive& primitive) : IndexBuffer(primitive.indicies){}
 	template<size_t N>
 	IndexBuffer(const std::array<unsigned int, N>& data) : IndexBuffer(data.data(), N){};
 	IndexBuffer(const std::vector<unsigned int>& data) : IndexBuffer(data.data(), data.size()) {};

@@ -2,10 +2,12 @@
 
 Renderer::Renderer()
 {
+	glViewport(0, 0, 800, 600);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	glEnable(GL_MULTISAMPLE);
+	glClearColor(0.1, 0.1, 0.1, 1.0f);
 }
 
 void Renderer::DrawElements(const VertexArray & vao, const ShaderProgram & shader) const

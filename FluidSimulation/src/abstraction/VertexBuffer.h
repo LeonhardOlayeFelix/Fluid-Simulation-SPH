@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <array>
 #include <vector>
+#include "Primitives.h"
 
 class VertexBuffer
 {
@@ -13,6 +14,7 @@ private:
 public:
 	VertexBuffer() = default;
 	VertexBuffer(const void* data, size_t size);
+	VertexBuffer(const Primitive& primitive) : VertexBuffer(primitive.positions) {};
 
 	template<size_t N>
 	VertexBuffer(const std::array<float, N>& data) : VertexBuffer(data.data(), N * sizeof(float)) {};
