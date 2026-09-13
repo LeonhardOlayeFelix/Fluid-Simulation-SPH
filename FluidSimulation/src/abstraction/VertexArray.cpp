@@ -21,6 +21,7 @@ void VertexArray::RecordVBOLayout(const VertexBuffer& vbo, const VertexBufferLay
 	Bind();
 	vbo.Bind();
 	m_VBOSize += vbo.GetSize();
+	m_Stride += vbl.GetStride();
 
 	const std::vector<VertexAttribute>& attributes = vbl.GetAttributes();
 

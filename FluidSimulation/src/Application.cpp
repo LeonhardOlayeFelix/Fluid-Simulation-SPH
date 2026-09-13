@@ -29,16 +29,16 @@ int main()
     };
 
     VertexArray vao;
-    VertexBuffer vbo{ vertices };
+    VertexBuffer vbo(vertices);
     VertexBufferLayout vbl;
-    IndexBuffer ibo{ indicies };
-    ShaderProgram("resources/shaders/TestShader.shader");
+    IndexBuffer ibo(indicies);
+    ShaderProgram shader("resources/shaders/TestShader.shader");
 
     vbl.push<float>(3);
     vao.RecordVBOLayout(vbo, vbl);
     vao.RecordIndexBuffer(ibo);
 
-
+    Renderer renderer;
 
 
 
@@ -46,15 +46,15 @@ int main()
     {
         processInput(window);
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        renderer.Clear();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::ShowDemoWindow();
+
+        renderer.DrawArray(vao, shader);
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
