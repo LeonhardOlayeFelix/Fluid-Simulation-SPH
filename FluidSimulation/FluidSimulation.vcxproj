@@ -54,7 +54,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\imgui\backends;$(SolutionDir)Dependencies\imgui;$(SolutionDir)Dependencies\spdlog\spdlog\include;$(SolutionDir)Dependencies\glfw\include;$(SolutionDir)Dependencies\glad\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\imgui\backends;$(SolutionDir)Dependencies\imgui;$(SolutionDir)Dependencies\spdlog\spdlog\include;$(SolutionDir)Dependencies\glfw\include;$(SolutionDir)Dependencies\glad\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -76,7 +76,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\imgui\backends;$(SolutionDir)Dependencies\imgui;$(SolutionDir)Dependencies\spdlog\spdlog\include;$(SolutionDir)Dependencies\glfw\include;$(SolutionDir)Dependencies\glad\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\imgui\backends;$(SolutionDir)Dependencies\imgui;$(SolutionDir)Dependencies\spdlog\spdlog\include;$(SolutionDir)Dependencies\glfw\include;$(SolutionDir)Dependencies\glad\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -90,6 +90,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\abstraction\ShaderProgram.cpp" />
     <ClCompile Include="src\initialisation\Initialiser.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\debug\Log.cpp" />
@@ -102,8 +103,11 @@
     <ClCompile Include="src\vendor\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\abstraction\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\abstraction\ShaderProgram.h" />
+    <ClInclude Include="src\abstraction\Includes.h" />
     <ClInclude Include="src\initialisation\Initialiser.h" />
     <ClInclude Include="src\debug\Log.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
@@ -116,6 +120,7 @@
     <ClInclude Include="src\vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="src\vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\abstraction\VertexBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

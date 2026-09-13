@@ -30,6 +30,10 @@ int main()
 
     VertexBuffer vbo{ vertices };
 
+    ShaderProgram("resources/shaders/TestShader.shader");
+
+
+
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
