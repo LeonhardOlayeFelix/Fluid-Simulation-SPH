@@ -90,8 +90,9 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\FluidSimulation.cpp" />
-    <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\initialisation\Initialiser.cpp" />
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\debug\Log.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
     <ClCompile Include="src\vendor\imgui\imgui.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_demo.cpp" />
@@ -103,7 +104,8 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Log.h" />
+    <ClInclude Include="src\initialisation\Initialiser.h" />
+    <ClInclude Include="src\debug\Log.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />
     <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h" />
