@@ -2,5 +2,5 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
-  <Project Path="FluidSimulation/FluidSimulation.vcxproj" />
+  <Project Path="FluidSimulation/FluidSimulation.vcxproj" Id="94610ba4-1b7b-48c2-83d5-d9a5db9db075" />
 </Solution>
