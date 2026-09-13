@@ -23,12 +23,13 @@ int main()
         -0.5f,  0.5f, 0.0f,
     };
 
-    unsigned int indicies[] = {
+    std::vector<unsigned int> indicies = {
         0, 1, 2,
         0, 2, 3
     };
 
     VertexBuffer vbo{ vertices };
+    IndexBuffer ibo{ indicies };
 
     ShaderProgram("resources/shaders/TestShader.shader");
 

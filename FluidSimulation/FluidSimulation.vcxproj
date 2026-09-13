@@ -90,6 +90,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\abstraction\IndexBuffer.cpp" />
     <ClCompile Include="src\abstraction\ShaderProgram.cpp" />
     <ClCompile Include="src\initialisation\Initialiser.cpp" />
     <ClCompile Include="src\Application.cpp" />
@@ -106,6 +107,7 @@
     <ClCompile Include="src\abstraction\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\abstraction\IndexBuffer.h" />
     <ClInclude Include="src\abstraction\ShaderProgram.h" />
     <ClInclude Include="src\abstraction\Includes.h" />
     <ClInclude Include="src\initialisation\Initialiser.h" />
