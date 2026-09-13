@@ -4,3 +4,7 @@
 [submodule "Dependencies/spdlog/spdlog"]
 	path = Dependencies/spdlog/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "Dependencies/imgui"]
+	path = Dependencies/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
