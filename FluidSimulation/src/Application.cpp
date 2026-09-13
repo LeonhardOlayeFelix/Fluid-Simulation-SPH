@@ -65,7 +65,6 @@ int main()
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         if (viewportPanelSize.x != lastViewPortSize.x || viewportPanelSize.y != lastViewPortSize.y) 
         {
-            SPHINFO("Gui size changed, new size: (" + std::to_string(viewportPanelSize.x) + ", " + std::to_string(viewportPanelSize.y) + ")");
             lastViewPortSize = viewportPanelSize;
             glViewport(0, 0, (int)viewportPanelSize.x, (int)viewportPanelSize.y);
             fbo.Resize(viewportPanelSize.x, viewportPanelSize.y);
