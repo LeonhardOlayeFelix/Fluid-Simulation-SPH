@@ -5,3 +5,7 @@
 #include "VertexArray.h"
 #include "Renderer.h"
 #include "Primitives.h"
+#include "Texture.h"
+#include "CubeMap.h"
+#include "RenderBuffer.h"
+#include "FrameBuffer.h"
