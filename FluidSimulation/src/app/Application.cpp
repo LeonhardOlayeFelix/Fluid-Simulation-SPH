@@ -1,12 +1,10 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include "vendor/imgui/imgui.h"
-#include "vendor/imgui/imgui_impl_glfw.h"
-#include "vendor/imgui/imgui_impl_opengl3.h"
-
 #include "Application.h"
-#include "debug/Log.h"
+
+#include "../vendor/imgui/imgui.h"
+#include "../vendor/imgui/imgui_impl_glfw.h"
+#include "../vendor/imgui/imgui_impl_opengl3.h"
+
+#include "../core/Log.h"
 
 Application* Application::s_Application = nullptr;
 

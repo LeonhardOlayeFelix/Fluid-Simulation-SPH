@@ -1,6 +1,6 @@
 #include "CubeMap.h"
-#include "../vendor/stb_image/stb_image.h"
-#include "../debug/Log.h"
+#include "../../vendor/stb_image/stb_image.h"
+#include "../Log.h"
 
 CubeMap::CubeMap(const std::string& path) : CubeMap(std::array<std::string, 6>{ path, path, path, path, path, path })
 {

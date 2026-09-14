@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\debug\Log.cpp">
+    <ClCompile Include="src\core\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vendor\glad\glad.c">
@@ -45,66 +45,60 @@
     <ClCompile Include="src\vendor\imgui\imgui_impl_opengl3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\initialisation\Initialiser.cpp">
+    <ClCompile Include="src\core\abstraction\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\VertexBuffer.cpp">
+    <ClCompile Include="src\core\abstraction\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\ShaderProgram.cpp">
+    <ClCompile Include="src\core\abstraction\IndexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\IndexBuffer.cpp">
+    <ClCompile Include="src\core\abstraction\VertexArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\VertexArray.cpp">
+    <ClCompile Include="src\core\abstraction\VertexBufferLayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\VertexBufferLayout.cpp">
+    <ClCompile Include="src\core\abstraction\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\Renderer.cpp">
+    <ClCompile Include="src\core\abstraction\Primitives.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\Primitives.cpp">
+    <ClCompile Include="src\core\abstraction\FrameBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\FrameBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\abstraction\Texture.cpp">
+    <ClCompile Include="src\core\abstraction\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vendor\stb_image\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\RenderBuffer.cpp">
+    <ClCompile Include="src\core\abstraction\RenderBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\abstraction\CubeMap.cpp">
+    <ClCompile Include="src\core\abstraction\CubeMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp">
+    <ClCompile Include="src\app\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderLayer.cpp">
+    <ClCompile Include="src\app\RenderLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
+    <ClCompile Include="src\app\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ImGuiLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneData.cpp">
+    <ClCompile Include="src\app\ImGuiLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\debug\Log.h">
+    <ClInclude Include="src\core\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\imgui\imconfig.h">
@@ -137,64 +131,61 @@
     <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\initialisation\Initialiser.h">
+    <ClInclude Include="src\core\abstraction\VertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\VertexBuffer.h">
+    <ClInclude Include="src\core\abstraction\Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\Includes.h">
+    <ClInclude Include="src\core\abstraction\ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\ShaderProgram.h">
+    <ClInclude Include="src\core\abstraction\IndexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\IndexBuffer.h">
+    <ClInclude Include="src\core\abstraction\VertexArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\VertexArray.h">
+    <ClInclude Include="src\core\abstraction\VertexBufferLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\VertexBufferLayout.h">
+    <ClInclude Include="src\core\abstraction\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\Renderer.h">
+    <ClInclude Include="src\core\abstraction\Primitives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\Primitives.h">
+    <ClInclude Include="src\core\abstraction\FrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\FrameBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\abstraction\Texture.h">
+    <ClInclude Include="src\core\abstraction\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\stb_image\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\RenderBuffer.h">
+    <ClInclude Include="src\core\abstraction\RenderBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\abstraction\CubeMap.h">
+    <ClInclude Include="src\core\abstraction\CubeMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Application.h">
+    <ClInclude Include="src\app\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Layer.h">
+    <ClInclude Include="src\core\Layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderLayer.h">
+    <ClInclude Include="src\app\RenderLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Window.h">
+    <ClInclude Include="src\app\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ImGuiLayer.h">
+    <ClInclude Include="src\app\ImGuiLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SceneData.h">
+    <ClInclude Include="src\app\SceneData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

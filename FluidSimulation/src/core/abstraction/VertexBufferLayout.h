@@ -1,7 +1,7 @@
 #pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../debug/Log.h"
+#include "../Log.h"
 
 struct VertexAttribute {
 	unsigned int type;

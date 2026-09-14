@@ -1,5 +1,5 @@
 #include "FrameBuffer.h"
-#include "../debug/Log.h"
+#include "../Log.h"
 
 FrameBuffer::FrameBuffer(int width, int height, int samples) : m_Width(width), m_Height(height), m_MSAASamples(samples)
 {

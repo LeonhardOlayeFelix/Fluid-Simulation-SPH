@@ -1,5 +1,5 @@
 #include "Window.h"
-#include "debug/Log.h"
+#include "../core/Log.h"
 
 Window::Window(WindowSpec winSpec) : m_WinSpec(winSpec)
 {

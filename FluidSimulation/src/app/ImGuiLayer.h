@@ -1,12 +1,12 @@
 #pragma once
-#include "Layer.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <memory>
+
+#include "../core/Layer.h"
 #include "SceneData.h"
 #include "RenderLayer.h"
-#include <memory>
-#include "vendor/imgui/imgui.h"
-#include "vendor/imgui/imgui_impl_glfw.h"
-#include "vendor/imgui/imgui_impl_opengl3.h"
-
 
 class ImGuiLayer : public Layer
 {

@@ -1,6 +1,10 @@
 #pragma once
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <string>
 #include <memory>
+
 #include "Window.h"
 #include "RenderLayer.h"
 #include "ImGuiLayer.h"

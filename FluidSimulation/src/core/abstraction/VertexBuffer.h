@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <array>
 #include <vector>
+
 #include "Primitives.h"
 
 class VertexBuffer

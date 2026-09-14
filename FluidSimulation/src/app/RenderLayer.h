@@ -1,13 +1,15 @@
 #pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "Layer.h"
-#include "SceneData.h"
-#include <memory>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "abstraction/Includes.h"
+
+#include <memory>
+
+#include "../core/Layer.h"
+#include "../core/abstraction/Includes.h"
+#include "SceneData.h"
 
 
 
@@ -36,13 +38,10 @@ private:
 	glm::vec2 m_ViewportSize{800, 600};
 
 	VertexArray m_CircleVao;
-	VertexArray m_QuadVao;
 
 	VertexBuffer m_CircleVbo;
-	VertexBuffer m_QuadVbo;
 
 	IndexBuffer m_CircleIbo;
-	IndexBuffer m_QuadIbo;
 
 	FrameBuffer m_RenderFbo;
 	FrameBuffer m_ResolveFbo;

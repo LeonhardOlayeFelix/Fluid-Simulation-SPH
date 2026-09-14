@@ -1,7 +1,7 @@
 #include "ShaderProgram.h"
 #include <fstream>
 #include <sstream>
-#include "../debug/Log.h"
+#include "../Log.h"
 
 ShaderProgram::ShaderProgram(const std::string& filepath) : m_FilePath(filepath), m_RendererId(0) {
 

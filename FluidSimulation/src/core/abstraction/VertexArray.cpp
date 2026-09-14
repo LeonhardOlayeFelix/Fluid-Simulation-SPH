@@ -1,5 +1,4 @@
 #include "VertexArray.h"
-#include "VertexArray.h"
 
 VertexArray::VertexArray() : m_VBOSize(0), m_Stride(0), m_AttributeIndex(0), m_IndexBuffer(nullptr)
 {

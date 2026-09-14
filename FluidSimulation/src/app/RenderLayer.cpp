@@ -6,19 +6,8 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_CircleVbo = VertexBuffer(circlePrimitive);
     m_CircleIbo = IndexBuffer(circlePrimitive);
 
-    VertexBufferLayout circleVbl;
-    circleVbl.push<float>(3);
-    m_CircleVao.RecordVBOLayout(m_CircleVbo, circleVbl);
+    m_CircleVao.RecordVBOLayout(m_CircleVbo, { 3 });
     m_CircleVao.RecordIndexBuffer(m_CircleIbo);
-
-    Primitive quadPrimitive = Primitives::NDCQuad();
-    m_QuadVbo = VertexBuffer(quadPrimitive);
-    m_QuadIbo = IndexBuffer(quadPrimitive);
-    VertexBufferLayout quadVbl;
-    quadVbl.push<float>(3);
-    quadVbl.push<float>(2);
-    m_QuadVao.RecordVBOLayout(m_QuadVbo, quadVbl);
-    m_QuadVao.RecordIndexBuffer(m_QuadIbo);
 
     m_TestShader = ShaderProgram("resources/shaders/TestShader.shader");
 
