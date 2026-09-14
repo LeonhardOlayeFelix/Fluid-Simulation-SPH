@@ -128,7 +128,10 @@ FrameBuffer::FrameBuffer(FrameBuffer && other) noexcept
 	m_RendererId = other.m_RendererId;
 	m_Width = other.m_Width;
 	m_Height = other.m_Height;
+	m_MSAASamples = other.m_MSAASamples;
 	m_Attachments = std::move(other.m_Attachments);
+	m_DrawBuffers = std::move(other.m_DrawBuffers);
+
 
 	other.m_RendererId = 0;
 }
@@ -142,7 +145,9 @@ FrameBuffer& FrameBuffer::operator=(FrameBuffer && other) noexcept
 	m_RendererId = other.m_RendererId;
 	m_Width = other.m_Width;
 	m_Height = other.m_Height;
+	m_MSAASamples = other.m_MSAASamples;
 	m_Attachments = std::move(other.m_Attachments);
+	m_DrawBuffers = std::move(other.m_DrawBuffers);
 
 	other.m_RendererId = 0;
 
