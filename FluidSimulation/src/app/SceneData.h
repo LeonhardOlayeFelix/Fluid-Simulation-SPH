@@ -5,7 +5,7 @@
 
 struct SceneData
 {
-	float Scale{ 0.1 };
+	float Scale{ 0.5 };
 	unsigned int FramebufferTextureId{};
 	glm::vec2 ViewportSize{};
 };

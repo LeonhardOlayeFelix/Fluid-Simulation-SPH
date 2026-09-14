@@ -8,8 +8,7 @@ VertexBuffer::VertexBuffer(const void* data, size_t size) : m_Size(size)
 
 VertexBuffer::~VertexBuffer()
 {
-    if (m_RendererId != 0)
-        glDeleteBuffers(1, &m_RendererId);
+    if (m_RendererId != 0) glDeleteBuffers(1, &m_RendererId);
 }
 
 VertexBuffer::VertexBuffer(VertexBuffer && other) noexcept

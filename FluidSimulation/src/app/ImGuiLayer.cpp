@@ -22,6 +22,8 @@ void ImGuiLayer::OnRender()
 {
 	BeginFrame();
 
+	ImGuiIO& io = ImGui::GetIO();
+
 	//Docking
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
@@ -43,6 +45,7 @@ void ImGuiLayer::OnRender()
 	ImGui::Text("Window Size: (%d, %d)", width, height);
 	ImGui::Text("Viewport Size: (%g, %g)", m_SceneData->ViewportSize.x, m_SceneData->ViewportSize.y);
 	ImGui::Text("Framebuffer Texture Id: %d", m_SceneData->FramebufferTextureId);
+	ImGui::Text("Application Frame Rate %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 	ImGui::End();
 
 	//Editor
