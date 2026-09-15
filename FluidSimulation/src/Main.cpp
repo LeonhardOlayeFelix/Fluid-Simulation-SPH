@@ -8,8 +8,8 @@ int main()
 {
     ApplicationSpec appSpec;
     appSpec.Title = "Fluid Simulation";
-    appSpec.WinSpec.Width = 800;
-    appSpec.WinSpec.Height = 600;
+    appSpec.WinSpec.Width = 1500;
+    appSpec.WinSpec.Height = 900;
 
     Application app(appSpec);
 

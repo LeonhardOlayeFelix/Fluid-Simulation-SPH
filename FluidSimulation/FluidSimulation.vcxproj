@@ -154,6 +154,9 @@
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
     <ClInclude Include="src\app\Window.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\..\..\..\..\Medal\Edits\Ball_Influenced_by_Gravity3.mp4" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
