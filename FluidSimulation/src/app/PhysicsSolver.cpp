@@ -8,7 +8,7 @@ void PhysicsSolver::AdvanceParticles(std::vector<Particle>& particles, double ti
 
 void PhysicsSolver::AdvanceParticle(Particle& particle, double timeStep, BoundaryData& boundaryConfig)
 {
-	particle.Velocity += (float) timeStep * glm::vec3(Gravity, Gravity, 0);
+	particle.Velocity += (float) timeStep * glm::vec3(0, Gravity, 0);
 	particle.Position += (float) timeStep * particle.Velocity;
 
 	DetectBoundaryCollision(particle, boundaryConfig);
