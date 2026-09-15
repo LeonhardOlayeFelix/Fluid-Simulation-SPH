@@ -90,6 +90,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\app\PhysicsSolver.cpp" />
     <ClCompile Include="src\app\ImGuiLayer.cpp" />
     <ClCompile Include="src\app\RenderLayer.cpp" />
     <ClCompile Include="src\app\Application.cpp" />
@@ -119,6 +120,9 @@
     <ClCompile Include="src\app\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\app\BoundaryData.h" />
+    <ClInclude Include="src\app\Particle.h" />
+    <ClInclude Include="src\app\PhysicsSolver.h" />
     <ClInclude Include="src\app\SceneData.h" />
     <ClInclude Include="src\app\ImGuiLayer.h" />
     <ClInclude Include="src\app\RenderLayer.h" />

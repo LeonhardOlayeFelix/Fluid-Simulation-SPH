@@ -10,6 +10,7 @@
 #include "../core/Layer.h"
 #include "../core/abstraction/Includes.h"
 #include "SceneData.h"
+#include "PhysicsSolver.h"
 
 
 
@@ -35,7 +36,7 @@ private:
 
 private:
 	std::shared_ptr<SceneData> m_SceneData;
-	glm::vec2 m_ViewportSize{800, 600};
+	BoundaryData m_BoundaryConfig;
 
 	VertexArray m_CircleVao;
 

@@ -27,15 +27,15 @@ void Application::Run()
     while (!m_Window->ShouldClose()) {
 
         double timeStep = GetTime() - lastFrame;
+        lastFrame = GetTime();
 
-
-        m_ImGuiLayer->OnUpdate(timeStep);
         m_RenderLayer->OnUpdate(timeStep);
+        m_ImGuiLayer->OnUpdate(timeStep);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        m_ImGuiLayer->OnRender();
         m_RenderLayer->OnRender();
+        m_ImGuiLayer->OnRender();
 
         m_Window->Update();
 
