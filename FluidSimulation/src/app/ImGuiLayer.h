@@ -7,6 +7,7 @@
 #include "../core/Layer.h"
 #include "SceneData.h"
 #include "RenderLayer.h"
+#include "BoundaryData.h"
 
 class ImGuiLayer : public Layer
 {
@@ -26,6 +27,5 @@ private:
 	void BeginFrame();
 	void EndFrame();
 	void Destroy();
-
 };
 

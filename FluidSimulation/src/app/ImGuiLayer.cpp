@@ -50,7 +50,7 @@ void ImGuiLayer::OnRender()
 	//Editor
 	ImGui::Begin("Editor");
 	ImGui::Text("Gravity (px/s²): %g", PhysicsSolver::Gravity);
-	ImGui::Text("Velocity (px/s²): (%g, %g, %g)", m_SceneData->FluidData.Particles[0].Velocity.x, m_SceneData->FluidData.Particles[0].Velocity.y, m_SceneData->FluidData.Particles[0].Velocity.z);
+	ImGui::Text("Velocity (px/s²): (%.5g, %.5g, %.5g)", m_SceneData->FluidData.Particles[0].Velocity.x, m_SceneData->FluidData.Particles[0].Velocity.y, m_SceneData->FluidData.Particles[0].Velocity.z);
 
 	if (ImGui::Button("Reset particle")) {
 		m_SceneData->FluidData.Particles[0].Velocity.y += 400;
