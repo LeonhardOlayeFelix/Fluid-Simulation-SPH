@@ -34,8 +34,8 @@ void Application::Run()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        m_RenderLayer->OnRender();
         m_ImGuiLayer->OnRender();
+        m_RenderLayer->OnRender();
 
         m_Window->Update();
 

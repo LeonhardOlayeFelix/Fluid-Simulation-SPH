@@ -16,23 +16,23 @@ void PhysicsSolver::AdvanceParticle(Particle& particle, double timeStep, Boundar
 
 void PhysicsSolver::DetectBoundaryCollision(Particle& particle, BoundaryData& boundaryConfig)
 {
-	if (particle.Position.y - particle.Radius <= 0.0f)
+	if (particle.Position.y - BallRadius <= 0.0f)
 	{
-		particle.Position.y = particle.Radius;
+		particle.Position.y = BallRadius;
 		particle.Velocity.y = -particle.Velocity.y * CollisionDampingFactor;
 	}
-	else if (particle.Position.y + particle.Radius >= boundaryConfig.ViewportSize.y) {
-		particle.Position.y = boundaryConfig.ViewportSize.y - particle.Radius;
+	else if (particle.Position.y + BallRadius >= boundaryConfig.ViewportSize.y) {
+		particle.Position.y = boundaryConfig.ViewportSize.y - BallRadius;
 		particle.Velocity.y = -particle.Velocity.y * CollisionDampingFactor;
 	}
 
-	if (particle.Position.x - particle.Radius  <= 0.0f)
+	if (particle.Position.x - BallRadius <= 0.0f)
 	{
-		particle.Position.x = particle.Radius;
+		particle.Position.x = BallRadius;
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
-	else if (particle.Position.x + particle.Radius >= boundaryConfig.ViewportSize.x) {
-		particle.Position.x = boundaryConfig.ViewportSize.x - particle.Radius;
+	else if (particle.Position.x + BallRadius >= boundaryConfig.ViewportSize.x) {
+		particle.Position.x = boundaryConfig.ViewportSize.x - BallRadius;
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
 }

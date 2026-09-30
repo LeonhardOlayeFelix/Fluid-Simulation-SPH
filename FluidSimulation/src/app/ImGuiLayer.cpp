@@ -1,6 +1,6 @@
 #include "ImGuiLayer.h"
 #include "Application.h"
-#include "PhysicsSolver.h"
+#include "Physics/PhysicsSolver.h"
 #include "../vendor/imgui/imgui.h"
 #include "../vendor/imgui/imgui_impl_glfw.h"
 #include "../vendor/imgui/imgui_impl_opengl3.h"
@@ -47,15 +47,13 @@ void ImGuiLayer::OnRender()
 	ImGui::Text("Application Frame Rate %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 	ImGui::End();
 
-	//Editor
-	ImGui::Begin("Editor");
-	ImGui::Text("Gravity (px/s²): %g", PhysicsSolver::Gravity);
-	ImGui::Text("Velocity (px/s²): (%.5g, %.5g, %.5g)", m_SceneData->FluidData.Particles[0].Velocity.x, m_SceneData->FluidData.Particles[0].Velocity.y, m_SceneData->FluidData.Particles[0].Velocity.z);
-
-	if (ImGui::Button("Reset particle")) {
-		m_SceneData->FluidData.Particles[0].Velocity.y += 400;
-		m_SceneData->FluidData.Particles[0].Velocity.x += 400;
-	}
+	//Physics Solver Properties
+	ImGui::Begin("Physics Solver Properties");
+	ImGui::SliderFloat("Gravity (px/s²): %g", &PhysicsSolver::Gravity, 0, -1000);
+	ImGui::SliderFloat("Collision Damping Factor: %g", &PhysicsSolver::CollisionDampingFactor, 0, 1);
+	ImGui::SliderFloat("Ball Radius (px): %g", &PhysicsSolver::BallRadius, 0, 500);
+	if (ImGui::Button((m_SceneData->FluidData.SimulationRunning ? "Stop Simulation" : "Begin Simulation")))
+		m_SceneData->FluidData.SimulationRunning = !m_SceneData->FluidData.SimulationRunning;
 	ImGui::End();
 
 

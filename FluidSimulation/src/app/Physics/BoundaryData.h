@@ -5,5 +5,5 @@
 
 
 struct BoundaryData {
-	glm::vec2 ViewportSize{ 800, 600 };
+	glm::vec2 ViewportSize{ };
 };

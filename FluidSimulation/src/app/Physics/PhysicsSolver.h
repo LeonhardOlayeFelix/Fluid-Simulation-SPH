@@ -9,10 +9,12 @@
 class PhysicsSolver {
 public:
 
-	static constexpr float MetersGravity = -9.81;
-	static constexpr float PixelsPerMeter = 50;
-	static constexpr float Gravity = MetersGravity * PixelsPerMeter;
-	static constexpr float CollisionDampingFactor = 0.8;
+	inline static float MetersGravity = -9.81;
+	inline static float PixelsPerMeter = 102;
+	inline static float Gravity = MetersGravity * PixelsPerMeter;
+	inline static float CollisionDampingFactor = 0.6;
+	inline static float BallRadius = 20;
+	inline static constexpr float PI = 3.141592;
 
 	static void AdvanceParticles(std::vector<Particle>& particles, double timeStep, BoundaryData& boundaryConfig);
 	static void AdvanceParticle(Particle& particle, double timeStep, BoundaryData& boundaryConfig);

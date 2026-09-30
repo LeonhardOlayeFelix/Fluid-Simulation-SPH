@@ -1,5 +1,5 @@
 #include "RenderLayer.h"
-#include "PhysicsSolver.h"
+#include "Physics/PhysicsSolver.h"
 
 RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sceneData)
 {
@@ -27,7 +27,8 @@ RenderLayer::~RenderLayer()
 
 void RenderLayer::OnUpdate(double ts)
 {
-    PhysicsSolver::AdvanceParticles(m_SceneData->FluidData.Particles, ts, m_BoundaryConfig);
+    if (m_SceneData->FluidData.SimulationRunning)
+        PhysicsSolver::AdvanceParticles(m_SceneData->FluidData.Particles, ts, m_BoundaryConfig);
 }
 
 
@@ -39,9 +40,9 @@ void RenderLayer::OnRender()
     ReadSceneData();
 
     for (int i = 0; i < m_SceneData->FluidData.Particles.size(); i++) {
-        Particle particle = m_SceneData->FluidData.Particles[i];
+        const Particle& particle = m_SceneData->FluidData.Particles[i];
         glm::mat4 model = glm::translate(glm::mat4(1), particle.Position);
-        model = glm::scale(model, glm::vec3(particle.Radius));
+        model = glm::scale(model, glm::vec3(PhysicsSolver::BallRadius));
 
         m_TestShader.SetUniformMat4f("u_Model", model);
         m_Renderer.DrawElements(m_CircleVao, m_TestShader);
@@ -81,6 +82,30 @@ float RenderLayer::getAspectRatio()
     return (float)m_BoundaryConfig.ViewportSize.x / m_BoundaryConfig.ViewportSize.y;
 }
 
+void RenderLayer::InitialiseParticleData()
+{
+    int numRows = 10;
+    int numCols = 10;
+
+    std::vector<Particle> particles;
+    particles.reserve(numRows * numCols);
+
+    int stepY = m_BoundaryConfig.ViewportSize.y / numRows;
+    int stepX = m_BoundaryConfig.ViewportSize.x / numCols;
+    int offsetY = stepY / 2;
+    int offsetX = stepX / 2;
+    
+
+    for (int row = 0; row < numRows; row++) {
+        for (int col = 0; col < numCols; col++) {
+            particles.emplace_back(glm::vec3{ offsetX + col * stepX, offsetY + row * stepY, 0 }, glm::vec3{});
+        }
+    }
+
+    m_SceneData->FluidData.SetParticles(particles);
+
+}
+
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
     m_BoundaryConfig.ViewportSize = { width, height };
@@ -89,6 +114,7 @@ void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
     m_ResolveFbo.Resize(m_BoundaryConfig.ViewportSize.x, m_BoundaryConfig.ViewportSize.y);
 
     m_TestShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, m_BoundaryConfig.ViewportSize.x, 0.0f, m_BoundaryConfig.ViewportSize.y, -1.0f, 1.0f));
+    if (!m_SceneData->FluidData.SimulationRunning) InitialiseParticleData();
 
     OnRender();
 }

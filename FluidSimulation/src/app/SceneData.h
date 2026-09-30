@@ -3,18 +3,22 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
-#include "PhysicsSolver.h"
-#include "Particle.h"
-#include "BoundaryData.h"
+#include "Physics/PhysicsSolver.h"
+#include "Physics/Particle.h"
+#include "Physics/BoundaryData.h"
 
 struct FluidData{
-	std::vector<Particle> Particles = { Particle({250.0, 250.0}, {0, 400}, 5) };
+	bool SimulationRunning;
+	std::vector<Particle> Particles;
+
+	void SetParticles(std::vector<Particle>& particles);
 };
 
 struct SceneData
 {
 	FluidData FluidData;
 	BoundaryData BoundaryData;
+
 
 	unsigned int FramebufferTextureId{};
 };

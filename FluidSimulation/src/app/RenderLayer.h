@@ -10,7 +10,7 @@
 #include "../core/Layer.h"
 #include "../core/abstraction/Includes.h"
 #include "SceneData.h"
-#include "PhysicsSolver.h"
+#include "Physics/PhysicsSolver.h"
 
 
 
@@ -32,10 +32,11 @@ public:
 
 private:
 	float getAspectRatio();
-
+	void InitialiseParticleData();
 
 private:
 	std::shared_ptr<SceneData> m_SceneData;
+
 	BoundaryData m_BoundaryConfig;
 
 	VertexArray m_CircleVao;
