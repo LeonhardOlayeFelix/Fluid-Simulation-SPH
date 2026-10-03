@@ -60,7 +60,7 @@
     <ClCompile Include="src\core\abstraction\VertexBufferLayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\abstraction\Renderer.cpp">
+    <ClCompile Include="src\core\abstraction\RenderCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\abstraction\Primitives.cpp">
@@ -155,7 +155,7 @@
     <ClInclude Include="src\core\abstraction\VertexBufferLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\abstraction\Renderer.h">
+    <ClInclude Include="src\core\abstraction\RenderCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\abstraction\Primitives.h">

@@ -33,7 +33,7 @@ private:
 	ApplicationSpec m_AppSpec;
 	std::shared_ptr<Window> m_Window;
 	std::shared_ptr<SceneData> m_SceneData;
-	std::shared_ptr<RenderLayer> m_RenderLayer;
+	std::shared_ptr<RenderLayer> m_SPHRenderLayer;
 	std::shared_ptr<ImGuiLayer> m_ImGuiLayer;
 
 	void initLogger();

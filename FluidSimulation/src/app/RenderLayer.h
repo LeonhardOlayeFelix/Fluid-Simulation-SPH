@@ -49,6 +49,5 @@ private:
 	FrameBuffer m_ResolveFbo;
 
 	ShaderProgram m_TestShader;
-	Renderer m_Renderer;
 };
 

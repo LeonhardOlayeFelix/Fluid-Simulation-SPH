@@ -3,7 +3,7 @@
 #include "IndexBuffer.h"
 #include "ShaderProgram.h"
 #include "VertexArray.h"
-#include "Renderer.h"
+#include "RenderCommand.h"
 #include "Primitives.h"
 #include "Texture.h"
 #include "CubeMap.h"

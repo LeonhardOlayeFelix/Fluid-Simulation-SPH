@@ -1,6 +1,6 @@
-#include "Renderer.h"
+#include "RenderCommand.h"
 
-Renderer::Renderer()
+RenderCommand::RenderCommand()
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -9,35 +9,37 @@ Renderer::Renderer()
 	glClearColor(0.1, 0.1, 0.1, 1.0f);
 }
 
-void Renderer::DrawElements(const VertexArray & vao, const ShaderProgram & shader) const
+void RenderCommand::DrawElements(const VertexArray & vao, const ShaderProgram & shader)
 {
 	shader.Bind();
 	vao.Bind();
 	glDrawElements(GL_TRIANGLES, vao.GetIndexBufferCount(), GL_UNSIGNED_INT, nullptr);
 }
 
-void Renderer::DrawElementsInstanced(const VertexArray & vao, const ShaderProgram & shader, int nInstances) const
+void RenderCommand::DrawElementsInstanced(const VertexArray & vao, const ShaderProgram & shader, int nInstances)
 {
 	shader.Bind();
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, vao.GetIndexBufferCount(), GL_UNSIGNED_INT, nullptr, nInstances);
 }
 
-void Renderer::DrawArray(const VertexArray & vao, const ShaderProgram & shader, GLenum mode) const
+void RenderCommand::DrawArray(const VertexArray & vao, const ShaderProgram & shader, GLenum mode)
 {
 	shader.Bind();
 	vao.Bind();
 	glDrawArrays(mode, 0, vao.GetVertexBufferSize() / vao.GetStride());
 }
 
-void Renderer::DrawArrayInstanced(const VertexArray & vao, const ShaderProgram & shader, int nInstances) const
+void RenderCommand::DrawArrayInstanced(const VertexArray & vao, const ShaderProgram & shader, int nInstances)
 {
 	shader.Bind();
 	vao.Bind();
 	glDrawArraysInstanced(GL_TRIANGLES, 0, vao.GetVertexBufferSize() / vao.GetStride(), nInstances);
 }
 
-void Renderer::Clear() const
+void RenderCommand::Clear()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
+
+

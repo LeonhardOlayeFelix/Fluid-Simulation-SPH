@@ -100,7 +100,7 @@
     <ClCompile Include="src\core\abstraction\RenderBuffer.cpp" />
     <ClCompile Include="src\core\abstraction\FrameBuffer.cpp" />
     <ClCompile Include="src\core\abstraction\Primitives.cpp" />
-    <ClCompile Include="src\core\abstraction\Renderer.cpp" />
+    <ClCompile Include="src\core\abstraction\RenderCommand.cpp" />
     <ClCompile Include="src\core\abstraction\IndexBuffer.cpp" />
     <ClCompile Include="src\core\abstraction\ShaderProgram.cpp" />
     <ClCompile Include="src\core\Log.cpp" />
@@ -133,7 +133,7 @@
     <ClInclude Include="src\core\abstraction\RenderBuffer.h" />
     <ClInclude Include="src\core\abstraction\FrameBuffer.h" />
     <ClInclude Include="src\core\abstraction\Primitives.h" />
-    <ClInclude Include="src\core\abstraction\Renderer.h" />
+    <ClInclude Include="src\core\abstraction\RenderCommand.h" />
     <ClInclude Include="src\core\abstraction\IndexBuffer.h" />
     <ClInclude Include="src\core\abstraction\ShaderProgram.h" />
     <ClInclude Include="src\core\abstraction\Includes.h" />
