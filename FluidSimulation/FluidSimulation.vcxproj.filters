@@ -200,7 +200,7 @@
     <ClInclude Include="src\app\Physics\Particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Physics\BoundaryData.h">
+    <ClInclude Include="src\app\Physics\Parameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

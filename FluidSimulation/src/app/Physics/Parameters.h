@@ -3,7 +3,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
-struct BoundaryData {
+struct BoundaryParameters {
 	glm::vec2 ViewportSize{ };
+};
+
+struct FluidParameters {
+	bool SimulationRunning;
+	float SmoothingRadius{ 20 };
 };

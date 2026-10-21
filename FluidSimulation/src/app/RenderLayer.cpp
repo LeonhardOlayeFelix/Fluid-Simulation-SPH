@@ -12,11 +12,11 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
 
     m_TestShader = ShaderProgram("resources/shaders/TestShader.shader");
 
-    m_RenderFbo = FrameBuffer(m_BoundaryConfig.ViewportSize.x, m_BoundaryConfig.ViewportSize.y, 6);
+    m_RenderFbo = FrameBuffer(m_SceneData->BoundaryParameters.ViewportSize.x, m_SceneData->BoundaryParameters.ViewportSize.y, 6);
     m_RenderFbo.AddAttachment(AttachmentTarget::Color, AttachmentStorage::Texture);
     m_RenderFbo.AddAttachment(AttachmentTarget::DepthStencil, AttachmentStorage::RenderBuffer);
 
-    m_ResolveFbo = FrameBuffer(m_BoundaryConfig.ViewportSize.x, m_BoundaryConfig.ViewportSize.y);
+    m_ResolveFbo = FrameBuffer(m_SceneData->BoundaryParameters.ViewportSize.x, m_SceneData->BoundaryParameters.ViewportSize.y);
     m_ResolveFbo.AddAttachment(AttachmentTarget::Color, AttachmentStorage::Texture);
 }
 
@@ -27,8 +27,7 @@ RenderLayer::~RenderLayer()
 
 void RenderLayer::OnUpdate(double ts)
 {
-    if (m_SceneData->FluidData.SimulationRunning)
-        PhysicsSolver::AdvanceParticles(m_SceneData->FluidData.Particles, ts, m_BoundaryConfig);
+    PhysicsSolver::AdvanceParticles(m_SceneData->Particles, ts, m_SceneData->BoundaryParameters, m_SceneData->FluidParameters);
 }
 
 void RenderLayer::OnRender()
@@ -37,11 +36,14 @@ void RenderLayer::OnRender()
 
     ReadSceneData();
 
-    for (int i = 0; i < m_SceneData->FluidData.Particles.size(); i++) {
-        const Particle& particle = m_SceneData->FluidData.Particles[i];
+    int specimenIndex = m_SceneData->Particles.size() / 2;
+
+    for (int i = 0; i < m_SceneData->Particles.size(); i++) {
+        const Particle& particle = m_SceneData->Particles[i];
         glm::mat4 model = glm::translate(glm::mat4(1), particle.Position);
         model = glm::scale(model, glm::vec3(PhysicsSolver::BallRadius));
 
+        m_TestShader.SetUniform1i("u_IsSpecimen", i == specimenIndex ? true : false);
         m_TestShader.SetUniformMat4f("u_Model", model);
         RenderCommand::DrawElements(m_CircleVao, m_TestShader);
     }
@@ -66,7 +68,6 @@ void RenderLayer::EndFrame()
 void RenderLayer::WriteSceneData()
 {
     m_SceneData->FramebufferTextureId = m_ResolveFbo.GetColorTexture().GetId();
-    m_SceneData->BoundaryData = m_BoundaryConfig;
 }
 
 void RenderLayer::ReadSceneData()
@@ -76,7 +77,7 @@ void RenderLayer::ReadSceneData()
 
 float RenderLayer::getAspectRatio()
 {
-    return (float)m_BoundaryConfig.ViewportSize.x / m_BoundaryConfig.ViewportSize.y;
+    return (float)m_SceneData->BoundaryParameters.ViewportSize.x / m_SceneData->BoundaryParameters.ViewportSize.y;
 }
 
 void RenderLayer::InitialiseParticleData()
@@ -87,8 +88,8 @@ void RenderLayer::InitialiseParticleData()
     std::vector<Particle> particles;
     particles.reserve(numRows * numCols);
 
-    int stepY = m_BoundaryConfig.ViewportSize.y / numRows;
-    int stepX = m_BoundaryConfig.ViewportSize.x / numCols;
+    int stepY = m_SceneData->BoundaryParameters.ViewportSize.y / numRows;
+    int stepX = m_SceneData->BoundaryParameters.ViewportSize.x / numCols;
     int offsetY = stepY / 2;
     int offsetX = stepX / 2;
     
@@ -99,19 +100,19 @@ void RenderLayer::InitialiseParticleData()
         }
     }
 
-    m_SceneData->FluidData.SetParticles(particles);
+    m_SceneData->SetParticles(particles);
 
 }
 
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
-    m_BoundaryConfig.ViewportSize = { width, height };
+    m_SceneData->BoundaryParameters.ViewportSize = { width, height };
     glViewport(0, 0, width, height);
     m_RenderFbo.Resize(width, height);
     m_ResolveFbo.Resize(width, height);
 
     m_TestShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
-    if (!m_SceneData->FluidData.SimulationRunning) InitialiseParticleData();
+    if (!m_SceneData->FluidParameters.SimulationRunning) InitialiseParticleData();
 
     OnRender();
 }

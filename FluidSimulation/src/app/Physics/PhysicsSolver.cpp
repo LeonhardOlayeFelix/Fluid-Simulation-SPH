@@ -1,51 +1,58 @@
 #include "PhysicsSolver.h"
 #include "Particle.h"
 
-void PhysicsSolver::AdvanceParticles(std::vector<Particle>& particles, double timeStep, BoundaryData& boundaryConfig)
+void PhysicsSolver::AdvanceParticles(std::vector<Particle>& particles, double timeStep, BoundaryParameters& boundaryParameters, FluidParameters& fluidParameters)
 {
-	//UpdateParticleDensities(particles, parameters);
+	UpdateParticleDensities(particles, fluidParameters.SmoothingRadius);
 
-	for (Particle& particle : particles) AdvanceParticle(particle, timeStep, boundaryConfig);
+	if (fluidParameters.SimulationRunning)
+		for (Particle& particle : particles) AdvanceParticle(particle, timeStep, boundaryParameters);
 }
 
-void PhysicsSolver::AdvanceParticle(Particle& particle, double timeStep, BoundaryData& boundaryConfig)
+void PhysicsSolver::AdvanceParticle(Particle& particle, double timeStep, BoundaryParameters& boundaryParameters)
 {
 	particle.Velocity += (float) timeStep * glm::vec3(0, Gravity, 0);
 	particle.Position += (float) timeStep * particle.Velocity;
 
-	DetectBoundaryCollision(particle, boundaryConfig);
+	DetectBoundaryCollision(particle, boundaryParameters);
 }
 
-void PhysicsSolver::UpdateParticleDensities(std::vector<Particle>& particles)
+void PhysicsSolver::UpdateParticleDensities(std::vector<Particle>& particles, float h)
 {
+	float h2 = h * h;
+	float h8 = h2 * h2 * h2 * h2;
+	float poly6Coeff = 4.0f / (PI * h8);
+
 	for (int i = 0; i < particles.size(); i++) {
 		Particle& source = particles[i];
 		source.Density = 0;
 		for (int j = 0; j < particles.size(); j++) {
 			const Particle& neighbour = particles[j];
-			float r = glm::length(source.Position - neighbour.Position);
-			float smoothingFactor = DensityKernel2d(r, 20);
-			float volumeFactor = neighbour.Mass;
-			source.Density += smoothingFactor * volumeFactor;
 
+			glm::vec3 d = source.Position - neighbour.Position;
+			float r2 = glm::dot(d, d);
+
+			source.Density += neighbour.Mass * poly6Kernel(r2, h2, poly6Coeff);
 		}
 	}
 }
 
-float PhysicsSolver::DensityKernel2d(float r, float h)
+float PhysicsSolver::poly6Kernel(float r2, float h2, float coeff)
 {
-	return 0.0f;
+	if (r2 >= h2) return 0.0f;
+	float diff = h2 - r2;
+	return coeff * diff * diff * diff;
 }
 
-void PhysicsSolver::DetectBoundaryCollision(Particle& particle, BoundaryData& boundaryConfig)
+void PhysicsSolver::DetectBoundaryCollision(Particle& particle, BoundaryParameters& boundaryParameters)
 {
 	if (particle.Position.y - BallRadius <= 0.0f)
 	{
 		particle.Position.y = BallRadius;
 		particle.Velocity.y = -particle.Velocity.y * CollisionDampingFactor;
 	}
-	else if (particle.Position.y + BallRadius >= boundaryConfig.ViewportSize.y) {
-		particle.Position.y = boundaryConfig.ViewportSize.y - BallRadius;
+	else if (particle.Position.y + BallRadius >= boundaryParameters.ViewportSize.y) {
+		particle.Position.y = boundaryParameters.ViewportSize.y - BallRadius;
 		particle.Velocity.y = -particle.Velocity.y * CollisionDampingFactor;
 	}
 
@@ -54,8 +61,8 @@ void PhysicsSolver::DetectBoundaryCollision(Particle& particle, BoundaryData& bo
 		particle.Position.x = BallRadius;
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
-	else if (particle.Position.x + BallRadius >= boundaryConfig.ViewportSize.x) {
-		particle.Position.x = boundaryConfig.ViewportSize.x - BallRadius;
+	else if (particle.Position.x + BallRadius >= boundaryParameters.ViewportSize.x) {
+		particle.Position.x = boundaryParameters.ViewportSize.x - BallRadius;
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
 }

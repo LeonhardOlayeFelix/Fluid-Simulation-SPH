@@ -36,8 +36,6 @@ private:
 private:
 	std::shared_ptr<SceneData> m_SceneData;
 
-	BoundaryData m_BoundaryConfig;
-
 	VertexArray m_CircleVao;
 
 	VertexBuffer m_CircleVbo;

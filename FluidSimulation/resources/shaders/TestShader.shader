@@ -16,7 +16,16 @@ void main()
 
 layout(location = 0) out vec4 color;
 
+uniform bool u_IsSpecimen;
+
 void main()
 {
-	color = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+	if (u_IsSpecimen)
+	{
+		color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	else
+	{
+		color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
 }

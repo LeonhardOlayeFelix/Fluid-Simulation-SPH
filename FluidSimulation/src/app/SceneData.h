@@ -5,27 +5,20 @@
 #include <vector>
 #include "Physics/PhysicsSolver.h"
 #include "Physics/Particle.h"
-#include "Physics/BoundaryData.h"
+#include "Physics/Parameters.h"
 
-struct FluidData{
-	//Fluid Parameters
-	bool SimulationRunning;
-	float SmoothingRadius{ 20 };
-
-
-	//Objects
-	std::vector<Particle> Particles;
-
-
-	void SetParticles(std::vector<Particle>& particles);
-};
 
 struct SceneData
 {
-	FluidData FluidData;
-	BoundaryData BoundaryData;
+	FluidParameters FluidParameters;
 
+	BoundaryParameters BoundaryParameters;
 
 	unsigned int FramebufferTextureId{};
+
+	std::vector<Particle> Particles;
+
+	void SetParticles(std::vector<Particle>& particles);
+
 };
 
