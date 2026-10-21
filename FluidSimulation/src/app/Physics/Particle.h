@@ -10,7 +10,7 @@ struct Particle {
 	glm::vec3 Velocity{};
 	float Density{ 0 };
 
-	float Mass{ 10 };
+	float Mass{ 100 };
 
 	Particle() = default;
 

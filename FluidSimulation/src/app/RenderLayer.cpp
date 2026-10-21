@@ -136,6 +136,18 @@ int RenderLayer::randomInt(int min, int max)
     return dist(rng);
 }
 
+int RenderLayer::randomIntNormal(int min, int max)
+{
+    static std::mt19937 rng(std::random_device{}());
+    float mean = 0.5f * (min + max);
+    float stddev = (max - min) / 9.0f;
+    std::normal_distribution<float> dist(mean, stddev);
+    int value = (int)std::round(dist(rng));
+    return std::clamp(value, min, max);
+}
+
+
+
 void RenderLayer::randomiseParticleData()
 {
     int count = 225;
@@ -145,8 +157,8 @@ void RenderLayer::randomiseParticleData()
 
     for (int i = 0; i < count; i++)
     {
-        int xPos = randomInt(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x);
-        int yPos = randomInt(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y);
+        int xPos = randomIntNormal(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x);
+        int yPos = randomIntNormal(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y);
 
         particles.emplace_back(glm::vec3{ xPos, yPos, 0 }, glm::vec3{});
     }

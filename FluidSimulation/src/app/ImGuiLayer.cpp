@@ -47,23 +47,25 @@ void ImGuiLayer::OnRender()
 	ImGui::Text("Application Frame Rate %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 	ImGui::End();
 
-	//Physics Solver Properties
+	//Simulation Properties
 	int specimenIndex = m_SceneData->PhysicsState->Particles.size() / 2;
 
 	ImGui::Begin("Physics Solver Properties");
 	ImGui::SliderFloat("Collision Damping Factor: %g", &PhysicsSolver::CollisionDampingFactor, 0, 1);
 	ImGui::SliderFloat("Ball Radius (px): %g", &PhysicsSolver::BallRadius, 0, 500);
 	ImGui::SliderFloat("Smoothing Radius (h): %g", &m_SceneData->PhysicsState->FluidParameters.SmoothingRadius, 0, 1000);
-
 	ImGui::SliderInt("Num rows", &m_SceneData->numRows, 1, 30);
 	ImGui::SliderInt("Num cols", &m_SceneData->numCols, 1, 30);
 
-	ImGui::InputFloat("Specimen Density", &m_SceneData->PhysicsState->Particles[specimenIndex].Density, 0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
 	ImGui::SliderFloat3("Specimen Position", glm::value_ptr(m_SceneData->PhysicsState->Particles[specimenIndex].Position), 0, 1000);
-
 
 	if (ImGui::Button((m_SceneData->PhysicsState->FluidParameters.SimulationRunning ? "Stop Simulation" : "Begin Simulation")))
 		m_SceneData->PhysicsState->FluidParameters.SimulationRunning = !m_SceneData->PhysicsState->FluidParameters.SimulationRunning;
+	ImGui::End();
+
+	//Field Properties
+	ImGui::Begin("Field Values");
+	ImGui::InputFloat("Specimen Density", &m_SceneData->PhysicsState->Particles[specimenIndex].Density, 0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
 	ImGui::End();
 
 

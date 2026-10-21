@@ -33,6 +33,7 @@ private:
 	void gridParticleData();
 	void randomiseParticleData();
 	int randomInt(int min, int max);
+	int randomIntNormal(int min, int max);
 
 private:
 	std::shared_ptr<SceneData> m_SceneData;
