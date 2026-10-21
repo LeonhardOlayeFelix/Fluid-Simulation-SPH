@@ -18,6 +18,8 @@ public:
 
 	static void AdvanceParticles(std::vector<Particle>& particles, double timeStep, BoundaryData& boundaryConfig);
 	static void AdvanceParticle(Particle& particle, double timeStep, BoundaryData& boundaryConfig);
+	static void UpdateParticleDensities(std::vector<Particle>& particles);
+	static float DensityKernel2d(float r, float h);
 	static void DetectBoundaryCollision(Particle& particle, BoundaryData& boundaryConfig);
 };
 

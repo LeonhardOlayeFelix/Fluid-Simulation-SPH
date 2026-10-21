@@ -8,8 +8,14 @@
 #include "Physics/BoundaryData.h"
 
 struct FluidData{
+	//Fluid Parameters
 	bool SimulationRunning;
+	float SmoothingRadius{ 20 };
+
+
+	//Objects
 	std::vector<Particle> Particles;
+
 
 	void SetParticles(std::vector<Particle>& particles);
 };

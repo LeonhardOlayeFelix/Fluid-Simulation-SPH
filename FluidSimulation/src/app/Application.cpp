@@ -15,6 +15,7 @@ Application::Application(ApplicationSpec appSpec) : m_AppSpec(appSpec)
     initLogger();
     initWindow();
     initImGui();
+
     m_SceneData = std::make_shared<SceneData>();
     m_SPHRenderLayer = std::make_shared<RenderLayer>(m_SceneData);
     m_ImGuiLayer = std::make_shared<ImGuiLayer>(m_SceneData, m_SPHRenderLayer);

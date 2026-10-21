@@ -52,6 +52,8 @@ void ImGuiLayer::OnRender()
 	ImGui::SliderFloat("Gravity (px/s²): %g", &PhysicsSolver::Gravity, 0, -1000);
 	ImGui::SliderFloat("Collision Damping Factor: %g", &PhysicsSolver::CollisionDampingFactor, 0, 1);
 	ImGui::SliderFloat("Ball Radius (px): %g", &PhysicsSolver::BallRadius, 0, 500);
+	ImGui::SliderFloat("Smoothing Radius (h)", &m_SceneData->FluidData.SmoothingRadius, 0, 50);
+
 	if (ImGui::Button((m_SceneData->FluidData.SimulationRunning ? "Stop Simulation" : "Begin Simulation")))
 		m_SceneData->FluidData.SimulationRunning = !m_SceneData->FluidData.SimulationRunning;
 	ImGui::End();

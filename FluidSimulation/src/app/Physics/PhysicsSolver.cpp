@@ -3,6 +3,8 @@
 
 void PhysicsSolver::AdvanceParticles(std::vector<Particle>& particles, double timeStep, BoundaryData& boundaryConfig)
 {
+	//UpdateParticleDensities(particles, parameters);
+
 	for (Particle& particle : particles) AdvanceParticle(particle, timeStep, boundaryConfig);
 }
 
@@ -12,6 +14,27 @@ void PhysicsSolver::AdvanceParticle(Particle& particle, double timeStep, Boundar
 	particle.Position += (float) timeStep * particle.Velocity;
 
 	DetectBoundaryCollision(particle, boundaryConfig);
+}
+
+void PhysicsSolver::UpdateParticleDensities(std::vector<Particle>& particles)
+{
+	for (int i = 0; i < particles.size(); i++) {
+		Particle& source = particles[i];
+		source.Density = 0;
+		for (int j = 0; j < particles.size(); j++) {
+			const Particle& neighbour = particles[j];
+			float r = glm::length(source.Position - neighbour.Position);
+			float smoothingFactor = DensityKernel2d(r, 20);
+			float volumeFactor = neighbour.Mass;
+			source.Density += smoothingFactor * volumeFactor;
+
+		}
+	}
+}
+
+float PhysicsSolver::DensityKernel2d(float r, float h)
+{
+	return 0.0f;
 }
 
 void PhysicsSolver::DetectBoundaryCollision(Particle& particle, BoundaryData& boundaryConfig)
