@@ -13,7 +13,7 @@ public:
 	inline static float PixelsPerMeter = 102;
 	inline static float Gravity = MetersGravity * PixelsPerMeter;
 	inline static float CollisionDampingFactor = 0.6;
-	inline static float BallRadius = 5;
+	inline static float BallRadius = 2.5;
 	inline static constexpr float PI = 3.141592;
 
 	PhysicsSolver(std::shared_ptr<PhysicsState> physicsState);

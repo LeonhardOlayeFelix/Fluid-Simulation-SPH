@@ -30,9 +30,9 @@ public:
 
 private:
 	float getAspectRatio();
-	void InitialiseParticleData();
-	int RandomInt(int min, int max);
-	void RandomiseParticleData();
+	void gridParticleData();
+	void randomiseParticleData();
+	int randomInt(int min, int max);
 
 private:
 	std::shared_ptr<SceneData> m_SceneData;

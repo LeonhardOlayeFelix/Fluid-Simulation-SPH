@@ -72,20 +72,7 @@ void RenderLayer::OnRender()
             m_BallShader.SetUniformMat4f("u_Model", model);
             RenderCommand::DrawElements(m_CircleVao, m_BallShader);
         }
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
     WriteSceneData();
 
     EndFrame();
@@ -119,10 +106,10 @@ float RenderLayer::getAspectRatio()
     return (float)m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x / m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y;
 }
 
-void RenderLayer::InitialiseParticleData()
+void RenderLayer::gridParticleData()
 {
-    int numRows = 10;
-    int numCols = 10;
+    int numRows = m_SceneData->numRows;
+    int numCols = m_SceneData->numRows;
 
     std::vector<Particle> particles;
     particles.reserve(numRows * numCols);
@@ -142,24 +129,24 @@ void RenderLayer::InitialiseParticleData()
 
 }
 
-int RenderLayer::RandomInt(int min, int max)
+int RenderLayer::randomInt(int min, int max)
 {
     static std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> dist(min, max);
     return dist(rng);
 }
 
-void RenderLayer::RandomiseParticleData()
+void RenderLayer::randomiseParticleData()
 {
-    int count = 200;
+    int count = 225;
 
     std::vector<Particle> particles;
     particles.reserve(count);
 
     for (int i = 0; i < count; i++)
     {
-        int xPos = RandomInt(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x);
-        int yPos = RandomInt(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y);
+        int xPos = randomInt(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x);
+        int yPos = randomInt(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y);
 
         particles.emplace_back(glm::vec3{ xPos, yPos, 0 }, glm::vec3{});
     }
@@ -177,7 +164,7 @@ void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 
     m_BallShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
     m_KernelShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
-    if (!m_SceneData->PhysicsState->FluidParameters.SimulationRunning) RandomiseParticleData();
+    if (!m_SceneData->PhysicsState->FluidParameters.SimulationRunning) gridParticleData();
 
     OnRender();
 }

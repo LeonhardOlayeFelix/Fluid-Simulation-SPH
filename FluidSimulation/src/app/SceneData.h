@@ -11,6 +11,10 @@ struct SceneData
 
 	std::shared_ptr<PhysicsState> PhysicsState;
 
+	int numRows = 10;
+	int numCols = 10;
+
+
 	SceneData();
 };
 

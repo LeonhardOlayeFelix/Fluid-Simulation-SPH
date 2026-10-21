@@ -21,7 +21,11 @@ uniform bool u_WithinRadius;
 
 void main()
 {
-	if (u_IsSpecimen || u_WithinRadius)
+	if (u_IsSpecimen)
+	{
+		color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else if (u_WithinRadius)
 	{
 		color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	}

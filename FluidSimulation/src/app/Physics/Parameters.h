@@ -9,5 +9,5 @@ struct BoundaryParameters {
 
 struct FluidParameters {
 	bool SimulationRunning;
-	float SmoothingRadius{ 20 };
+	float SmoothingRadius{ 200 };
 };

@@ -14,10 +14,6 @@ void PhysicsSolver::AdvanceParticles(double timeStep)
 {
 	UpdateParticleDensities(m_PhysicsState->FluidParameters.SmoothingRadius);
 
-
-
-
-
 	if (m_PhysicsState->FluidParameters.SimulationRunning)
 	{
 		for (Particle& particle : m_PhysicsState->Particles)

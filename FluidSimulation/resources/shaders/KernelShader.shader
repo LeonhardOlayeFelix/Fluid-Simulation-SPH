@@ -22,11 +22,22 @@ layout(location = 0) out vec4 color;
 
 in vec3 v_Position;
 
+float poly6Alpha(float d)
+{
+	float d2 = d * d;
+	float c = (1 - d2);
+	return c * c * c;
+}
+
 void main()
 {
-	float alpha = 0.5f;
-	if (length(v_Position) > 1)
+	float len = length(v_Position);
+
+	if (len > 1)
 		discard;
 
-	color = vec4(1.0, 1.0, 1.0, alpha);
+	if (0.98 < len  && len < 1)
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+	else
+		color = vec4(1.0, 1.0, 1.0, poly6Alpha(len));
 }

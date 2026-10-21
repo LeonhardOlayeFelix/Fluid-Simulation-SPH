@@ -51,10 +51,13 @@ void ImGuiLayer::OnRender()
 	int specimenIndex = m_SceneData->PhysicsState->Particles.size() / 2;
 
 	ImGui::Begin("Physics Solver Properties");
-	ImGui::SliderFloat("Gravity (px/s²): %g", &PhysicsSolver::Gravity, 0, -1000);
 	ImGui::SliderFloat("Collision Damping Factor: %g", &PhysicsSolver::CollisionDampingFactor, 0, 1);
 	ImGui::SliderFloat("Ball Radius (px): %g", &PhysicsSolver::BallRadius, 0, 500);
 	ImGui::SliderFloat("Smoothing Radius (h): %g", &m_SceneData->PhysicsState->FluidParameters.SmoothingRadius, 0, 1000);
+
+	ImGui::SliderInt("Num rows", &m_SceneData->numRows, 1, 30);
+	ImGui::SliderInt("Num cols", &m_SceneData->numCols, 1, 30);
+
 	ImGui::InputFloat("Specimen Density", &m_SceneData->PhysicsState->Particles[specimenIndex].Density, 0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
 	ImGui::SliderFloat3("Specimen Position", glm::value_ptr(m_SceneData->PhysicsState->Particles[specimenIndex].Position), 0, 1000);
 

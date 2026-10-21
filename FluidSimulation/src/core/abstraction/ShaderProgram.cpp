@@ -142,7 +142,9 @@ unsigned int ShaderProgram::CompileShader(unsigned int type, const std::string& 
 
         glGetShaderInfoLog(shader, length, &length, message);
 
-        SPHERROR("Failed to compile shader!");
+        SPHERROR(std::string("Failed to compile ")
+            + (type == GL_VERTEX_SHADER ? "vertex" : type == GL_FRAGMENT_SHADER ? "fragment" : "geometry")
+            + " shader:\n" + message);
 
         glDeleteShader(shader);
         return 0;
