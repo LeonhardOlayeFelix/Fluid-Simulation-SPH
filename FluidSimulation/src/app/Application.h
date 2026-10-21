@@ -8,6 +8,7 @@
 #include "Window.h"
 #include "RenderLayer.h"
 #include "ImGuiLayer.h"
+#include "Physics/PhysicsSystem.h"
 
 struct ApplicationSpec {
 	std::string Title;
@@ -32,7 +33,9 @@ private:
 
 	ApplicationSpec m_AppSpec;
 	std::shared_ptr<Window> m_Window;
+
 	std::shared_ptr<SceneData> m_SceneData;
+	std::shared_ptr<PhysicsSystem> m_PhysicsSystem;
 	std::shared_ptr<RenderLayer> m_SPHRenderLayer;
 	std::shared_ptr<ImGuiLayer> m_ImGuiLayer;
 

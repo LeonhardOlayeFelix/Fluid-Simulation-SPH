@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="src\app\Physics\PhysicsSolver.cpp" />
     <ClCompile Include="src\app\ImGuiLayer.cpp" />
+    <ClCompile Include="src\app\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\app\RenderLayer.cpp" />
     <ClCompile Include="src\app\Application.cpp" />
     <ClCompile Include="src\app\SceneData.cpp" />
@@ -124,6 +125,8 @@
     <ClInclude Include="src\app\Physics\Parameters.h" />
     <ClInclude Include="src\app\Physics\Particle.h" />
     <ClInclude Include="src\app\Physics\PhysicsSolver.h" />
+    <ClInclude Include="src\app\Physics\PhysicsState.h" />
+    <ClInclude Include="src\app\Physics\PhysicsSystem.h" />
     <ClInclude Include="src\app\SceneData.h" />
     <ClInclude Include="src\app\ImGuiLayer.h" />
     <ClInclude Include="src\app\RenderLayer.h" />

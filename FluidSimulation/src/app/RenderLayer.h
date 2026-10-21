@@ -10,7 +10,6 @@
 #include "../core/Layer.h"
 #include "../core/abstraction/Includes.h"
 #include "SceneData.h"
-#include "Physics/PhysicsSolver.h"
 
 
 class RenderLayer : public Layer
@@ -32,19 +31,25 @@ public:
 private:
 	float getAspectRatio();
 	void InitialiseParticleData();
+	int RandomInt(int min, int max);
+	void RandomiseParticleData();
 
 private:
 	std::shared_ptr<SceneData> m_SceneData;
 
 	VertexArray m_CircleVao;
+	VertexArray m_QuadVao;
 
 	VertexBuffer m_CircleVbo;
+	VertexBuffer m_QuadVbo;
 
 	IndexBuffer m_CircleIbo;
+	IndexBuffer m_QuadIbo;
 
 	FrameBuffer m_RenderFbo;
 	FrameBuffer m_ResolveFbo;
 
-	ShaderProgram m_TestShader;
+	ShaderProgram m_BallShader;
+	ShaderProgram m_KernelShader;
 };
 

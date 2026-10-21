@@ -1,6 +1,7 @@
 #include "SceneData.h"
 
-void SceneData::SetParticles(std::vector<Particle>& particles)
+SceneData::SceneData()
+	: PhysicsState(std::make_shared<::PhysicsState>())
 {
-	Particles = std::move(particles);
+
 }

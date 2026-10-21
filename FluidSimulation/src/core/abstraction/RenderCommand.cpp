@@ -6,7 +6,7 @@ RenderCommand::RenderCommand()
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
-	glClearColor(0.1, 0.1, 0.1, 1.0f);
+	glClearColor(0.5, 0.5, 0.5, 1.0f);
 }
 
 void RenderCommand::DrawElements(const VertexArray & vao, const ShaderProgram & shader)

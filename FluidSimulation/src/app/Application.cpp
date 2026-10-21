@@ -17,6 +17,7 @@ Application::Application(ApplicationSpec appSpec) : m_AppSpec(appSpec)
     initImGui();
 
     m_SceneData = std::make_shared<SceneData>();
+    m_PhysicsSystem = std::make_shared<PhysicsSystem>(m_SceneData->PhysicsState, 1.0 / 60.0);
     m_SPHRenderLayer = std::make_shared<RenderLayer>(m_SceneData);
     m_ImGuiLayer = std::make_shared<ImGuiLayer>(m_SceneData, m_SPHRenderLayer);
 }
@@ -30,6 +31,7 @@ void Application::Run()
         double timeStep = GetTime() - lastFrame;
         lastFrame = GetTime();
 
+        m_PhysicsSystem->OnUpdate(timeStep);
         m_SPHRenderLayer->OnUpdate(timeStep);
         m_ImGuiLayer->OnUpdate(timeStep);
 
