@@ -53,19 +53,32 @@ void ImGuiLayer::OnRender()
 	ImGui::Begin("Physics Solver Properties");
 	ImGui::SliderFloat("Collision Damping Factor: %g", &PhysicsSolver::CollisionDampingFactor, 0, 1);
 	ImGui::SliderFloat("Ball Radius (px): %g", &PhysicsSolver::BallRadius, 0, 500);
-	ImGui::SliderFloat("Smoothing Radius (h): %g", &m_SceneData->PhysicsState->FluidParameters.SmoothingRadius, 0, 1000);
 	ImGui::SliderInt("Num rows", &m_SceneData->numRows, 1, 30);
 	ImGui::SliderInt("Num cols", &m_SceneData->numCols, 1, 30);
-
+	ImGui::SliderInt("Count", &m_SceneData->count, 1, 200);
+	
 	ImGui::SliderFloat3("Specimen Position", glm::value_ptr(m_SceneData->PhysicsState->Particles[specimenIndex].Position), 0, 1000);
 
 	if (ImGui::Button((m_SceneData->PhysicsState->FluidParameters.SimulationRunning ? "Stop Simulation" : "Begin Simulation")))
 		m_SceneData->PhysicsState->FluidParameters.SimulationRunning = !m_SceneData->PhysicsState->FluidParameters.SimulationRunning;
+
+	ImGui::End();
+
+	ImGui::Begin("Kernel Settings");
+	ImGui::Checkbox("Show Kernel", &m_SceneData->showKernel);
+	ImGui::Checkbox("Show Density Gradient", &m_SceneData->showDensityGradient);
+	if (m_SceneData->showDensityGradient)
+		ImGui::Checkbox("Negate Gradient", &m_SceneData->flipDensityGradient);
+	ImGui::SliderFloat("Smoothing Radius (h): %g", &m_SceneData->PhysicsState->FluidParameters.SmoothingRadius, 0, 1000);
+	ImGui::SliderInt("Arrow Length", &m_SceneData->ArrowLengthMax, 1, 100);
+	ImGui::SliderInt("Arrow Width", &m_SceneData->ArrowWidth, 1, 10);
+
 	ImGui::End();
 
 	//Field Properties
 	ImGui::Begin("Field Values");
 	ImGui::InputFloat("Specimen Density", &m_SceneData->PhysicsState->Particles[specimenIndex].Density, 0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
+	ImGui::InputFloat3("Specimen Density Gradient", glm::value_ptr(m_SceneData->PhysicsState->Particles[specimenIndex].DensityGradient), "%.3f", ImGuiInputTextFlags_ReadOnly);
 	ImGui::End();
 
 

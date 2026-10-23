@@ -13,7 +13,7 @@ public:
 	inline static float PixelsPerMeter = 102;
 	inline static float Gravity = MetersGravity * PixelsPerMeter;
 	inline static float CollisionDampingFactor = 0.6;
-	inline static float BallRadius = 2.5;
+	inline static float BallRadius = 3.2;
 	inline static constexpr float PI = 3.141592;
 
 	PhysicsSolver(std::shared_ptr<PhysicsState> physicsState);
@@ -21,12 +21,14 @@ public:
 	void Update(double timeStep);
 
 	static float poly6Kernel(float r2, float h2, float coeff);
+	static glm::vec3 poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff);
 
 private:
 	std::shared_ptr<PhysicsState> m_PhysicsState;
 
 	void AdvanceParticles(double timeStep);
 	void UpdateParticleDensities(float smoothingRadius);
+	void UpdateParticleDensityGradients(float smoothingRadius);
 	void DetectBoundaryCollision(Particle& particle);
 };
 

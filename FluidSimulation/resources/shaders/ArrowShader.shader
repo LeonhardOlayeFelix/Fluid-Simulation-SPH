@@ -2,6 +2,7 @@
 #version 450 core
 
 layout(location = 0) in vec3 a_Position;
+layout(location = 1) in vec2 a_TexCoord;
 
 uniform mat4 u_Model;
 uniform mat4 u_Proj;
@@ -16,21 +17,7 @@ void main()
 
 layout(location = 0) out vec4 color;
 
-uniform bool u_IsSpecimen;
-uniform bool u_WithinRadius;
-
 void main()
 {
-	if (u_IsSpecimen)
-	{
-		color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	}
-	else if (u_WithinRadius)
-	{
-		color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
-	}
-	else
-	{
-		color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	}
+	color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
 }

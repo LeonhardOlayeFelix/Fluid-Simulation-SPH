@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="src\app\Physics\PhysicsSolver.cpp" />
     <ClCompile Include="src\app\ImGuiLayer.cpp" />
+    <ClCompile Include="src\app\Physics\PhysicsState.cpp" />
     <ClCompile Include="src\app\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\app\RenderLayer.cpp" />
     <ClCompile Include="src\app\Application.cpp" />

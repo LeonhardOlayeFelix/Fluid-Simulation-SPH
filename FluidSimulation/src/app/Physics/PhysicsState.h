@@ -13,4 +13,13 @@ struct PhysicsState
 	BoundaryParameters BoundaryParameters;
 
 	PhysicsState() = default;
+
+    void RandomiseParticleData(int count);
+    void GridParticleData(int numRows, int numCols);
+    
+
+private:
+	
+    int randomInt(int min, int max);
+	int randomIntNormal(int min, int max);
 };

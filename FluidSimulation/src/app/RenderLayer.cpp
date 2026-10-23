@@ -16,8 +16,10 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_QuadVao.RecordVBOLayout(m_QuadVbo, {3, 2});
     m_QuadVao.RecordIndexBuffer(m_QuadIbo);
 
-    m_BallShader = ShaderProgram("resources/shaders/BallShader.shader");
-    m_KernelShader = ShaderProgram("resources/shaders/KernelShader.shader");
+    m_DefaultBallShader = ShaderProgram("resources/shaders/DefaultBallShader.shader");
+    m_KernelBallShader = ShaderProgram("resources/shaders/KernelBallShader.shader");
+    m_KernelRadiusShader = ShaderProgram("resources/shaders/KernelSmoothingRadiusShader.shader");
+    m_ArrowShader = ShaderProgram("resources/shaders/ArrowShader.shader");
 
     m_RenderFbo = FrameBuffer(m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y, 6);
     m_RenderFbo.AddAttachment(AttachmentTarget::Color, AttachmentStorage::Texture);
@@ -43,39 +45,93 @@ void RenderLayer::OnRender()
 
     ReadSceneData();
 
-    const std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
+    std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
+    float h = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
 
     int specimenIndex = particles.size() == 0 ? -1 : particles.size() / 2;
 
-    if (!(specimenIndex == -1)) {
-        const Particle& specimen = particles[specimenIndex];
-        float h = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
-        float h2 = h * h;
+    if (specimenIndex == -1) return;
 
-        //draw smoothing radius
-        glm::mat4 model = glm::translate(glm::mat4(1), specimen.Position);
-        model = glm::scale(model, glm::vec3(h, h, 1));
-        m_KernelShader.SetUniformMat4f("u_Model", model);
-        RenderCommand::DrawElements(m_QuadVao, m_KernelShader);
+    Particle& specimen = particles[specimenIndex];
 
-        //draw balls
-        for (int i = 0; i < m_SceneData->PhysicsState->Particles.size(); i++) {
-            const Particle& particle = m_SceneData->PhysicsState->Particles[i];
-            glm::mat4 model = glm::translate(glm::mat4(1), particle.Position);
-            model = glm::scale(model, glm::vec3(PhysicsSolver::BallRadius));
+    float h2 = h * h;
 
-            glm::vec3 d = particle.Position - specimen.Position;
-            float r2 = glm::dot(d, d);
+    if (m_SceneData->showKernel)
+        DrawKernelRadius(specimen, h);
 
-            m_BallShader.SetUniform1i("u_IsSpecimen", i == specimenIndex ? true : false);
-            m_BallShader.SetUniform1i("u_WithinRadius", r2 <= h2);
-            m_BallShader.SetUniformMat4f("u_Model", model);
-            RenderCommand::DrawElements(m_CircleVao, m_BallShader);
+
+    if (m_SceneData->showDensityGradient) 
+    {
+        float MaxDensityGradientLength = 0;
+
+        for (const Particle& particle : particles) {
+            MaxDensityGradientLength = std::max(MaxDensityGradientLength, glm::length(particle.DensityGradient));
         }
+
+        for (const Particle& particle : particles) {
+            DrawDensityGradient(particle, MaxDensityGradientLength);
+        }
+
     }
+
+
+    DrawParticles(specimen, specimenIndex, h);
+
     WriteSceneData();
 
     EndFrame();
+}
+
+void RenderLayer::DrawKernelRadius(const Particle& specimen, float h)
+{
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), specimen.Position);
+    model = glm::scale(model, glm::vec3(h, h, 1.0f));
+
+    m_KernelRadiusShader.SetUniformMat4f("u_Model", model);
+    RenderCommand::DrawElements(m_QuadVao, m_KernelRadiusShader);
+}
+
+void RenderLayer::DrawDensityGradient(const Particle& specimen, float MaxDensityGradientLength)
+{
+    const glm::vec3& g = specimen.DensityGradient;
+    if (glm::dot(g, g) < 1e-12f) return;
+
+    float length = m_SceneData->ArrowLengthMax * glm::length(specimen.DensityGradient) / MaxDensityGradientLength;
+    float width = (float)m_SceneData->ArrowWidth;
+
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(specimen.Position.x, specimen.Position.y, 0.0f));
+    float angle = std::atan2(g.y, g.x) + (m_SceneData->flipDensityGradient ? glm::pi<float>() : 0.0f);
+    model = glm::rotate(model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::translate(model, glm::vec3(length / 2.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(length / 2.0f, width / 2.0f, 1.0f));
+
+    m_ArrowShader.SetUniformMat4f("u_Model", model);
+    RenderCommand::DrawElements(m_QuadVao, m_ArrowShader);
+}
+
+void RenderLayer::DrawParticles(const Particle& specimen, int specimenIndex, float h)
+{
+    const float h2 = h * h;
+    const bool showKernel = m_SceneData->showKernel;
+    ShaderProgram& shader = showKernel ? m_KernelBallShader : m_DefaultBallShader;
+    const auto& particles = m_SceneData->PhysicsState->Particles;
+
+    for (int i = 0; i < particles.size(); i++) {
+        const Particle& particle = particles[i];
+
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), particle.Position);
+        model = glm::scale(model, glm::vec3(PhysicsSolver::BallRadius));
+
+        shader.SetUniform1i("u_IsSpecimen", i == specimenIndex);
+        shader.SetUniformMat4f("u_Model", model);
+
+        if (showKernel) {
+            glm::vec3 d = particle.Position - specimen.Position;
+            shader.SetUniform1i("u_WithinRadius", glm::dot(d, d) <= h2);
+        }
+
+        RenderCommand::DrawElements(m_CircleVao, shader);
+    }
 }
 
 
@@ -106,67 +162,6 @@ float RenderLayer::getAspectRatio()
     return (float)m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x / m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y;
 }
 
-void RenderLayer::gridParticleData()
-{
-    int numRows = m_SceneData->numRows;
-    int numCols = m_SceneData->numRows;
-
-    std::vector<Particle> particles;
-    particles.reserve(numRows * numCols);
-
-    int stepY = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y / numRows;
-    int stepX = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x / numCols;
-    int offsetY = stepY / 2;
-    int offsetX = stepX / 2;
-
-
-    for (int row = 0; row < numRows; row++) {
-        for (int col = 0; col < numCols; col++) {
-            particles.emplace_back(glm::vec3{ offsetX + col * stepX, offsetY + row * stepY, 0 }, glm::vec3{});
-        }
-    }
-    m_SceneData->PhysicsState->Particles = std::move(particles);
-
-}
-
-int RenderLayer::randomInt(int min, int max)
-{
-    static std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<int> dist(min, max);
-    return dist(rng);
-}
-
-int RenderLayer::randomIntNormal(int min, int max)
-{
-    static std::mt19937 rng(std::random_device{}());
-    float mean = 0.5f * (min + max);
-    float stddev = (max - min) / 9.0f;
-    std::normal_distribution<float> dist(mean, stddev);
-    int value = (int)std::round(dist(rng));
-    return std::clamp(value, min, max);
-}
-
-
-
-void RenderLayer::randomiseParticleData()
-{
-    int count = 225;
-
-    std::vector<Particle> particles;
-    particles.reserve(count);
-
-    for (int i = 0; i < count; i++)
-    {
-        int xPos = randomIntNormal(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x);
-        int yPos = randomIntNormal(0, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y);
-
-        particles.emplace_back(glm::vec3{ xPos, yPos, 0 }, glm::vec3{});
-    }
-
-    m_SceneData->PhysicsState->Particles = std::move(particles);
-
-}
-
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
     m_SceneData->PhysicsState->BoundaryParameters.ViewportSize = { width, height };
@@ -174,9 +169,11 @@ void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
     m_RenderFbo.Resize(width, height);
     m_ResolveFbo.Resize(width, height);
 
-    m_BallShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
-    m_KernelShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
-    if (!m_SceneData->PhysicsState->FluidParameters.SimulationRunning) gridParticleData();
+    m_DefaultBallShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
+    m_KernelBallShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
+    m_KernelRadiusShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
+    m_ArrowShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
+    if (!m_SceneData->PhysicsState->FluidParameters.SimulationRunning) m_SceneData->PhysicsState->GridParticleData(10, 10);
 
     OnRender();
 }
