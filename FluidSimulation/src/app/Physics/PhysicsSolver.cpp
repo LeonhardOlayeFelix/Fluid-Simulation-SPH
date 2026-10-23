@@ -20,7 +20,7 @@ void PhysicsSolver::AdvanceParticles(double timeStep)
 	{
 		for (Particle& particle : m_PhysicsState->Particles)
 		{
-			particle.Velocity += (float)timeStep * glm::vec3(0, Gravity, 0);
+			particle.Velocity -= m_PhysicsState->FluidParameters.Alpha * particle.DensityGradient;
 			particle.Position += (float)timeStep * particle.Velocity;
 
 			DetectBoundaryCollision(particle);

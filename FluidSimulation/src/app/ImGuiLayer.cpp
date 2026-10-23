@@ -53,6 +53,7 @@ void ImGuiLayer::OnRender()
 	ImGui::Begin("Physics Solver Properties");
 	ImGui::SliderFloat("Collision Damping Factor: %g", &PhysicsSolver::CollisionDampingFactor, 0, 1);
 	ImGui::SliderFloat("Ball Radius (px): %g", &PhysicsSolver::BallRadius, 0, 500);
+	ImGui::SliderFloat("Alpha", &m_SceneData->PhysicsState->FluidParameters.Alpha, 1, 200);
 	ImGui::SliderInt("Num rows", &m_SceneData->numRows, 1, 30);
 	ImGui::SliderInt("Num cols", &m_SceneData->numCols, 1, 30);
 	ImGui::SliderInt("Count", &m_SceneData->count, 1, 200);
@@ -72,6 +73,7 @@ void ImGuiLayer::OnRender()
 	ImGui::SliderFloat("Smoothing Radius (h): %g", &m_SceneData->PhysicsState->FluidParameters.SmoothingRadius, 0, 1000);
 	ImGui::SliderInt("Arrow Length", &m_SceneData->ArrowLengthMax, 1, 100);
 	ImGui::SliderInt("Arrow Width", &m_SceneData->ArrowWidth, 1, 10);
+
 
 	ImGui::End();
 
