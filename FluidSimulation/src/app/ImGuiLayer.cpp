@@ -22,69 +22,110 @@ void ImGuiLayer::OnRender()
 {
 	BeginFrame();
 
-	ImGuiIO& io = ImGui::GetIO();
-
-	//Docking
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
-	//Demo Window
-	ImGui::ShowDemoWindow();
-
-	//Viewport
-	ImGui::Begin("Viewport");
-	auto oldSize = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize;
-	auto currSize = ImGui::GetContentRegionAvail();
-	if (currSize.x != oldSize.x || currSize.y != oldSize.y) m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
-	ImGui::Image(reinterpret_cast<void*>(m_SceneData->FramebufferTextureId), currSize, ImVec2(0, 1), ImVec2(1, 0));
-	ImGui::End();
-
-	//Application Properties
-	ImGui::Begin("Application Properties");
-	int width, height;
-	glfwGetWindowSize(Application::Get()->GetWindow()->Handle(), &width, &height);
-	ImGui::Text("Window Size: (%d, %d)", width, height);
-	ImGui::Text("Viewport Size: (%g, %g)", m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y);
-	ImGui::Text("Application Frame Rate %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-	ImGui::End();
-
-	//Simulation Properties
-	int specimenIndex = m_SceneData->PhysicsState->Particles.size() / 2;
-
-	ImGui::Begin("Physics Solver Properties");
-	ImGui::SliderFloat("Collision Damping Factor: %g", &PhysicsSolver::CollisionDampingFactor, 0, 1);
-	ImGui::SliderFloat("Ball Radius (px): %g", &PhysicsSolver::BallRadius, 0, 500);
-	ImGui::SliderFloat("Alpha", &m_SceneData->PhysicsState->FluidParameters.Alpha, 1, 200);
-	ImGui::SliderInt("Num rows", &m_SceneData->numRows, 1, 30);
-	ImGui::SliderInt("Num cols", &m_SceneData->numCols, 1, 30);
-	ImGui::SliderInt("Count", &m_SceneData->count, 1, 200);
-	
-	ImGui::SliderFloat3("Specimen Position", glm::value_ptr(m_SceneData->PhysicsState->Particles[specimenIndex].Position), 0, 1000);
-
-	if (ImGui::Button((m_SceneData->PhysicsState->FluidParameters.SimulationRunning ? "Stop Simulation" : "Begin Simulation")))
-		m_SceneData->PhysicsState->FluidParameters.SimulationRunning = !m_SceneData->PhysicsState->FluidParameters.SimulationRunning;
-
-	ImGui::End();
-
-	ImGui::Begin("Kernel Settings");
-	ImGui::Checkbox("Show Kernel", &m_SceneData->showKernel);
-	ImGui::Checkbox("Show Density Gradient", &m_SceneData->showDensityGradient);
-	if (m_SceneData->showDensityGradient)
-		ImGui::Checkbox("Negate Gradient", &m_SceneData->flipDensityGradient);
-	ImGui::SliderFloat("Smoothing Radius (h): %g", &m_SceneData->PhysicsState->FluidParameters.SmoothingRadius, 0, 1000);
-	ImGui::SliderInt("Arrow Length", &m_SceneData->ArrowLengthMax, 1, 100);
-	ImGui::SliderInt("Arrow Width", &m_SceneData->ArrowWidth, 1, 10);
-
-
-	ImGui::End();
-
-	//Field Properties
-	ImGui::Begin("Field Values");
-	ImGui::InputFloat("Specimen Density", &m_SceneData->PhysicsState->Particles[specimenIndex].Density, 0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
-	ImGui::InputFloat3("Specimen Density Gradient", glm::value_ptr(m_SceneData->PhysicsState->Particles[specimenIndex].DensityGradient), "%.3f", ImGuiInputTextFlags_ReadOnly);
-	ImGui::End();
+	DrawViewport();
+	DrawControlsPanel();
+	DrawInspector();
+	DrawStats();
 
 
 	EndFrame();
+}
+
+void ImGuiLayer::DrawViewport()
+{
+    ImGui::Begin("Viewport");
+
+    auto oldSize = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize;
+    ImVec2 currSize = ImGui::GetContentRegionAvail();
+    if (currSize.x != oldSize.x || currSize.y != oldSize.y)
+        m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
+
+    ImGui::Image(reinterpret_cast<void*>(m_SceneData->FramebufferTextureId), currSize, ImVec2(0, 1), ImVec2(1, 0));
+
+    ImGui::End();
+}
+
+void ImGuiLayer::DrawControlsPanel()
+{
+    auto& state = *m_SceneData->PhysicsState;
+    auto& fluid = state.FluidParameters;
+
+    ImGui::Begin("Controls");
+
+    if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::SliderInt("Rows", &m_SceneData->numRows, 1, 30);
+        ImGui::SliderInt("Columns", &m_SceneData->numCols, 1, 30);
+        ImGui::SliderInt("Count", &m_SceneData->count, 1, 200);
+    }
+
+    if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::Button(fluid.SimulationRunning ? "Stop Simulation" : "Begin Simulation"))
+            fluid.SimulationRunning = !fluid.SimulationRunning;
+
+        ImGui::SliderFloat("Collision Damping", &PhysicsSolver::CollisionDampingFactor, 0.0f, 1.0f, "%.2f");
+    }
+
+    if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::SliderFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 0.0f, 1000.0f, "%.1f");
+        ImGui::SliderFloat("Alpha", &fluid.Alpha, 1.0f, 200.0f, "%.1f");
+    }
+
+    if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::SliderFloat("Ball Radius (px)", &PhysicsSolver::BallRadius, 0.0f, 500.0f, "%.1f");
+        ImGui::Checkbox("Show Kernel", &m_SceneData->showKernel);
+        ImGui::Checkbox("Show Density Gradient", &m_SceneData->showDensityGradient);
+        if (m_SceneData->showDensityGradient) {
+            ImGui::Indent();
+            ImGui::Checkbox("Negate Gradient", &m_SceneData->flipDensityGradient);
+            ImGui::SliderInt("Arrow Length", &m_SceneData->ArrowLengthMax, 1, 100);
+            ImGui::SliderInt("Arrow Width", &m_SceneData->ArrowWidth, 1, 10);
+            ImGui::Unindent();
+        }
+    }
+
+    ImGui::End();
+}
+
+void ImGuiLayer::DrawInspector()
+{
+    ImGui::Begin("Inspector");
+
+    auto& particles = m_SceneData->PhysicsState->Particles;
+    if (particles.empty()) {
+        ImGui::TextDisabled("No particles");
+        ImGui::End();
+        return;
+    }
+
+    int specimenIndex = (int)particles.size() / 2;
+    Particle& specimen = particles[specimenIndex];
+
+    ImGui::Text("Particle #%d", specimenIndex);
+    ImGui::SliderFloat3("Position", glm::value_ptr(specimen.Position), 0.0f, 1000.0f);
+
+    ImGui::BeginDisabled();
+    ImGui::InputFloat("Density", &specimen.Density, 0.0f, 0.0f, "%.3f");
+    ImGui::InputFloat3("Density Gradient", glm::value_ptr(specimen.DensityGradient), "%.3f");
+    ImGui::EndDisabled();
+
+    ImGui::End();
+}
+
+void ImGuiLayer::DrawStats()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    const auto& viewport = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize;
+
+    int width, height;
+    glfwGetWindowSize(Application::Get()->GetWindow()->Handle(), &width, &height);
+
+    ImGui::Begin("Stats");
+    ImGui::Text("%.1f FPS  |  %.3f ms/frame", io.Framerate, 1000.0f / io.Framerate);
+    ImGui::Text("Particles: %d", (int)m_SceneData->PhysicsState->Particles.size());
+    ImGui::Text("Window: %d x %d  |  Viewport: %.0f x %.0f", width, height, viewport.x, viewport.y);
+    ImGui::End();
 }
 
 void ImGuiLayer::BeginFrame()

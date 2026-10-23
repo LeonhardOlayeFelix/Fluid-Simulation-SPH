@@ -21,6 +21,10 @@ public:
 
 	virtual void OnUpdate(double ts) override;
 	virtual void  OnRender() override;
+	void  DrawViewport();
+	void  DrawControlsPanel();
+	void  DrawInspector();
+	void  DrawStats();
 
 private:
 	void BeginFrame();
