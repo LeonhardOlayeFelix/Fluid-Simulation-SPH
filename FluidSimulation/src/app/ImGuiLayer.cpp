@@ -49,8 +49,8 @@ void ImGuiLayer::DrawViewport()
 
 void ImGuiLayer::DrawControlsPanel()
 {
-    auto& state = *m_SceneData->PhysicsState;
-    auto& fluid = state.FluidParameters;
+    PhysicsState& state = *m_SceneData->PhysicsState;
+    FluidParameters& fluid = state.FluidParameters;
 
     ImGui::Begin("Controls");
 
@@ -92,7 +92,7 @@ void ImGuiLayer::DrawInspector()
 {
     ImGui::Begin("Inspector");
 
-    auto& particles = m_SceneData->PhysicsState->Particles;
+    std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
     if (particles.empty()) {
         ImGui::TextDisabled("No particles");
         ImGui::End();
@@ -116,7 +116,7 @@ void ImGuiLayer::DrawInspector()
 void ImGuiLayer::DrawStats()
 {
     ImGuiIO& io = ImGui::GetIO();
-    const auto& viewport = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize;
+    const glm::vec2& viewport = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize;
 
     int width, height;
     glfwGetWindowSize(Application::Get()->GetWindow()->Handle(), &width, &height);
