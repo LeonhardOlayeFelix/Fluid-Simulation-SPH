@@ -42,6 +42,7 @@ private:
 
 	VertexBuffer m_CircleVbo;
 	VertexBuffer m_QuadVbo;
+	VertexBuffer m_TranslationInstanceVbo;
 
 	IndexBuffer m_CircleIbo;
 	IndexBuffer m_QuadIbo;

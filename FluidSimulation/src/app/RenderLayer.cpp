@@ -7,8 +7,12 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     Primitive circlePrimitive = Primitives::Circle(400);
     m_CircleVbo = VertexBuffer(circlePrimitive);
     m_CircleIbo = IndexBuffer(circlePrimitive);
+    m_TranslationInstanceVbo = VertexBuffer::CreateEmpty();
     m_CircleVao.RecordVBOLayout(m_CircleVbo, { 3 });
+    m_CircleVao.RecordVBOLayout(m_TranslationInstanceVbo, { 3 });
+    m_CircleVao.SetAttribDivisor(1, 1);
     m_CircleVao.RecordIndexBuffer(m_CircleIbo);
+
 
     Primitive squarePrimitive = Primitives::NDCQuad();
     m_QuadVbo = VertexBuffer(squarePrimitive);
@@ -114,9 +118,29 @@ void RenderLayer::DrawParticles(const Particle& specimen, int specimenIndex, flo
     const float h2 = h * h;
     const bool showKernel = m_SceneData->showKernel;
     ShaderProgram& shader = showKernel ? m_KernelBallShader : m_DefaultBallShader;
-    const auto& particles = m_SceneData->PhysicsState->Particles;
+    const std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
 
-    for (int i = 0; i < particles.size(); i++) {
+    std::vector<glm::vec3> translations(particles.size());
+
+    for (int i = 0; i < translations.size(); i++)
+        translations[i] = particles[i].Position;
+    
+    shader.SetUniformMat4f("u_Model", glm::scale(glm::mat4(1), glm::vec3(PhysicsSolver::BallRadius)));
+    shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
+
+    if (showKernel) {
+        shader.SetUniform1f("u_SmoothingRadiusSquared", h2);
+        shader.SetUniform3f("u_SpecimenPosition", specimen.Position);
+    }
+
+    m_TranslationInstanceVbo.UpdateData(translations.data(), translations.size() * 3 * sizeof(float));
+    
+
+
+    RenderCommand::DrawElementsInstanced(m_CircleVao, shader, particles.size());
+
+
+    /*for (int i = 0; i < particles.size(); i++) {
         const Particle& particle = particles[i];
 
         glm::mat4 model = glm::translate(glm::mat4(1.0f), particle.Position);
@@ -131,7 +155,7 @@ void RenderLayer::DrawParticles(const Particle& specimen, int specimenIndex, flo
         }
 
         RenderCommand::DrawElements(m_CircleVao, shader);
-    }
+    }*/
 }
 
 

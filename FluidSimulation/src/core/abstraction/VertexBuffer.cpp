@@ -44,3 +44,19 @@ void VertexBuffer::Unbind() const
 {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+void VertexBuffer::UpdateData(const void* data, size_t size)
+{
+    m_Size = size;
+    glNamedBufferData(m_RendererId, size, data, GL_DYNAMIC_DRAW);
+}
+
+VertexBuffer VertexBuffer::CreateEmpty()
+{
+    VertexBuffer vertexBuffer;
+    
+    glCreateBuffers(1, &vertexBuffer.m_RendererId);
+    glNamedBufferData(vertexBuffer.m_RendererId, 0, nullptr, GL_DYNAMIC_DRAW);
+
+    return vertexBuffer;
+}
