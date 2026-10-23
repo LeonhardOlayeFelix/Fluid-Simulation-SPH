@@ -173,7 +173,7 @@ void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
     m_KernelBallShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
     m_KernelRadiusShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
     m_ArrowShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
-    if (!m_SceneData->PhysicsState->FluidParameters.SimulationRunning) m_SceneData->PhysicsState->GridParticleData(10, 10);
+    if (!m_SceneData->PhysicsState->FluidParameters.SimulationRunning) m_SceneData->PhysicsState->RandomiseParticleData(m_SceneData->count);
 
     OnRender();
 }
