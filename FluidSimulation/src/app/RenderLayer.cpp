@@ -36,11 +36,6 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_KernelRadiusShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
     m_ArrowShader = ShaderProgram("resources/shaders/2D/ArrowShader.shader");
 
-    m_DefaultBallShader.SetUniformBlockBinding("Matrices", 0);
-    m_KernelBallShader.SetUniformBlockBinding("Matrices", 0);
-    m_KernelRadiusShader.SetUniformBlockBinding("Matrices", 0);
-    m_ArrowShader.SetUniformBlockBinding("Matrices", 0);
-
     m_MatricesUbo = UniformBuffer(sizeof(glm::mat4));
     m_MatricesUbo.BindToPoint(0);
 
@@ -72,8 +67,7 @@ void RenderLayer::OnRender()
 
     if (!particles.empty())
     {
-
-        int specimenIndex = particles.size() == 0 ? -1 : particles.size() / 2;
+        int specimenIndex = particles.size() / 2;
         float smoothingRadius = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
 
         UpdateInstanceBuffers(particles);
