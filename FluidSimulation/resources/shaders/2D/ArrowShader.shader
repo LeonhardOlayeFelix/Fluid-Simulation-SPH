@@ -29,14 +29,14 @@ void main()
 
 	vec3 scale = vec3(length / 2, u_ArrowWidth / 2, 0);
 
-	vec3 translate1 = vec3(length / 2, 0, 0);
+	vec3 localTranslation = vec3(length / 2, 0, 0);
 
 	float theta = atan(a_Gradient.y, a_Gradient.x) + (u_NegateGradient ? 3.14159 : 0);
 	float c = cos(theta);
 	float s = sin(theta);
 	mat3 rotation = mat3(c, s, 0.0, -s, c, 0.0, 0.0, 0.0, 1.0);
 
-	vec3 position = rotation * (scale * a_Position + translate1) + a_Translation;
+	vec3 position = rotation * (scale * a_Position + localTranslation) + a_Translation;
 
 	gl_Position = u_Proj * vec4(position, 1.0f);
 }

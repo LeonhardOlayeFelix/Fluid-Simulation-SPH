@@ -106,13 +106,13 @@ void RenderLayer::DrawDensityGradients(const std::vector<Particle>& particles)
 void RenderLayer::DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float smoothingRadius)
 {
     const float h2 = smoothingRadius * smoothingRadius;
-    const bool showKernel = m_SceneData->showKernel;
-    ShaderProgram& shader = showKernel ? m_KernelBallShader : m_DefaultBallShader;
+    ShaderProgram& shader = m_SceneData->showKernel ? m_KernelBallShader : m_DefaultBallShader;
     
     shader.SetUniform1f("u_BallRadius", PhysicsSolver::BallRadius);
     shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
 
-    if (showKernel) {
+    if (m_SceneData->showKernel)
+    {
         shader.SetUniform1f("u_SmoothingRadiusSquared", h2);
         shader.SetUniform3f("u_SpecimenPosition", particles[specimenIndex].Position);
     }
