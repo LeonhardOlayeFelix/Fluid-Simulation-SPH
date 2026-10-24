@@ -97,6 +97,7 @@
     <ClCompile Include="src\app\RenderLayer.cpp" />
     <ClCompile Include="src\app\Application.cpp" />
     <ClCompile Include="src\app\SceneData.cpp" />
+    <ClCompile Include="src\core\abstraction\UniformBuffer.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\core\abstraction\CubeMap.cpp" />
     <ClCompile Include="src\core\abstraction\RenderBuffer.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="src\app\SceneData.h" />
     <ClInclude Include="src\app\ImGuiLayer.h" />
     <ClInclude Include="src\app\RenderLayer.h" />
+    <ClInclude Include="src\core\abstraction\UniformBuffer.h" />
     <ClInclude Include="src\core\Layer.h" />
     <ClInclude Include="src\app\Application.h" />
     <ClInclude Include="src\core\abstraction\CubeMap.h" />

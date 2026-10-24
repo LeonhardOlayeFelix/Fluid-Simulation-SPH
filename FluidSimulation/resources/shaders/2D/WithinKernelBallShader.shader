@@ -4,7 +4,13 @@
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Translation;
 
-uniform mat4 u_Proj;
+
+layout (std140) uniform Matrices
+{
+    mat4 u_Proj;
+};
+
+
 uniform vec3 u_SpecimenPosition;
 
 flat out int v_InstanceId;

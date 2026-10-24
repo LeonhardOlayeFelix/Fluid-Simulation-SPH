@@ -20,6 +20,11 @@ void ShaderProgram::Unbind() const
     glUseProgram(0);
 }
 
+void ShaderProgram::SetUniformBlockBinding(const std::string& name, int bindingPoint)
+{
+    glUniformBlockBinding(m_RendererId, GetUniformBlockIndex(name), bindingPoint);
+}
+
 void ShaderProgram::SetUniform4f(const std::string& name, const glm::vec4& vec)
 {
     glProgramUniform4f(m_RendererId, GetUniformLocation(name), vec.x, vec.y, vec.z, vec.w);
@@ -165,6 +170,15 @@ int ShaderProgram::GetUniformLocation(const std::string& name)
 
     m_UniformLocationCache[name] = location;
     return location;
+}
+
+int ShaderProgram::GetUniformBlockIndex(const std::string& name)
+{
+    int index = glGetUniformBlockIndex(m_RendererId, name.c_str());
+    if (index == -1)
+        SPHWARN("Warning: Uniform block '" + name + "' doesn't exist!");
+
+    return index;
 }
 
 ShaderProgram::~ShaderProgram()

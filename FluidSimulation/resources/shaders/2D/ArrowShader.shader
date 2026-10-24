@@ -6,7 +6,11 @@ layout(location = 1) in vec2 a_TexCoord;
 layout(location = 2) in vec3 a_Translation;
 layout(location = 3) in vec3 a_Gradient;
 
-uniform mat4 u_Proj;
+layout (std140) uniform Matrices
+{
+    mat4 u_Proj;
+};
+
 uniform float u_ArrowLengthMax;
 uniform float u_MaxDensityGradientSize;
 uniform float u_ArrowWidth;

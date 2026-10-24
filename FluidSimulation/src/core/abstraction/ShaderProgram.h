@@ -39,6 +39,7 @@ public:
 	void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
 	void SetUniformMat3f(const std::string& name, const glm::mat3& matrix);
 	void SetUniform1fv(const std::string& name, int count, const float* values);
+	void SetUniformBlockBinding(const std::string& name, int bindingPoint);
 
 	~ShaderProgram();
 	ShaderProgram(const ShaderProgram& other) = delete;
@@ -54,5 +55,6 @@ private:
 	unsigned int AttachShaderToProgram(unsigned int program, const std::string& source, GLenum type);
 	unsigned int CompileShader(unsigned int type, const std::string& source);
 	int GetUniformLocation(const std::string& name);
+	int GetUniformBlockIndex(const std::string& name);
 };
 

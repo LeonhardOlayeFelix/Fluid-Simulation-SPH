@@ -28,12 +28,13 @@ public:
 
 	inline unsigned int GetFrameBufferTextureId() { return m_ResolveFbo.GetColorTexture().GetId(); };
 	void OnGuiViewportSizeChanged(int width, int height);
-	void DrawParticles(const Particle& specimen, int specimenIndex, float h);
-	void DrawDensityGradients(float MaxDensityGradientSize, int particleCount);
+	void DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float h);
+	void DrawDensityGradients(const std::vector<Particle>& particles);
 	void DrawKernelRadius(glm::vec3 position, float h);
 
 private:
 	float getAspectRatio();
+	float getMaxDensityGradient(const std::vector<Particle>& particles);
 
 private:
 	std::shared_ptr<SceneData> m_SceneData;
@@ -61,5 +62,7 @@ private:
 	ShaderProgram m_DefaultBallShader;
 	ShaderProgram m_KernelRadiusShader;
 	ShaderProgram m_ArrowShader;
+
+	UniformBuffer m_MatricesUbo;
 };
 

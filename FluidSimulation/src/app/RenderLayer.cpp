@@ -36,6 +36,14 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_KernelRadiusShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
     m_ArrowShader = ShaderProgram("resources/shaders/2D/ArrowShader.shader");
 
+    m_DefaultBallShader.SetUniformBlockBinding("Matrices", 0);
+    m_KernelBallShader.SetUniformBlockBinding("Matrices", 0);
+    m_KernelRadiusShader.SetUniformBlockBinding("Matrices", 0);
+    m_ArrowShader.SetUniformBlockBinding("Matrices", 0);
+
+    m_MatricesUbo = UniformBuffer(sizeof(glm::mat4));
+    m_MatricesUbo.BindToPoint(0);
+
     m_RenderFbo = FrameBuffer(m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y, 6);
     m_RenderFbo.AddAttachment(AttachmentTarget::Color, AttachmentStorage::Texture);
     m_RenderFbo.AddAttachment(AttachmentTarget::DepthStencil, AttachmentStorage::RenderBuffer);
@@ -64,32 +72,20 @@ void RenderLayer::OnRender()
 
     if (!particles.empty())
     {
-        float h = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
 
         int specimenIndex = particles.size() == 0 ? -1 : particles.size() / 2;
-
-        Particle& specimen = particles[specimenIndex];
+        float smoothingRadius = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
 
         UpdateInstanceBuffers(particles);
 
         if (m_SceneData->showKernel)
-            DrawKernelRadius(specimen.Position, h);
-
+            DrawKernelRadius(particles[specimenIndex].Position, smoothingRadius);
 
         if (m_SceneData->showDensityGradient)
-        {
-            float max = 0;
+            DrawDensityGradients(particles);
 
-            for (const Particle& particle : particles)
-                max = std::max(max, glm::dot(particle.DensityGradient, particle.DensityGradient));
-
-            DrawDensityGradients(std::sqrt(max), particles.size());
-        }
-
-        DrawParticles(specimen, specimenIndex, h);
+        DrawParticles(particles, specimenIndex, smoothingRadius);
     }
-
-    
 
     WriteSceneData();
 
@@ -103,33 +99,31 @@ void RenderLayer::DrawKernelRadius(glm::vec3 position, float h)
     RenderCommand::DrawElements(m_QuadVao, m_KernelRadiusShader);
 }
 
-void RenderLayer::DrawDensityGradients(float MaxDensityGradientSize, int particleCount)
+void RenderLayer::DrawDensityGradients(const std::vector<Particle>& particles)
 {
     m_ArrowShader.SetUniform1f("u_ArrowLengthMax", m_SceneData->ArrowLengthMax);
     m_ArrowShader.SetUniform1f("u_ArrowWidth", m_SceneData->ArrowWidth);
-    m_ArrowShader.SetUniform1f("u_MaxDensityGradientSize", MaxDensityGradientSize);
+    m_ArrowShader.SetUniform1f("u_MaxDensityGradientSize", getMaxDensityGradient(particles));
     m_ArrowShader.SetUniform1i("u_NegateGradient", m_SceneData->flipDensityGradient);
     
-    RenderCommand::DrawElementsInstanced(m_ArrowVao, m_ArrowShader, particleCount);
+    RenderCommand::DrawElementsInstanced(m_ArrowVao, m_ArrowShader, particles.size());
 }
 
-void RenderLayer::DrawParticles(const Particle& specimen, int specimenIndex, float h)
+void RenderLayer::DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float smoothingRadius)
 {
-    const float h2 = h * h;
+    const float h2 = smoothingRadius * smoothingRadius;
     const bool showKernel = m_SceneData->showKernel;
     ShaderProgram& shader = showKernel ? m_KernelBallShader : m_DefaultBallShader;
-    const std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
     
     shader.SetUniform1f("u_BallRadius", PhysicsSolver::BallRadius);
     shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
 
     if (showKernel) {
         shader.SetUniform1f("u_SmoothingRadiusSquared", h2);
-        shader.SetUniform3f("u_SpecimenPosition", specimen.Position);
+        shader.SetUniform3f("u_SpecimenPosition", particles[specimenIndex].Position);
     }
 
     RenderCommand::DrawElementsInstanced(m_CircleVao, shader, particles.size());
-
 }
 
 
@@ -174,17 +168,26 @@ float RenderLayer::getAspectRatio()
     return (float)m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x / m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y;
 }
 
+float RenderLayer::getMaxDensityGradient(const std::vector<Particle>& particles)
+{
+    float max = 0;
+
+    for (const Particle& particle : particles)
+        max = std::max(max, glm::dot(particle.DensityGradient, particle.DensityGradient));
+
+    return std::sqrt(max);
+}
+
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
     m_SceneData->PhysicsState->BoundaryParameters.ViewportSize = { width, height };
+
     glViewport(0, 0, width, height);
     m_RenderFbo.Resize(width, height);
     m_ResolveFbo.Resize(width, height);
 
-    m_DefaultBallShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
-    m_KernelBallShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
-    m_KernelRadiusShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
-    m_ArrowShader.SetUniformMat4f("u_Proj", glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f));
+    glm::mat4 newProjectionMatrix = glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f);
+    m_MatricesUbo.SetData(glm::value_ptr(newProjectionMatrix), sizeof(glm::mat4), 0);
 
     OnRender();
 }

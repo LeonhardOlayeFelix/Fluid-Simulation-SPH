@@ -4,7 +4,11 @@
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Translation;
 
-uniform mat4 u_Proj;
+layout (std140) uniform Matrices
+{
+    mat4 u_Proj;
+};
+
 uniform float u_BallRadius;
 
 flat out int v_InstanceId;
