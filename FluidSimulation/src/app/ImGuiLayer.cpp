@@ -57,10 +57,16 @@ void ImGuiLayer::DrawControlsPanel()
     if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderInt("Rows", &m_SceneData->numRows, 1, 30);
         ImGui::SliderInt("Columns", &m_SceneData->numCols, 1, 30);
-        ImGui::SliderInt("Count", &m_SceneData->count, 1, 200);
+        if (ImGui::Button("Grid Distribute Particles")) 
+            m_SceneData->PhysicsState->GridParticleData(m_SceneData->numRows, m_SceneData->numCols);
+
+        ImGui::SliderInt("Count", &m_SceneData->count, 1, 1000);
+        if (ImGui::Button("Normally Distribute Particles")) 
+            m_SceneData->PhysicsState->RandomiseParticleData(m_SceneData->count);
     }
 
     if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen)) {
+
         if (ImGui::Button(fluid.SimulationRunning ? "Stop Simulation" : "Begin Simulation"))
             fluid.SimulationRunning = !fluid.SimulationRunning;
 

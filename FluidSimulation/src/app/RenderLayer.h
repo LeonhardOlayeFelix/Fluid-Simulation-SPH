@@ -24,12 +24,13 @@ public:
 	void EndFrame();
 	void WriteSceneData();
 	void ReadSceneData();
+	void UpdateInstanceBuffers(const std::vector<Particle>& particles);
 
 	inline unsigned int GetFrameBufferTextureId() { return m_ResolveFbo.GetColorTexture().GetId(); };
 	void OnGuiViewportSizeChanged(int width, int height);
 	void DrawParticles(const Particle& specimen, int specimenIndex, float h);
-	void DrawDensityGradient(const Particle& specimen, float MaxDensityGradientSize);
-	void DrawKernelRadius(const Particle& specimen, float h);
+	void DrawDensityGradients(float MaxDensityGradientSize, int particleCount);
+	void DrawKernelRadius(glm::vec3 position, float h);
 
 private:
 	float getAspectRatio();
@@ -39,13 +40,19 @@ private:
 
 	VertexArray m_CircleVao;
 	VertexArray m_QuadVao;
+	VertexArray m_ArrowVao;
 
 	VertexBuffer m_CircleVbo;
 	VertexBuffer m_QuadVbo;
-	VertexBuffer m_TranslationInstanceVbo;
+	VertexBuffer m_ArrowVbo;
+
+	//Instance Vbos
+	VertexBuffer m_TranslationsInstanceVbo;
+	VertexBuffer m_DensityGradientsInstanceVbo;
 
 	IndexBuffer m_CircleIbo;
 	IndexBuffer m_QuadIbo;
+	IndexBuffer m_ArrowIbo;
 
 	FrameBuffer m_RenderFbo;
 	FrameBuffer m_ResolveFbo;

@@ -4,19 +4,20 @@
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Translation;
 
-uniform mat4 u_Model;
 uniform mat4 u_Proj;
 uniform vec3 u_SpecimenPosition;
 
 flat out int v_InstanceId;
 
 uniform float u_SmoothingRadiusSquared;
+uniform float u_BallRadius;
+
 flat out int v_WithinRadius;
 
 void main()
 {
 
-	gl_Position = u_Proj * vec4(mat3(u_Model) * a_Position + a_Translation, 1.0f);
+	gl_Position = u_Proj * vec4(u_BallRadius * a_Position + a_Translation, 1.0f);
 
 	v_InstanceId = gl_InstanceID;
 
