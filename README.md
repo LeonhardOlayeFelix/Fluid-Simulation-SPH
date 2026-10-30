@@ -1,4 +1,4 @@
-# Fluid Simulation (SPH)
+# (In-Progress) Fluid Simulation SPH
 
 A real-time fluid simulation using **Smoothed Particle Hydrodynamics (SPH)**, written from scratch in C++ and OpenGL.
 
