@@ -14,13 +14,16 @@ void PhysicsSolver::AdvanceParticles(double timeStep)
 {
 	UpdateParticleDensities(m_PhysicsState->FluidParameters.SmoothingRadius);
 	UpdateParticleDensityGradients(m_PhysicsState->FluidParameters.SmoothingRadius);
-
+	UpdateParticlePressures();
+	UpdateParticlePressureGradients(m_PhysicsState->FluidParameters.SmoothingRadius);
 
 	if (m_PhysicsState->FluidParameters.SimulationRunning)
 	{
 		for (Particle& particle : m_PhysicsState->Particles)
 		{
-			particle.Velocity -= m_PhysicsState->FluidParameters.Alpha * particle.DensityGradient;
+			particle.RecalculateForceDensity();
+			particle.Acceleration = particle.ForceDensity / particle.Density;
+			particle.Velocity += (float)timeStep * particle.Acceleration;
 			particle.Position += (float)timeStep * particle.Velocity;
 
 			DetectBoundaryCollision(particle);
@@ -50,6 +53,17 @@ void PhysicsSolver::UpdateParticleDensities(float h)
 	}
 }
 
+void PhysicsSolver::UpdateParticlePressures()
+{
+	float stiffness = m_PhysicsState->FluidParameters.FluidStiffness;
+	float restDensity = m_PhysicsState->FluidParameters.RestDensity;
+
+	for (int i = 0; i < m_PhysicsState->Particles.size(); i++) {
+		Particle& source = m_PhysicsState->Particles[i];
+		source.Pressure = stiffness * (source.Density - restDensity);
+	}
+}
+
 void PhysicsSolver::UpdateParticleDensityGradients(float h)
 {
 	float h2 = h * h;
@@ -68,6 +82,31 @@ void PhysicsSolver::UpdateParticleDensityGradients(float h)
 			float r2 = glm::dot(r, r);
 
 			source.DensityGradient += neighbour.Mass * poly6KernelGradient(r, r2, h2, coeff);
+		}
+	}
+}
+
+void PhysicsSolver::UpdateParticlePressureGradients(float h)
+{
+	std::vector<Particle>& particles = m_PhysicsState->Particles;
+
+	float h2 = h * h;
+	float h8 = h2 * h2 * h2 * h2;
+	float coeff = -24.0f / (PI * h8);
+
+	for (int i = 0; i < particles.size(); i++) {
+		Particle& source = particles[i];
+		source.PressureGradient = glm::vec3(0);
+
+		for (int j = 0; j < particles.size(); j++) {
+
+			const Particle& neighbour = m_PhysicsState->Particles[j];
+
+			glm::vec3 r = source.Position - neighbour.Position;
+			float r2 = glm::dot(r, r);
+
+			source.PressureGradient += neighbour.Mass * (neighbour.Pressure / neighbour.Density) * poly6KernelGradient(r, r2, h2, coeff);
+
 		}
 	}
 }

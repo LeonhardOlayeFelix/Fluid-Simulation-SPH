@@ -28,7 +28,9 @@ private:
 
 	void AdvanceParticles(double timeStep);
 	void UpdateParticleDensities(float smoothingRadius);
+	void UpdateParticlePressures();
 	void UpdateParticleDensityGradients(float smoothingRadius);
+	void UpdateParticlePressureGradients(float smoothingRadius);
 	void DetectBoundaryCollision(Particle& particle);
 };
 

@@ -9,9 +9,11 @@ struct Particle {
 	glm::vec3 Position{};
 	glm::vec3 Velocity{};
 	glm::vec3 Acceleration{};
-	glm::vec3 Force{};
+	glm::vec3 ForceDensity{};
 	float Density{ 0 };
+	float Pressure{ 0 };
 	glm::vec3 DensityGradient;
+	glm::vec3 PressureGradient;
 
 	float Mass{ 100 };
 
@@ -21,5 +23,11 @@ struct Particle {
 	{
 		Position = glm::vec3(position, 0);
 		Velocity = glm::vec3(velocity, 0);
+	}
+
+	void RecalculateForceDensity() {
+
+		ForceDensity = -PressureGradient;
+
 	}
 };
