@@ -55,10 +55,6 @@ void ImGuiLayer::DrawControlsPanel()
     ImGui::Begin("Controls");
 
     if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderInt("Rows", &m_SceneData->numRows, 1, 30);
-        ImGui::SliderInt("Columns", &m_SceneData->numCols, 1, 30);
-        if (ImGui::Button("Grid Distribute Particles")) 
-            m_SceneData->PhysicsState->GridParticleData(m_SceneData->numRows, m_SceneData->numCols);
 
         ImGui::SliderInt("Count", &m_SceneData->count, 1, 1000);
         if (ImGui::Button("Normally Distribute Particles")) 
@@ -73,24 +69,18 @@ void ImGuiLayer::DrawControlsPanel()
         ImGui::SliderFloat("Collision Damping", &PhysicsSolver::CollisionDampingFactor, 0.0f, 1.0f, "%.2f");
     }
 
-    if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 0.0f, 1000.0f, "%.1f");
-        ImGui::SliderFloat("Alpha", &fluid.Alpha, 1.0f, 200.0f, "%.1f");
+    if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) 
+    {
+        ImGui::SliderFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 0.1f, 1000.0f, "%.1f");
         ImGui::SliderFloat("Rest Density", &fluid.RestDensity, 0.001, 5);
-        ImGui::SliderFloat("Stiffness", &fluid.FluidStiffness, 1, 10000);
+        ImGui::SliderFloat("Stiffness", &fluid.FluidStiffness, 1, 100000);
     }
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderFloat("Ball Radius (px)", &PhysicsSolver::BallRadius, 0.0f, 500.0f, "%.1f");
-        ImGui::Checkbox("Show Kernel", &m_SceneData->showKernel);
-        ImGui::Checkbox("Show Density Gradient", &m_SceneData->showDensityGradient);
-        if (m_SceneData->showDensityGradient) {
-            ImGui::Indent();
-            ImGui::Checkbox("Negate Gradient", &m_SceneData->flipDensityGradient);
-            ImGui::SliderInt("Arrow Length", &m_SceneData->ArrowLengthMax, 1, 100);
-            ImGui::SliderInt("Arrow Width", &m_SceneData->ArrowWidth, 1, 10);
-            ImGui::Unindent();
-        }
+        //ImGui::SliderFloat("Ball Radius (px)", &PhysicsSolver::BallRadius, 0.0f, 500.0f, "%.1f");
+        //ImGui::Checkbox("Show Kernel", &m_SceneData->showKernel);
+        ImGui::Checkbox("Show Pressure Force", &m_SceneData->showDensityGradient);
+
     }
 
     ImGui::End();

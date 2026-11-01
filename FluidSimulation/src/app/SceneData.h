@@ -16,9 +16,9 @@ struct SceneData
 	int count = 150;
 	int ArrowLengthMax = 40;
 	int ArrowWidth = 2;
-	bool showDensityGradient = true;
+	bool showDensityGradient = false;
 	bool flipDensityGradient = false;
-	bool showKernel = true;
+	bool showKernel = false;
 
 
 

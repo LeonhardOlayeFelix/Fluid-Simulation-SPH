@@ -7,7 +7,7 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     Primitive circlePrimitive = Primitives::Circle(16);
     Primitive squarePrimitive = Primitives::NDCQuad();
 
-    m_DensityGradientsInstanceVbo = VertexBuffer::CreateEmpty();
+    m_ForceDensityInstanceVbo = VertexBuffer::CreateEmpty();
     m_TranslationsInstanceVbo = VertexBuffer::CreateEmpty();
 
     m_CircleVbo = VertexBuffer(circlePrimitive);
@@ -26,7 +26,7 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_ArrowIbo = IndexBuffer(squarePrimitive);
     m_ArrowVao.RecordVBOLayout(m_ArrowVbo, { 3, 2 });
     m_ArrowVao.RecordVBOLayout(m_TranslationsInstanceVbo, { 3 });
-    m_ArrowVao.RecordVBOLayout(m_DensityGradientsInstanceVbo, { 3 });
+    m_ArrowVao.RecordVBOLayout(m_ForceDensityInstanceVbo, { 3 });
     m_ArrowVao.RecordIndexBuffer(m_ArrowIbo);
     m_ArrowVao.SetAttribDivisor(2, 1);
     m_ArrowVao.SetAttribDivisor(3, 1);
@@ -97,7 +97,7 @@ void RenderLayer::DrawDensityGradients(const std::vector<Particle>& particles)
 {
     m_ArrowShader.SetUniform1f("u_ArrowLengthMax", m_SceneData->ArrowLengthMax);
     m_ArrowShader.SetUniform1f("u_ArrowWidth", m_SceneData->ArrowWidth);
-    m_ArrowShader.SetUniform1f("u_MaxDensityGradientSize", getMaxDensityGradient(particles));
+    m_ArrowShader.SetUniform1f("u_MaxDensityGradientSize", getMaxForceLength(particles));
     m_ArrowShader.SetUniform1i("u_NegateGradient", m_SceneData->flipDensityGradient);
     
     RenderCommand::DrawElementsInstanced(m_ArrowVao, m_ArrowShader, particles.size());
@@ -146,15 +146,15 @@ void RenderLayer::ReadSceneData()
 void RenderLayer::UpdateInstanceBuffers(const std::vector<Particle>& particles)
 {
     std::vector<glm::vec3> translations(particles.size());
-    std::vector<glm::vec3> densityGradients(particles.size());
+    std::vector<glm::vec3> forceDensities(particles.size());
 
     for (int i = 0; i < translations.size(); i++) {
         translations[i] = particles[i].Position;
-        densityGradients[i] = particles[i].DensityGradient;
+        forceDensities[i] = particles[i].ForceDensity;
     }
 
     m_TranslationsInstanceVbo.UpdateData(translations.data(), translations.size() * 3 * sizeof(float));
-    m_DensityGradientsInstanceVbo.UpdateData(densityGradients.data(), densityGradients.size() * 3 * sizeof(float));
+    m_ForceDensityInstanceVbo.UpdateData(forceDensities.data(), forceDensities.size() * 3 * sizeof(float));
 }
 
 float RenderLayer::getAspectRatio()
@@ -162,12 +162,12 @@ float RenderLayer::getAspectRatio()
     return (float)m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x / m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y;
 }
 
-float RenderLayer::getMaxDensityGradient(const std::vector<Particle>& particles)
+float RenderLayer::getMaxForceLength(const std::vector<Particle>& particles)
 {
     float max = 0;
 
     for (const Particle& particle : particles)
-        max = std::max(max, glm::dot(particle.DensityGradient, particle.DensityGradient));
+        max = std::max(max, glm::dot(particle.ForceDensity, particle.ForceDensity));
 
     return std::sqrt(max);
 }

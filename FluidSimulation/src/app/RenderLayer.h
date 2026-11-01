@@ -34,7 +34,7 @@ public:
 
 private:
 	float getAspectRatio();
-	float getMaxDensityGradient(const std::vector<Particle>& particles);
+	float getMaxForceLength(const std::vector<Particle>& particles);
 
 private:
 	std::shared_ptr<SceneData> m_SceneData;
@@ -49,7 +49,7 @@ private:
 
 	//Instance Vbos
 	VertexBuffer m_TranslationsInstanceVbo;
-	VertexBuffer m_DensityGradientsInstanceVbo;
+	VertexBuffer m_ForceDensityInstanceVbo;
 
 	IndexBuffer m_CircleIbo;
 	IndexBuffer m_QuadIbo;

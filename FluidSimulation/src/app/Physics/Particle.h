@@ -15,7 +15,7 @@ struct Particle {
 	glm::vec3 DensityGradient;
 	glm::vec3 PressureGradient;
 
-	float Mass{ 100 };
+	float Mass{ 1000 };
 
 	Particle() = default;
 

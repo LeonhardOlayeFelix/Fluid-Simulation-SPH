@@ -21,7 +21,10 @@ public:
 	void Update(double timeStep);
 
 	static float poly6Kernel(float r2, float h2, float coeff);
+	static float kernel1(float r2, float h, float h2, float coeff);
 	static glm::vec3 poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff);
+	static glm::vec3 kernel1Gradient(glm::vec3 r, float r2, float h, float h2, float coeff);
+	static glm::vec3 spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff);
 
 private:
 	std::shared_ptr<PhysicsState> m_PhysicsState;
@@ -32,5 +35,6 @@ private:
 	void UpdateParticleDensityGradients(float smoothingRadius);
 	void UpdateParticlePressureGradients(float smoothingRadius);
 	void DetectBoundaryCollision(Particle& particle);
+	float CalculateSymmetrisedPressure(const Particle& source, const Particle& target);
 };
 
