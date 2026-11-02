@@ -7,12 +7,12 @@
 
 struct Particle {
 	glm::vec3 Position{};
+	glm::vec3 PredictedPosition{};
 	glm::vec3 Velocity{};
 	glm::vec3 Acceleration{};
 	glm::vec3 ForceDensity{};
 	float Density{ 0 };
 	float Pressure{ 0 };
-	glm::vec3 DensityGradient;
 	glm::vec3 PressureGradient;
 
 	float Mass{ 1000 };

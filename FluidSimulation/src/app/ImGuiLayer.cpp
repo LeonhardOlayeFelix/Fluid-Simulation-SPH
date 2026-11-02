@@ -72,15 +72,12 @@ void ImGuiLayer::DrawControlsPanel()
     if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) 
     {
         ImGui::SliderFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 0.1f, 1000.0f, "%.1f");
-        ImGui::SliderFloat("Rest Density", &fluid.RestDensity, 0.001, 5);
+        ImGui::SliderFloat("Rest Density", &fluid.RestDensity, 0.1, 5.0);
         ImGui::SliderFloat("Stiffness", &fluid.FluidStiffness, 1, 100000);
     }
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
-        //ImGui::SliderFloat("Ball Radius (px)", &PhysicsSolver::BallRadius, 0.0f, 500.0f, "%.1f");
-        //ImGui::Checkbox("Show Kernel", &m_SceneData->showKernel);
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->showDensityGradient);
-
     }
 
     ImGui::End();
@@ -105,7 +102,7 @@ void ImGuiLayer::DrawInspector()
 
     ImGui::BeginDisabled();
     ImGui::InputFloat("Pressure", &specimen.Pressure, 0.0f, 0.0f, "%.3f");
-    ImGui::InputFloat("Desnity", &specimen.Density, 0.0f, 0.0f, "%.3f");
+    ImGui::InputFloat("Density", &specimen.Density, 0.0f, 0.0f, "%.3f");
     ImGui::InputFloat3("Pressure Gradient", glm::value_ptr(specimen.PressureGradient), "%.3f");
     ImGui::EndDisabled();
 
