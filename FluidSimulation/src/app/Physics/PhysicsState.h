@@ -15,7 +15,7 @@ struct PhysicsState
 	PhysicsState() = default;
 
     void RandomiseParticleData(int count);
-    void GridParticleData(int numRows, int numCols);
+    void GridParticleData(int count, float spacing);
     
 
 private:

@@ -39,8 +39,9 @@ void ImGuiLayer::DrawViewport()
 
     auto oldSize = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize;
     ImVec2 currSize = ImGui::GetContentRegionAvail();
-    if (currSize.x != oldSize.x || currSize.y != oldSize.y)
+    if (currSize.x != oldSize.x || currSize.y != oldSize.y) {
         m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
+    }
 
     ImGui::Image(reinterpret_cast<void*>(m_SceneData->FramebufferTextureId), currSize, ImVec2(0, 1), ImVec2(1, 0));
 
@@ -56,14 +57,21 @@ void ImGuiLayer::DrawControlsPanel()
 
     if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-        ImGui::SliderInt("Count", &m_SceneData->count, 1, 1000);
-        if (ImGui::Button("Normally Distribute Particles")) 
-            m_SceneData->PhysicsState->RandomiseParticleData(m_SceneData->count);
+        bool a = ImGui::DragInt("Count", &m_SceneData->count, 1.0, 1, 1000);
+        bool b = ImGui::DragInt("Particle Spacing", &m_SceneData->ParticleGridSpacing, 1.0, 5, 50);
+
+        if ((a || b) && !fluid.SimulationRunning)
+        {
+            m_SceneData->PhysicsState->GridParticleData(m_SceneData->count, m_SceneData->ParticleGridSpacing);
+        }
+
+        if (ImGui::Button("Set"))
+            m_SceneData->PhysicsState->GridParticleData(m_SceneData->count, m_SceneData->ParticleGridSpacing);
     }
 
     if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-        if (ImGui::Button(fluid.SimulationRunning ? "Stop Simulation" : "Begin Simulation"))
+        if (ImGui::Button(fluid.SimulationRunning ? "Pause Simulation" : "Begin Simulation"))
             fluid.SimulationRunning = !fluid.SimulationRunning;
 
         ImGui::SliderFloat("Collision Damping", &PhysicsSolver::CollisionDampingFactor, 0.0f, 1.0f, "%.2f");
@@ -71,7 +79,7 @@ void ImGuiLayer::DrawControlsPanel()
 
     if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) 
     {
-        ImGui::SliderFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 0.1f, 1000.0f, "%.1f");
+        ImGui::SliderFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 20.0f, 50.0, "%.1f");
         ImGui::SliderFloat("Rest Density", &fluid.RestDensity, 0.1, 5.0);
         ImGui::SliderFloat("Stiffness", &fluid.FluidStiffness, 1, 100000);
     }

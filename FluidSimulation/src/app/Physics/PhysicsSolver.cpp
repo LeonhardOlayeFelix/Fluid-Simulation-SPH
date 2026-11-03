@@ -12,7 +12,7 @@ void PhysicsSolver::Update(double timeStep)
 	AdvanceParticles(timeStep);
 }
 
-uint32_t hashCell(int x, int y, uint32_t n) {
+uint32_t PhysicsSolver::HashCell(int x, int y, uint32_t n) {
 	constexpr uint32_t p1 = 73856093u;
 	constexpr uint32_t p2 = 19349663u;
 
@@ -49,7 +49,7 @@ void PhysicsSolver::UpdateGridSearch()
 		int cellX = std::floor(particle.PredictedPosition.x / h);
 		int cellY = std::floor(particle.PredictedPosition.y / h);
 
-		uint32_t key = hashCell(cellX, cellY, (uint32_t)particles.size());
+		uint32_t key = HashCell(cellX, cellY, (uint32_t)particles.size());
 
 		m_SpatialLookup[i].first = key;
 		m_SpatialLookup[i].second = i;
@@ -84,7 +84,7 @@ void PhysicsSolver::UpdatePredictedPositions(double timeStep)
 }
 
 //note to self - this could be changed to be a template function to better more performant.
-void PhysicsSolver::ForEachNeighbour(const glm::vec3& position, std::function<void(const Particle&)> callback, const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices) {
+void PhysicsSolver::ForEachNeighbour(const glm::vec3& position, std::function<void(const Particle&)> callback) {
 
 	//function which searches all the neighbors of a particle using a spatialLookup and StartIndices array.
 
@@ -99,15 +99,15 @@ void PhysicsSolver::ForEachNeighbour(const glm::vec3& position, std::function<vo
 			int cellToSearchX = cellX + rowOffset;
 			int cellToSearchY = cellY + colOffset;
 
-			uint32_t cellKey = hashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
+			uint32_t cellKey = HashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
 
-			uint32_t startParticleIndex = startIndices[cellKey];
+			uint32_t startParticleIndex = m_StartIndices[cellKey];
 
-			for (uint32_t i = startParticleIndex; i < spatialLookup.size(); i++) {
+			for (uint32_t i = startParticleIndex; i < m_SpatialLookup.size(); i++) {
 
-				if (spatialLookup[i].first != cellKey) break;
+				if (m_SpatialLookup[i].first != cellKey) break;
 
-				const Particle& pj = particles[spatialLookup[i].second];
+				const Particle& pj = particles[m_SpatialLookup[i].second];
 
 				callback(pj);
 
@@ -130,14 +130,14 @@ void PhysicsSolver::UpdateParticleDensities()
 
 		pi.Density = 0;
 
-		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
+		ForEachNeighbour2(pi.PredictedPosition, [&](const Particle& pj) {
 
 				glm::vec3 d = pi.PredictedPosition - pj.PredictedPosition;
 				float r2 = glm::dot(d, d);
 
 				pi.Density += pj.Mass * poly6Kernel(r2, h2, coeff);
 
-			}, m_SpatialLookup, m_StartIndices);
+			});
 
 	}
 }
@@ -167,7 +167,7 @@ void PhysicsSolver::UpdateParticlePressureGradients()
 
 		pi.PressureGradient = glm::vec3(0);
 
-		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
+		ForEachNeighbour2(pi.PredictedPosition, [&](const Particle& pj) {
 
 			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
 			float r2 = glm::dot(r, r);
@@ -176,7 +176,7 @@ void PhysicsSolver::UpdateParticlePressureGradients()
 
 			pi.PressureGradient += pj.Mass * symmetrisedPressure / pj.Density * spikyKernelGradient(r, r2, h, h2, coeff);
 
-			}, m_SpatialLookup, m_StartIndices);
+			});
 
 	}
 }

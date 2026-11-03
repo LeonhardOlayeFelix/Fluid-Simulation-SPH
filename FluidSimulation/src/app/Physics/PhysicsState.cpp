@@ -18,25 +18,26 @@ void PhysicsState::RandomiseParticleData(int count)
     Particles = std::move(particles);
 }
 
-void PhysicsState::GridParticleData(int numRows, int numCols)
+void PhysicsState::GridParticleData(int count, float spacing)
 {
-
     std::vector<Particle> particles;
-    particles.reserve(numRows * numCols);
+    particles.reserve(count);
 
-    int stepY = BoundaryParameters.ViewportSize.y / numRows;
-    int stepX = BoundaryParameters.ViewportSize.x / numCols;
-    int offsetY = stepY / 2;
-    int offsetX = stepX / 2;
+    int sideLength = (int)std::ceil(std::sqrt((float)count));
 
+    glm::vec2 centre = BoundaryParameters.ViewportSize / 2.0f;
+    float gridWidth = (sideLength - 1) * spacing;
+    glm::vec2 origin = centre - glm::vec2(gridWidth / 2.0f);
 
-    for (int row = 0; row < numRows; row++) {
-        for (int col = 0; col < numCols; col++) {
-            particles.emplace_back(glm::vec3{ offsetX + col * stepX, offsetY + row * stepY, 0 }, glm::vec3{});
-        }
+    for (int i = 0; i < count; i++) {
+        int row = i / sideLength;
+        int col = i % sideLength;
+
+        glm::vec3 position{ origin.x + col * spacing, origin.y + row * spacing, 0.0f };
+        particles.emplace_back(position, glm::vec3{});
     }
-    Particles = std::move(particles);
 
+    Particles = std::move(particles);
 }
 
 int PhysicsState::randomInt(int min, int max)
