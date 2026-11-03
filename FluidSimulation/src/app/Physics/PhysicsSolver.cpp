@@ -21,18 +21,59 @@ uint32_t hashCell(int x, int y, uint32_t n) {
 	return key % n;
 }
 
-std::vector<std::pair<int, int>> getOwnAndNeighboringCells(int x, int y) {
-	return { {x, y}, { x - 1, y }, {x + 1, y}, {x, y - 1}, {x, y + 1}, {x - 1, y - 1}, {x + 1, y + 1}, {x + 1, y - 1}, {x - 1, y + 1} };
-}
-
 void PhysicsSolver::AdvanceParticles(double timeStep)
 {
-	if (!m_PhysicsState->FluidParameters.SimulationRunning)
-		return;
+	if (!m_PhysicsState->FluidParameters.SimulationRunning || m_PhysicsState->Particles.size() == 0) return;
 
+	UpdatePredictedPositions(timeStep);
+	UpdateGridSearch();
+	UpdateParticleDensities();
+	UpdateParticlePressures();
+	UpdateParticlePressureGradients();
+	UpdateActualPositions(timeStep);
+}
+
+void PhysicsSolver::UpdateGridSearch()
+{
+	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 	std::vector<Particle>& particles = m_PhysicsState->Particles;
 
-	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+	m_SpatialLookup.resize(particles.size());
+	m_StartIndices.assign(particles.size(), UINT32_MAX);
+
+	//note to self- need to fix case where squares within the same 9 are mapped to the same key, so they are counted twice. Rare, but important.
+
+	for (int i = 0; i < m_SpatialLookup.size(); i++) {
+		Particle& particle = particles[i];
+
+		int cellX = std::floor(particle.PredictedPosition.x / h);
+		int cellY = std::floor(particle.PredictedPosition.y / h);
+
+		uint32_t key = hashCell(cellX, cellY, (uint32_t)particles.size());
+
+		m_SpatialLookup[i].first = key;
+		m_SpatialLookup[i].second = i;
+
+	}
+
+	std::sort(m_SpatialLookup.begin(), m_SpatialLookup.end());
+
+
+	uint32_t lastSeenNum = -1;
+
+	for (int i = 0; i < m_SpatialLookup.size(); i++) {
+		if (m_SpatialLookup[i].first != lastSeenNum) {
+			m_StartIndices[m_SpatialLookup[i].first] = i;
+			lastSeenNum = m_SpatialLookup[i].first;
+		}
+	}
+
+}
+
+void PhysicsSolver::UpdatePredictedPositions(double timeStep)
+{
+	std::vector<Particle>& particles = m_PhysicsState->Particles;
+
 	float dt = (float)timeStep;
 
 	for (Particle& particle : particles)
@@ -40,48 +81,6 @@ void PhysicsSolver::AdvanceParticles(double timeStep)
 		particle.PredictedPosition = particle.Position + dt * particle.Velocity;
 	}
 
-	std::vector<std::pair<uint32_t, uint32_t>> spatialLookup(particles.size()); //query with particle index. Stores a list fo (Cell key, Particle Index) pairs
-
-	for (int i = 0; i < spatialLookup.size(); i++) {
-		Particle& particle = particles[i];
-
-		int cellX = std::floor(particle.Position.x / h);
-		int cellY = std::floor(particle.Position.y / h);
-
-		uint32_t key = hashCell(cellX, cellY, (uint32_t)particles.size());
-
-		spatialLookup[i].first = key;
-		spatialLookup[i].second = i;
-		
-	}
-
-	std::sort(spatialLookup.begin(), spatialLookup.end());
-
-	std::vector<uint32_t> startIndices(particles.size(), UINT32_MAX); //query with cell key. Stores a list of (indicies) at which cells start appearing in spatialLookup
-
-	uint32_t lastSeenNum = -1;
-
-	for (int i = 0; i < spatialLookup.size(); i++) {
-		if (spatialLookup[i].first != lastSeenNum) {
-			startIndices[spatialLookup[i].first] = i;
-			lastSeenNum = spatialLookup[i].first;
-		}
-	}
-
-
-	UpdateParticleDensities(spatialLookup, startIndices);
-	UpdateParticlePressures(spatialLookup, startIndices);
-	UpdateParticlePressureGradients(spatialLookup, startIndices);
-
-	for (Particle& particle : particles)
-	{
-		particle.RecalculateForceDensity();
-		particle.Acceleration = particle.ForceDensity / particle.Density;
-		particle.Velocity += dt * particle.Acceleration;
-		particle.Position += dt * particle.Velocity;
-
-		DetectBoundaryCollision(particle);
-	}
 }
 
 //note to self - this could be changed to be a template function to better more performant.
@@ -119,7 +118,7 @@ void PhysicsSolver::ForEachNeighbour(const glm::vec3& position, std::function<vo
 
 }
 
-void PhysicsSolver::UpdateParticleDensities(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices)
+void PhysicsSolver::UpdateParticleDensities()
 {
 	std::vector<Particle>& particles = m_PhysicsState->Particles;
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
@@ -138,12 +137,12 @@ void PhysicsSolver::UpdateParticleDensities(const std::vector<std::pair<uint32_t
 
 				pi.Density += pj.Mass * poly6Kernel(r2, h2, coeff);
 
-			}, spatialLookup, startIndices);
+			}, m_SpatialLookup, m_StartIndices);
 
 	}
 }
 
-void PhysicsSolver::UpdateParticlePressures(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices)
+void PhysicsSolver::UpdateParticlePressures()
 {
 	float stiffness = m_PhysicsState->FluidParameters.FluidStiffness;
 	float restDensity = m_PhysicsState->FluidParameters.RestDensity;
@@ -154,7 +153,7 @@ void PhysicsSolver::UpdateParticlePressures(const std::vector<std::pair<uint32_t
 	}
 }
 
-void PhysicsSolver::UpdateParticlePressureGradients(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices)
+void PhysicsSolver::UpdateParticlePressureGradients()
 {
 	std::vector<Particle>& particles = m_PhysicsState->Particles;
 
@@ -164,22 +163,37 @@ void PhysicsSolver::UpdateParticlePressureGradients(const std::vector<std::pair<
 	float h8 = h2 * h2 * h2 * h2;
 	float coeff = -30.0f / (PI * h5);
 
+	for (Particle& pi : particles) {
 
-	for (int i = 0; i < particles.size(); i++) {
-		Particle& source = particles[i];
-		source.PressureGradient = glm::vec3(0);
+		pi.PressureGradient = glm::vec3(0);
 
-		for (int j = 0; j < particles.size(); j++) {
+		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
 
-			const Particle& neighbour = m_PhysicsState->Particles[j];
-
-			glm::vec3 r = source.PredictedPosition - neighbour.PredictedPosition;
+			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
 			float r2 = glm::dot(r, r);
 
-			float sharedPressure = CalculateSymmetrisedPressure(source, neighbour);
+			float symmetrisedPressure = (pi.Pressure + pj.Pressure) / 2;
 
-			source.PressureGradient += neighbour.Mass * sharedPressure / neighbour.Density * spikyKernelGradient(r, r2, h, h2, coeff);
-		}
+			pi.PressureGradient += pj.Mass * symmetrisedPressure / pj.Density * spikyKernelGradient(r, r2, h, h2, coeff);
+
+			}, m_SpatialLookup, m_StartIndices);
+
+	}
+}
+
+void PhysicsSolver::UpdateActualPositions(double timeStep)
+{
+	float dt = (float)timeStep;
+	std::vector<Particle>& particles = m_PhysicsState->Particles;
+
+	for (Particle& particle : particles)
+	{
+		particle.RecalculateForceDensity();
+		particle.Acceleration = particle.ForceDensity / particle.Density;
+		particle.Velocity += dt * particle.Acceleration;
+		particle.Position += dt * particle.Velocity;
+
+		DetectBoundaryCollision(particle);
 	}
 }
 
@@ -208,11 +222,6 @@ void PhysicsSolver::DetectBoundaryCollision(Particle& particle)
 		particle.Position.x = bounds.ViewportSize.x - BallRadius;
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
-}
-
-float PhysicsSolver::CalculateSymmetrisedPressure(const Particle& source, const Particle& neighbour)
-{
-	return (source.Pressure + neighbour.Pressure) / 2;
 }
 
 float PhysicsSolver::poly6Kernel(float r2, float h2, float coeff)

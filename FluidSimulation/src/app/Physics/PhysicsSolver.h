@@ -27,14 +27,17 @@ public:
 
 private:
 	std::shared_ptr<PhysicsState> m_PhysicsState;
+	std::vector<std::pair<uint32_t, uint32_t>> m_SpatialLookup; //query with particle index. Stores a list fo (Cell key, Particle Index) pairs
+	std::vector<uint32_t> m_StartIndices;  //query with cell key. Stores a list of (indicies) at which cells start appearing in spatialLookup
 
 	void AdvanceParticles(double timeStep);
-	void UpdateParticleDensities(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices);
-	void static UpdateParticleDensitySummand(Particle& pi, const Particle& pj, const std::vector<float>& constants);
-	void UpdateParticlePressures(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices);
-	void UpdateParticlePressureGradients(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices);
+	void UpdateGridSearch();
+	void UpdatePredictedPositions(double timeStep);
+	void UpdateParticleDensities();
+	void UpdateParticlePressures();
+	void UpdateParticlePressureGradients();
+	void UpdateActualPositions(double timeStep);
 	void DetectBoundaryCollision(Particle& particle);
-	float CalculateSymmetrisedPressure(const Particle& source, const Particle& target);
 	void ForEachNeighbour(const glm::vec3& position, std::function<void(const Particle&)> callback, const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices);
 
 };
