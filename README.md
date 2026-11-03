@@ -3,6 +3,9 @@
 A real-time fluid simulation using **Smoothed Particle Hydrodynamics (SPH)**, written from scratch in C++ and OpenGL.
 
 ![Fluid Simulation](https://github.com/user-attachments/assets/55be1121-fdfb-43d0-9e93-70f8fda74139)
+![Fluid Simulation2](https://github.com/user-attachments/assets/7de48a8f-3710-4c2d-98c3-d6f8d00f07f4)
+
+
 
 > **Status:** early development.
 
