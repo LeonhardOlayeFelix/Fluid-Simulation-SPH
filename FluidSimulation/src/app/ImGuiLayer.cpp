@@ -57,7 +57,7 @@ void ImGuiLayer::DrawControlsPanel()
 
     if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-        bool a = ImGui::DragInt("Count", &m_SceneData->count, 1.0, 1, 1000);
+        bool a = ImGui::DragInt("Count", &m_SceneData->count, 1.0, 1, 10000);
         bool b = ImGui::DragInt("Particle Spacing", &m_SceneData->ParticleGridSpacing, 1.0, 5, 50);
 
         if ((a || b) && !fluid.SimulationRunning)
@@ -74,14 +74,14 @@ void ImGuiLayer::DrawControlsPanel()
         if (ImGui::Button(fluid.SimulationRunning ? "Pause Simulation" : "Begin Simulation"))
             fluid.SimulationRunning = !fluid.SimulationRunning;
 
-        ImGui::SliderFloat("Collision Damping", &PhysicsSolver::CollisionDampingFactor, 0.0f, 1.0f, "%.2f");
+        ImGui::DragFloat("Collision Damping", &PhysicsSolver::CollisionDampingFactor, 1, 0.0f, 1.0f, "%.2f");
     }
 
     if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) 
     {
-        ImGui::SliderFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 20.0f, 50.0, "%.1f");
-        ImGui::SliderFloat("Rest Density", &fluid.RestDensity, 0.1, 5.0);
-        ImGui::SliderFloat("Stiffness", &fluid.FluidStiffness, 1, 100000);
+        ImGui::DragFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 1, 20.0f, 50.0, "%.1f");
+        ImGui::DragFloat("Rest Density", &fluid.RestDensity,1 , 0.1, 5.0);
+        ImGui::DragFloat("Stiffness", &fluid.FluidStiffness,1 , 1, 100000);
     }
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -106,7 +106,7 @@ void ImGuiLayer::DrawInspector()
     Particle& specimen = particles[specimenIndex];
 
     ImGui::Text("Particle #%d", specimenIndex);
-    ImGui::SliderFloat3("Position", glm::value_ptr(specimen.Position), 0.0f, 1000.0f);
+    ImGui::DragFloat3("Position", glm::value_ptr(specimen.Position), 1, 0.0f, 1000.0f);
 
     ImGui::BeginDisabled();
     ImGui::InputFloat("Pressure", &specimen.Pressure, 0.0f, 0.0f, "%.3f");
