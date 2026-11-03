@@ -24,11 +24,11 @@ public:
 	#define SPHTRACE(...)    ::Log::Logger()->trace(__VA_ARGS__)
 	#define SPHCRITICAL(...) ::Log::Logger()->critical(__VA_ARGS__)
 #else
-	#define SPHERROR(...)
-	#define SPHWARN(...)
-	#define SPHINFO(...)
-	#define SPHTRACE(...)
-	#define SPHCRITICAL(...)
+	#define SPHERROR(...)     ::Log::Logger()->error(__VA_ARGS__)
+	#define SPHWARN(...)	  ::Log::Logger()->warn(__VA_ARGS__)
+	#define SPHINFO(...)	  ::Log::Logger()->info(__VA_ARGS__)
+	#define SPHTRACE(...)	  ::Log::Logger()->trace(__VA_ARGS__)
+	#define SPHCRITICAL(...)  ::Log::Logger()->critical(__VA_ARGS__)
 #endif
 
 #define ASSERT(x) if (!(x)) __debugbreak();

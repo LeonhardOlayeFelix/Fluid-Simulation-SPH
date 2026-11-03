@@ -29,7 +29,7 @@ public:
 	inline unsigned int GetFrameBufferTextureId() { return m_ResolveFbo.GetColorTexture().GetId(); };
 	void OnGuiViewportSizeChanged(int width, int height);
 	void DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float h);
-	void DrawDensityGradients(const std::vector<Particle>& particles);
+	void DrawForceArrows(const std::vector<Particle>& particles);
 	void DrawKernelRadius(glm::vec3 position, float h);
 
 private:
@@ -50,6 +50,7 @@ private:
 	//Instance Vbos
 	VertexBuffer m_TranslationsInstanceVbo;
 	VertexBuffer m_ForceDensityInstanceVbo;
+	VertexBuffer m_VelocityInstanceVbo;
 
 	IndexBuffer m_CircleIbo;
 	IndexBuffer m_QuadIbo;
@@ -59,10 +60,17 @@ private:
 	FrameBuffer m_ResolveFbo;
 
 	ShaderProgram m_KernelBallShader;
-	ShaderProgram m_DefaultBallShader;
-	ShaderProgram m_KernelRadiusShader;
+	ShaderProgram m_ParticleShader;
+	ShaderProgram m_RadiusParticleShader;
+	ShaderProgram m_VelocityParticleShader;
 	ShaderProgram m_ArrowShader;
 
 	UniformBuffer m_MatricesUbo;
+
+
+
+	std::vector<glm::vec3> m_Translations;
+	std::vector<glm::vec3> m_ForceDensities;
+	std::vector<glm::vec3> m_Velocities;
 };
 

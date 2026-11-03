@@ -2,6 +2,8 @@
 #version 450 core
 
 layout(location = 0) in vec3 a_Position;
+
+//Instanced attributes
 layout(location = 1) in vec3 a_Translation;
 
 layout (std140, binding = 0) uniform Matrices

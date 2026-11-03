@@ -12,9 +12,9 @@ layout (std140, binding = 0) uniform Matrices
 };
 
 uniform float u_ArrowLengthMax;
-uniform float u_MaxDensityGradientSize;
+uniform float u_MaxForceSize;
 uniform float u_ArrowWidth;
-uniform bool u_NegateGradient;
+uniform bool u_NegateDirection;
 
 void main()
 {
@@ -25,13 +25,13 @@ void main()
 		return;
 	}
 
-	float length = u_ArrowLengthMax * length(a_Gradient) / u_MaxDensityGradientSize;
+	float length = u_ArrowLengthMax * length(a_Gradient) / u_MaxForceSize;
 
 	vec3 scale = vec3(length / 2, u_ArrowWidth / 2, 0);
 
 	vec3 localTranslation = vec3(length / 2, 0, 0);
 
-	float theta = atan(a_Gradient.y, a_Gradient.x) + (u_NegateGradient ? 3.14159 : 0);
+	float theta = atan(a_Gradient.y, a_Gradient.x) + (u_NegateDirection ? 3.14159 : 0);
 	float c = cos(theta);
 	float s = sin(theta);
 	mat3 rotation = mat3(c, s, 0.0, -s, c, 0.0, 0.0, 0.0, 1.0);

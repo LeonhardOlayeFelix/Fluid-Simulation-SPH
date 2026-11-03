@@ -13,14 +13,17 @@ struct SceneData
 
 	int numRows = 10;
 	int numCols = 10;
-	int count = 0;
+	int count = 4500;
 	int ParticleGridSpacing = 10;
 
 	int ArrowLengthMax = 40;
 	int ArrowWidth = 2;
-	bool showDensityGradient = false;
-	bool flipDensityGradient = false;
-	bool showKernel = true;
+	float VMax = 100;
+
+
+	bool ShowForceArrow = false;
+	bool FlipForceArrow = false;
+	bool ShowKernel = false;
 
 
 

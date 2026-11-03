@@ -9,12 +9,15 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
 
     m_ForceDensityInstanceVbo = VertexBuffer::CreateEmpty();
     m_TranslationsInstanceVbo = VertexBuffer::CreateEmpty();
+    m_VelocityInstanceVbo = VertexBuffer::CreateEmpty();
 
     m_CircleVbo = VertexBuffer(circlePrimitive);
     m_CircleIbo = IndexBuffer(circlePrimitive);
     m_CircleVao.RecordVBOLayout(m_CircleVbo, { 3 });
     m_CircleVao.RecordVBOLayout(m_TranslationsInstanceVbo, { 3 });
+    m_CircleVao.RecordVBOLayout(m_VelocityInstanceVbo, { 3 });
     m_CircleVao.SetAttribDivisor(1, 1);
+    m_CircleVao.SetAttribDivisor(2, 1);
     m_CircleVao.RecordIndexBuffer(m_CircleIbo);
 
     m_QuadVbo = VertexBuffer(squarePrimitive);
@@ -31,9 +34,11 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_ArrowVao.SetAttribDivisor(2, 1);
     m_ArrowVao.SetAttribDivisor(3, 1);
 
-    m_DefaultBallShader = ShaderProgram("resources/shaders/2D/DefaultBallShader.shader");
-    m_KernelBallShader = ShaderProgram("resources/shaders/2D/WithinKernelBallShader.shader");
-    m_KernelRadiusShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
+    m_ParticleShader = ShaderProgram("resources/shaders/2D/ParticleShader.shader");
+    m_RadiusParticleShader = ShaderProgram("resources/shaders/2D/RadiusParticleShader.shader");
+    m_VelocityParticleShader = ShaderProgram("resources/shaders/2D/VelocityParticleShader.shader");
+
+    m_KernelBallShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
     m_ArrowShader = ShaderProgram("resources/shaders/2D/ArrowShader.shader");
 
     m_MatricesUbo = UniformBuffer(sizeof(glm::mat4));
@@ -72,11 +77,11 @@ void RenderLayer::OnRender()
 
         UpdateInstanceBuffers(particles);
 
-        if (m_SceneData->showKernel)
+        if (m_SceneData->ShowKernel)
             DrawKernelRadius(particles[specimenIndex].Position, smoothingRadius);
 
-        if (m_SceneData->showDensityGradient)
-            DrawDensityGradients(particles);
+        if (m_SceneData->ShowForceArrow)
+            DrawForceArrows(particles);
 
         DrawParticles(particles, specimenIndex, smoothingRadius);
     }
@@ -88,17 +93,17 @@ void RenderLayer::OnRender()
 
 void RenderLayer::DrawKernelRadius(glm::vec3 position, float h)
 {
-    m_KernelRadiusShader.SetUniformMat4f("u_Model", glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f)));
+    m_RadiusParticleShader.SetUniformMat4f("u_Model", glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f)));
 
-    RenderCommand::DrawElements(m_QuadVao, m_KernelRadiusShader);
+    RenderCommand::DrawElements(m_QuadVao, m_RadiusParticleShader);
 }
 
-void RenderLayer::DrawDensityGradients(const std::vector<Particle>& particles)
+void RenderLayer::DrawForceArrows(const std::vector<Particle>& particles)
 {
     m_ArrowShader.SetUniform1f("u_ArrowLengthMax", m_SceneData->ArrowLengthMax);
     m_ArrowShader.SetUniform1f("u_ArrowWidth", m_SceneData->ArrowWidth);
-    m_ArrowShader.SetUniform1f("u_MaxDensityGradientSize", getMaxForceLength(particles));
-    m_ArrowShader.SetUniform1i("u_NegateGradient", m_SceneData->flipDensityGradient);
+    m_ArrowShader.SetUniform1f("u_MaxForceSize", getMaxForceLength(particles));
+    m_ArrowShader.SetUniform1i("u_NegateDirection", m_SceneData->FlipForceArrow);
     
     RenderCommand::DrawElementsInstanced(m_ArrowVao, m_ArrowShader, particles.size());
 }
@@ -106,12 +111,14 @@ void RenderLayer::DrawDensityGradients(const std::vector<Particle>& particles)
 void RenderLayer::DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float smoothingRadius)
 {
     const float h2 = smoothingRadius * smoothingRadius;
-    ShaderProgram& shader = m_SceneData->showKernel ? m_KernelBallShader : m_DefaultBallShader;
-    
+    //ShaderProgram& shader = m_SceneData->showKernel ? m_KernelBallShader : m_ParticleShader;
+    ShaderProgram& shader = m_VelocityParticleShader;
+
     shader.SetUniform1f("u_BallRadius", PhysicsSolver::BallRadius);
     shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
+    shader.SetUniform1f("u_MaxVelocitySize", m_SceneData->VMax);
 
-    if (m_SceneData->showKernel)
+    if (m_SceneData->ShowKernel)
     {
         shader.SetUniform1f("u_SmoothingRadiusSquared", h2);
         shader.SetUniform3f("u_SpecimenPosition", particles[specimenIndex].Position);
@@ -145,16 +152,19 @@ void RenderLayer::ReadSceneData()
 
 void RenderLayer::UpdateInstanceBuffers(const std::vector<Particle>& particles)
 {
-    std::vector<glm::vec3> translations(particles.size());
-    std::vector<glm::vec3> forceDensities(particles.size());
+    m_Translations.resize(particles.size());
+    m_ForceDensities.resize(particles.size());
+    m_Velocities.resize(particles.size());
 
-    for (int i = 0; i < translations.size(); i++) {
-        translations[i] = particles[i].Position;
-        forceDensities[i] = particles[i].ForceDensity;
+    for (int i = 0; i < m_Translations.size(); i++) {
+        m_Translations[i] = particles[i].Position;
+        m_ForceDensities[i] = particles[i].ForceDensity;
+        m_Velocities[i] = particles[i].Velocity;
     }
 
-    m_TranslationsInstanceVbo.UpdateData(translations.data(), translations.size() * 3 * sizeof(float));
-    m_ForceDensityInstanceVbo.UpdateData(forceDensities.data(), forceDensities.size() * 3 * sizeof(float));
+    m_TranslationsInstanceVbo.UpdateData(m_Translations.data(), m_Translations.size() * 3 * sizeof(float));
+    m_ForceDensityInstanceVbo.UpdateData(m_ForceDensities.data(), m_ForceDensities.size() * 3 * sizeof(float));
+    m_VelocityInstanceVbo.UpdateData(m_Velocities.data(), m_Velocities.size() * 3 * sizeof(float));
 }
 
 float RenderLayer::getAspectRatio()

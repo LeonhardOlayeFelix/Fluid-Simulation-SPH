@@ -85,7 +85,8 @@ void ImGuiLayer::DrawControlsPanel()
     }
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::Checkbox("Show Pressure Force", &m_SceneData->showDensityGradient);
+        ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
+        ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 200);
     }
 
     ImGui::End();
@@ -112,6 +113,7 @@ void ImGuiLayer::DrawInspector()
     ImGui::InputFloat("Pressure", &specimen.Pressure, 0.0f, 0.0f, "%.3f");
     ImGui::InputFloat("Density", &specimen.Density, 0.0f, 0.0f, "%.3f");
     ImGui::InputFloat3("Pressure Gradient", glm::value_ptr(specimen.PressureGradient), "%.3f");
+    ImGui::InputFloat3("Velocity", glm::value_ptr(specimen.Velocity), "%.3f");
     ImGui::EndDisabled();
 
     ImGui::End();
