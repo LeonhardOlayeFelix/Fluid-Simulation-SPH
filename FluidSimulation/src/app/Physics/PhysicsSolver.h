@@ -6,6 +6,7 @@
 #include "Particle.h"
 #include "Parameters.h"
 #include "PhysicsState.h"
+#include <functional>
 
 class PhysicsSolver {
 public:
@@ -28,10 +29,13 @@ private:
 	std::shared_ptr<PhysicsState> m_PhysicsState;
 
 	void AdvanceParticles(double timeStep);
-	void UpdateParticleDensities(float smoothingRadius);
-	void UpdateParticlePressures();
-	void UpdateParticlePressureGradients(float smoothingRadius);
+	void UpdateParticleDensities(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices);
+	void static UpdateParticleDensitySummand(Particle& pi, const Particle& pj, const std::vector<float>& constants);
+	void UpdateParticlePressures(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices);
+	void UpdateParticlePressureGradients(const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices);
 	void DetectBoundaryCollision(Particle& particle);
 	float CalculateSymmetrisedPressure(const Particle& source, const Particle& target);
+	void ForEachNeighbour(const glm::vec3& position, std::function<void(const Particle&)> callback, const std::vector<std::pair<uint32_t, uint32_t>>& spatialLookup, const std::vector<uint32_t>& startIndices);
+
 };
 
