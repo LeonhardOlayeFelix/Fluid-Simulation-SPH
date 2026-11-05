@@ -17,7 +17,7 @@ $$A(\mathbf{r}) = \sum_j m_j \, \frac{A_j}{\rho_j} \, W(\mathbf{r} - \mathbf{r}_
 
 where $m_j$, $\rho_j$, $\mathbf{r}_j$ and $A_j$ are the mass, density, position and value of $A$ for particle $j$. Gradients of a field come from the same sum with $W$ replaced by its gradient $\nabla W$.
 
-This project follows Müller, Charypar & Gross (2003), *Particle-Based Fluid Simulation for Interactive Applications*.
+This project follows Müller, Charypar & Gross (2003), *Particle-Based Fluid Simulation for Interactive Applications*, along with various other papers used for rendering not yet mentioned here.
 
 ## Building
 
