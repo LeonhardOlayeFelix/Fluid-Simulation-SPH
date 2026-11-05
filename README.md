@@ -39,7 +39,7 @@ GLAD and GLM are included in the repo. Dear ImGui (docking branch) and spdlog co
 
 ## References
 
-- M. Müller, D. Charypar, M. Gross. *Particle-Based Fluid Simulation for Interactive Applications*. SCA 2003.
+- M. Müller, D. Charypar, M. Gross. *Particle-Based Fluid Simulation for Interactive Applications*. SCA 2003, along with various other papers used for rendering not yet mentioned here.
 
 ## Acknowledgements
 
