@@ -7,7 +7,7 @@ class PhysicsSolver;
 class PhysicsSystem
 {
 public:
-	PhysicsSystem(std::shared_ptr<PhysicsState> initialState, double fixedTimeStep = 1.0 / 60.0);
+	PhysicsSystem(std::shared_ptr<PhysicsState> initialState, double fixedTimeStep = 1.0 / 240.0);
 
 	~PhysicsSystem();
 

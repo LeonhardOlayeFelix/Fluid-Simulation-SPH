@@ -72,7 +72,7 @@ void RenderLayer::OnRender()
 
     if (!particles.empty())
     {
-        int specimenIndex = particles.size() / 2;
+        int specimenIndex = particles.size() / 4;
         float smoothingRadius = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
 
         UpdateInstanceBuffers(particles);
@@ -111,7 +111,7 @@ void RenderLayer::DrawForceArrows(const std::vector<Particle>& particles)
 void RenderLayer::DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float smoothingRadius)
 {
     const float h2 = smoothingRadius * smoothingRadius;
-    //ShaderProgram& shader = m_SceneData->showKernel ? m_KernelBallShader : m_ParticleShader;
+    //ShaderProgram& shader = m_ParticleShader;
     ShaderProgram& shader = m_VelocityParticleShader;
 
     shader.SetUniform1f("u_BallRadius", PhysicsSolver::BallRadius);

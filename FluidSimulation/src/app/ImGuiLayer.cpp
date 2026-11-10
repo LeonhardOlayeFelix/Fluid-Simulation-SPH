@@ -74,14 +74,14 @@ void ImGuiLayer::DrawControlsPanel()
         if (ImGui::Button(fluid.SimulationRunning ? "Pause Simulation" : "Begin Simulation"))
             fluid.SimulationRunning = !fluid.SimulationRunning;
 
-        ImGui::DragFloat("Collision Damping", &PhysicsSolver::CollisionDampingFactor, 1, 0.0f, 1.0f, "%.2f");
+        ImGui::DragFloat("Collision Damping", &PhysicsSolver::CollisionDampingFactor, 0.01, 0.0f, 1.0f, "%.2f");
     }
 
     if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) 
     {
         ImGui::DragFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 1, 20.0f, 50.0, "%.1f");
-        ImGui::DragFloat("Rest Density", &fluid.RestDensity,1 , 0.1, 5.0);
-        ImGui::DragFloat("Stiffness", &fluid.FluidStiffness,1 , 1, 100000);
+        ImGui::DragFloat("Rest Density", &fluid.RestDensity,1 , 0.1, 100.0);
+        ImGui::DragFloat("Stiffness", &fluid.FluidStiffness,1000 , 1000, 10000000);
     }
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {

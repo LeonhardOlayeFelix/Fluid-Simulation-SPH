@@ -9,7 +9,7 @@ struct BoundaryParameters {
 
 struct FluidParameters {
 	bool SimulationRunning;
-	float RestDensity = 0.1;
-	float FluidStiffness = 50000;
-	float SmoothingRadius{ 45 };
+	float RestDensity = 6.0;
+	float FluidStiffness = 1000;
+	float SmoothingRadius{ 25 };
 };

@@ -2,6 +2,7 @@
 #include "Particle.h"
 #include <cstdint>
 #include <algorithm>
+#include <utility>
 
 PhysicsSolver::PhysicsSolver(std::shared_ptr<PhysicsState> physicsState) : m_PhysicsState(physicsState)
 {
@@ -78,6 +79,7 @@ void PhysicsSolver::UpdatePredictedPositions(double timeStep)
 
 	for (Particle& particle : particles)
 	{
+		particle.Velocity = particle.Velocity + dt * glm::vec3(0, Gravity, 0);
 		particle.PredictedPosition = particle.Position + dt * particle.Velocity;
 	}
 
@@ -149,7 +151,8 @@ void PhysicsSolver::UpdateParticlePressures()
 
 	for (int i = 0; i < m_PhysicsState->Particles.size(); i++) {
 		Particle& source = m_PhysicsState->Particles[i];
-		source.Pressure = stiffness * (source.Density - restDensity);
+		source.Pressure = std::max(0.0f, stiffness * (source.Density - restDensity));
+		//source.Pressure = stiffness * (source.Density - restDensity);
 	}
 }
 
