@@ -6,14 +6,16 @@
 #include <glm/gtc/type_ptr.hpp>
 
 struct Particle {
+public:
 	glm::vec3 Position{};
 	glm::vec3 PredictedPosition{};
 	glm::vec3 Velocity{};
 	glm::vec3 Acceleration{};
-	glm::vec3 ForceDensity{};
+	glm::vec3 PressureForceDensity{};
+	glm::vec3 ViscousForceDensity{};
+	glm::vec3 ResultantForceDensity{};
 	float Density{ 0 };
 	float Pressure{ 0 };
-	glm::vec3 PressureGradient;
 
 	float Mass{ 1000 };
 
@@ -25,9 +27,10 @@ struct Particle {
 		Velocity = glm::vec3(velocity, 0);
 	}
 
-	void RecalculateForceDensity() {
-
-		ForceDensity = -PressureGradient;
+	glm::vec3 RecalculateResultantForceDensity()
+	{
+		ResultantForceDensity = PressureForceDensity + ViscousForceDensity;
+		return ResultantForceDensity;
 
 	}
 };

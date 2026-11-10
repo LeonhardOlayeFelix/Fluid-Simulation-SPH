@@ -82,6 +82,7 @@ void ImGuiLayer::DrawControlsPanel()
         ImGui::DragFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 1, 20.0f, 50.0, "%.1f");
         ImGui::DragFloat("Rest Density", &fluid.RestDensity,1 , 0.1, 100.0);
         ImGui::DragFloat("Stiffness", &fluid.FluidStiffness,1000 , 1000, 10000000);
+        ImGui::DragFloat("Viscosity", &fluid.Viscosity, 1000 ,0, 10000000);
     }
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -110,10 +111,11 @@ void ImGuiLayer::DrawInspector()
     ImGui::DragFloat3("Position", glm::value_ptr(specimen.Position), 1, 0.0f, 1000.0f);
 
     ImGui::BeginDisabled();
-    ImGui::InputFloat("Pressure", &specimen.Pressure, 0.0f, 0.0f, "%.3f");
     ImGui::InputFloat("Density", &specimen.Density, 0.0f, 0.0f, "%.3f");
-    ImGui::InputFloat3("Pressure Gradient", glm::value_ptr(specimen.PressureGradient), "%.3f");
     ImGui::InputFloat3("Velocity", glm::value_ptr(specimen.Velocity), "%.3f");
+    ImGui::InputFloat("Pressure", &specimen.Pressure, 0.0f, 0.0f, "%.3f");
+    ImGui::InputFloat3("Pressure Force Density", glm::value_ptr(specimen.PressureForceDensity), "%.3f");
+    ImGui::InputFloat3("Viscous Force Density", glm::value_ptr(specimen.Velocity), "%.3f");
     ImGui::EndDisabled();
 
     ImGui::End();

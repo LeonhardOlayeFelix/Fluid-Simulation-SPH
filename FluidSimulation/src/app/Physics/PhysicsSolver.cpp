@@ -30,7 +30,8 @@ void PhysicsSolver::AdvanceParticles(double timeStep)
 	UpdateGridSearch();
 	UpdateParticleDensities();
 	UpdateParticlePressures();
-	UpdateParticlePressureGradients();
+	UpdateParticlePressureForceDensities();
+	UpdateParticleViscosityForceDensities();
 	UpdateActualPositions(timeStep);
 }
 
@@ -85,39 +86,20 @@ void PhysicsSolver::UpdatePredictedPositions(double timeStep)
 
 }
 
-//note to self - this could be changed to be a template function to better more performant.
-void PhysicsSolver::ForEachNeighbour(const glm::vec3& position, std::function<void(const Particle&)> callback) {
-
-	//function which searches all the neighbors of a particle using a spatialLookup and StartIndices array.
-
+void PhysicsSolver::UpdateActualPositions(double timeStep)
+{
+	float dt = (float)timeStep;
 	std::vector<Particle>& particles = m_PhysicsState->Particles;
-	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 
-	int cellX = std::floor(position.x / h);
-	int cellY = std::floor(position.y / h);
+	for (Particle& particle : particles)
+	{
+		glm::vec3 f_i = particle.RecalculateResultantForceDensity();
+		particle.Acceleration = f_i / particle.Density;
+		particle.Velocity += dt * particle.Acceleration;
+		particle.Position += dt * particle.Velocity;
 
-	for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
-		for (int colOffset = -1; colOffset <= 1; colOffset++) {
-			int cellToSearchX = cellX + rowOffset;
-			int cellToSearchY = cellY + colOffset;
-
-			uint32_t cellKey = HashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
-
-			uint32_t startParticleIndex = m_StartIndices[cellKey];
-
-			for (uint32_t i = startParticleIndex; i < m_SpatialLookup.size(); i++) {
-
-				if (m_SpatialLookup[i].first != cellKey) break;
-
-				const Particle& pj = particles[m_SpatialLookup[i].second];
-
-				callback(pj);
-
-			}
-
-		}
+		DetectBoundaryCollision(particle);
 	}
-
 }
 
 void PhysicsSolver::UpdateParticleDensities()
@@ -132,7 +114,7 @@ void PhysicsSolver::UpdateParticleDensities()
 
 		pi.Density = 0;
 
-		ForEachNeighbour2(pi.PredictedPosition, [&](const Particle& pj) {
+		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
 
 				glm::vec3 d = pi.PredictedPosition - pj.PredictedPosition;
 				float r2 = glm::dot(d, d);
@@ -156,7 +138,7 @@ void PhysicsSolver::UpdateParticlePressures()
 	}
 }
 
-void PhysicsSolver::UpdateParticlePressureGradients()
+void PhysicsSolver::UpdateParticlePressureForceDensities()
 {
 	std::vector<Particle>& particles = m_PhysicsState->Particles;
 
@@ -168,37 +150,56 @@ void PhysicsSolver::UpdateParticlePressureGradients()
 
 	for (Particle& pi : particles) {
 
-		pi.PressureGradient = glm::vec3(0);
+		pi.PressureForceDensity = glm::vec3(0);
 
-		ForEachNeighbour2(pi.PredictedPosition, [&](const Particle& pj) {
+		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
 
 			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
 			float r2 = glm::dot(r, r);
 
 			float symmetrisedPressure = (pi.Pressure + pj.Pressure) / 2;
 
-			pi.PressureGradient += pj.Mass * symmetrisedPressure / pj.Density * spikyKernelGradient(r, r2, h, h2, coeff);
+			pi.PressureForceDensity += pj.Mass * symmetrisedPressure / pj.Density * spikyKernelGradient(r, r2, h, h2, coeff);
 
 			});
 
+		pi.PressureForceDensity = -pi.PressureForceDensity;
+
 	}
 }
 
-void PhysicsSolver::UpdateActualPositions(double timeStep)
+void PhysicsSolver::UpdateParticleViscosityForceDensities()
 {
-	float dt = (float)timeStep;
 	std::vector<Particle>& particles = m_PhysicsState->Particles;
 
-	for (Particle& particle : particles)
-	{
-		particle.RecalculateForceDensity();
-		particle.Acceleration = particle.ForceDensity / particle.Density;
-		particle.Velocity += dt * particle.Acceleration;
-		particle.Position += dt * particle.Velocity;
+	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+	float h2 = h * h;
+	float h5 = h2 * h2 * h;
+	float coeff = 40 / (PI * h5);
 
-		DetectBoundaryCollision(particle);
+
+	for (Particle& pi : particles) {
+
+		pi.ViscousForceDensity = glm::vec3(0);
+
+		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
+
+			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
+			float r2 = glm::dot(r, r);
+
+			glm::vec3 symmetrisedVelocity = (pj.Velocity - pi.Velocity);
+
+			pi.ViscousForceDensity += pj.Mass * symmetrisedVelocity / pj.Density * viscosityLaplacianKernel2D(r2, h, h2, coeff);
+
+			});
+
+		pi.ViscousForceDensity *= m_PhysicsState->FluidParameters.Viscosity;
+
 	}
+
 }
+
+
 
 void PhysicsSolver::DetectBoundaryCollision(Particle& particle)
 {
@@ -253,3 +254,15 @@ glm::vec3 PhysicsSolver::spikyKernelGradient(glm::vec3 r, float r2, float h, flo
 
 	return coeff * diff * diff * (r / dst);
 }
+
+float PhysicsSolver::viscosityLaplacianKernel2D(float r2, float h, float h2, float coeff)
+{
+	if (r2 == 0.0f || r2 >= h2) return 0.0;
+
+	float dst = std::sqrt(r2);
+	float diff = h - dst;
+
+	return coeff * diff;
+}
+
+

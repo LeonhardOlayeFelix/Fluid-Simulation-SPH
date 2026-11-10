@@ -158,7 +158,7 @@ void RenderLayer::UpdateInstanceBuffers(const std::vector<Particle>& particles)
 
     for (int i = 0; i < m_Translations.size(); i++) {
         m_Translations[i] = particles[i].Position;
-        m_ForceDensities[i] = particles[i].ForceDensity;
+        m_ForceDensities[i] = particles[i].ResultantForceDensity;
         m_Velocities[i] = particles[i].Velocity;
     }
 
@@ -177,7 +177,7 @@ float RenderLayer::getMaxForceLength(const std::vector<Particle>& particles)
     float max = 0;
 
     for (const Particle& particle : particles)
-        max = std::max(max, glm::dot(particle.ForceDensity, particle.ForceDensity));
+        max = std::max(max, glm::dot(particle.ResultantForceDensity, particle.ResultantForceDensity));
 
     return std::sqrt(max);
 }

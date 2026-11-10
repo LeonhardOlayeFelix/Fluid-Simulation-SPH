@@ -22,6 +22,7 @@ public:
 	void Update(double timeStep);
 
 	static float poly6Kernel(float r2, float h2, float coeff);
+	static float viscosityLaplacianKernel2D(float r2, float h, float h2, float coeff);
 	static glm::vec3 poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff);
 	static glm::vec3 spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff);
 
@@ -35,16 +36,17 @@ private:
 	void UpdatePredictedPositions(double timeStep);
 	void UpdateParticleDensities();
 	void UpdateParticlePressures();
-	void UpdateParticlePressureGradients();
+	void UpdateParticlePressureForceDensities();
+	void UpdateParticleViscosityForceDensities();
 	void UpdateActualPositions(double timeStep);
 	void DetectBoundaryCollision(Particle& particle);
-	void ForEachNeighbour(const glm::vec3& position, std::function<void(const Particle&)> callback);
 	uint32_t HashCell(int x, int y, uint32_t n);
 
 	template <typename Callback>
-	void ForEachNeighbour2(const glm::vec3& position, Callback callback) {
+	void ForEachNeighbour(const glm::vec3& position, Callback callback) {
 
 		//function which searches all the neighbors of a particle using a spatialLookup and StartIndices array.
+		//Avoids duplicate counting within the same 9.
 
 		std::vector<Particle>& particles = m_PhysicsState->Particles;
 		float h = m_PhysicsState->FluidParameters.SmoothingRadius;
@@ -52,12 +54,26 @@ private:
 		int cellX = std::floor(position.x / h);
 		int cellY = std::floor(position.y / h);
 
+		uint32_t searchedKeys[9];
+		int searchedKeyCount = 0;
+
 		for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
 			for (int colOffset = -1; colOffset <= 1; colOffset++) {
 				int cellToSearchX = cellX + rowOffset;
 				int cellToSearchY = cellY + colOffset;
 
 				uint32_t cellKey = HashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
+
+				bool alreadySearched = false;
+				for (int k = 0; k < searchedKeyCount; k++) {
+					if (searchedKeys[k] == cellKey) {
+						alreadySearched = true;
+						break;
+					}
+				}
+				if (alreadySearched) continue;
+
+				searchedKeys[searchedKeyCount++] = cellKey;
 
 				uint32_t startParticleIndex = m_StartIndices[cellKey];
 
