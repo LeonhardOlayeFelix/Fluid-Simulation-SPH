@@ -13,4 +13,5 @@ struct FluidParameters {
 	float FluidStiffness = 300000;
 	float Viscosity = 3000;
 	float SmoothingRadius{ 25 };
+	int ParticleCount = 3000;
 };

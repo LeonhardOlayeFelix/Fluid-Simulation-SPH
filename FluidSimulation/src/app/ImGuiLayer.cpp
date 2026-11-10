@@ -57,16 +57,16 @@ void ImGuiLayer::DrawControlsPanel()
 
     if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-        bool a = ImGui::DragInt("Count", &m_SceneData->count, 1.0, 1, 10000);
+        bool a = ImGui::DragInt("Count", &m_SceneData->PhysicsState->FluidParameters.ParticleCount, 1.0, 1, 10000);
         bool b = ImGui::DragInt("Particle Spacing", &m_SceneData->ParticleGridSpacing, 1.0, 5, 50);
 
         if ((a || b) && !fluid.SimulationRunning)
         {
-            m_SceneData->PhysicsState->GridParticleData(m_SceneData->count, m_SceneData->ParticleGridSpacing);
+            m_SceneData->PhysicsState->GridParticleData(m_SceneData->PhysicsState->FluidParameters.ParticleCount, m_SceneData->ParticleGridSpacing);
         }
 
         if (ImGui::Button("Set"))
-            m_SceneData->PhysicsState->GridParticleData(m_SceneData->count, m_SceneData->ParticleGridSpacing);
+            m_SceneData->PhysicsState->GridParticleData(m_SceneData->PhysicsState->FluidParameters.ParticleCount, m_SceneData->ParticleGridSpacing);
     }
 
     if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -87,7 +87,7 @@ void ImGuiLayer::DrawControlsPanel()
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
-        ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 200);
+        ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
     }
 
     ImGui::End();
