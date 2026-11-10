@@ -3,6 +3,9 @@
 A real-time fluid simulation using **Smoothed Particle Hydrodynamics (SPH)**, written from scratch in C++ and OpenGL.
 
 ![Fluid Simulation](https://github.com/user-attachments/assets/55be1121-fdfb-43d0-9e93-70f8fda74139)
+![Fluid Simulation2](https://github.com/user-attachments/assets/7de48a8f-3710-4c2d-98c3-d6f8d00f07f4)
+
+
 
 > **Status:** early development.
 
@@ -14,7 +17,7 @@ $$A(\mathbf{r}) = \sum_j m_j \, \frac{A_j}{\rho_j} \, W(\mathbf{r} - \mathbf{r}_
 
 where $m_j$, $\rho_j$, $\mathbf{r}_j$ and $A_j$ are the mass, density, position and value of $A$ for particle $j$. Gradients of a field come from the same sum with $W$ replaced by its gradient $\nabla W$.
 
-This project follows Müller, Charypar & Gross (2003), *Particle-Based Fluid Simulation for Interactive Applications*.
+This project follows Müller, Charypar & Gross (2003), *Particle-Based Fluid Simulation for Interactive Applications*, along with various other papers used for rendering not yet mentioned here.
 
 ## Building
 
@@ -36,7 +39,7 @@ GLAD and GLM are included in the repo. Dear ImGui (docking branch) and spdlog co
 
 ## References
 
-- M. Müller, D. Charypar, M. Gross. *Particle-Based Fluid Simulation for Interactive Applications*. SCA 2003.
+- M. Müller, D. Charypar, M. Gross. *Particle-Based Fluid Simulation for Interactive Applications*. SCA 2003, along with various other papers used for rendering not yet mentioned here.
 
 ## Acknowledgements
 
