@@ -133,7 +133,7 @@ void PhysicsSolver::UpdateParticlePressures()
 
 	for (int i = 0; i < m_PhysicsState->Particles.size(); i++) {
 		Particle& source = m_PhysicsState->Particles[i];
-		source.Pressure = std::max(0.0f, stiffness * (source.Density - restDensity));
+		source.Pressure = stiffness * (source.Density - restDensity);
 		//source.Pressure = stiffness * (source.Density - restDensity);
 	}
 }
