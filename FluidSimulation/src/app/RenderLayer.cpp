@@ -47,7 +47,8 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_ParticleShader = ShaderProgram("resources/shaders/2D/ParticleShader.shader");
     m_RadiusParticleShader = ShaderProgram("resources/shaders/2D/RadiusParticleShader.shader");
     m_VelocityParticleShader = ShaderProgram("resources/shaders/2D/VelocityParticleShader.shader");
-    m_KernelShapeShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
+    m_KernelRadiusFallOffShader = ShaderProgram("resources/shaders/2D/KernelRadiusFallOffShader.shader");
+    m_KernelRadiusOutlineShader = ShaderProgram("resources/shaders/2D/KernelRadiusOutlineShader.shader");
     m_WhiteBallShader = ShaderProgram("resources/shaders/2D/WhiteBallShader.shader");
 
     m_KernelBallShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
@@ -93,12 +94,15 @@ void RenderLayer::OnRender()
         UpdateFluidParticleInstanceBuffers(fluidParticles);
 
         if (m_SceneData->ShowKernel)
-            DrawKernelRadius(fluidParticles[specimenIndex].Position, smoothingRadius);
+            DrawKernelRadiusFallOff(fluidParticles[specimenIndex].Position, smoothingRadius); //outline needs to appear behind
+
+        DrawFluidParticles(fluidParticles, specimenIndex, smoothingRadius);
+
+        if (m_SceneData->ShowKernel)
+            DrawKernelRadiusOutline(fluidParticles[specimenIndex].Position, smoothingRadius); //outline needs to appear in front
 
         if (m_SceneData->ShowForceArrow)
             DrawForceArrows(fluidParticles);
-
-        DrawFluidParticles(fluidParticles, specimenIndex, smoothingRadius);
     }
 
     if (m_SceneData->ShowBoundaryParticles) 
@@ -112,12 +116,20 @@ void RenderLayer::OnRender()
     EndFrame();
 }
 
-void RenderLayer::DrawKernelRadius(glm::vec3 position, float h)
+void RenderLayer::DrawKernelRadiusFallOff(glm::vec3 position, float h)
 {
     glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f));
-    m_KernelShapeShader.SetUniformMat4f("u_Model", model);
+    m_KernelRadiusFallOffShader.SetUniformMat4f("u_Model", model);
 
-    RenderCommand::DrawElements(m_QuadVao, m_KernelShapeShader);
+    RenderCommand::DrawElements(m_QuadVao, m_KernelRadiusFallOffShader);
+}
+
+void RenderLayer::DrawKernelRadiusOutline(glm::vec3 position, float h)
+{
+    glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f));
+    m_KernelRadiusOutlineShader.SetUniformMat4f("u_Model", model);
+
+    RenderCommand::DrawElements(m_QuadVao, m_KernelRadiusOutlineShader);
 }
 
 void RenderLayer::DrawForceArrows(const std::vector<FluidParticle>& particles)
@@ -132,11 +144,11 @@ void RenderLayer::DrawForceArrows(const std::vector<FluidParticle>& particles)
 
 void RenderLayer::DrawFluidParticles(const std::vector<FluidParticle>& particles, int specimenIndex, float smoothingRadius)
 {
+    const FluidParameters& fluid = m_SceneData->PhysicsState->FluidParameters;
     const float h2 = smoothingRadius * smoothingRadius;
-    //ShaderProgram& shader = m_ParticleShader;
     ShaderProgram& shader = m_VelocityParticleShader;
 
-    shader.SetUniform1f("u_BallRadius", PhysicsSolver::FluidParticleRadius);
+    shader.SetUniform1f("u_BallRadius", (m_SceneData->MatchBallSizeToSpacing ? fluid.ParticleSpacing / 2 : PhysicsSolver::FluidParticleRadius));
     shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
     shader.SetUniform1f("u_MaxVelocitySize", m_SceneData->VMax);
 

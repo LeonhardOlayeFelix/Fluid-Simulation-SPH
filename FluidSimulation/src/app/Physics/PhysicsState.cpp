@@ -43,11 +43,12 @@ void PhysicsState::GridParticleData(int count, float spacing)
 void PhysicsState::RecalculateBoundaryParticles()
 {
     float d = FluidParameters.ParticleSpacing;
+    float offset = d / 2;
 
     BoundingBox domain = BoundaryParameters.ParticleDomain;
     
     //Boundary particles should be placed slightly outside of particle domain.
-    BoundingBox surfaceToSample = BoundingBox(domain.min() - glm::vec2{ d, d }, domain.max() + glm::vec2{ d, d });
+    BoundingBox surfaceToSample = BoundingBox(domain.min() - glm::vec2{ offset, offset }, domain.max() + glm::vec2{ offset, offset });
 
 
     BoundaryParticles.clear();

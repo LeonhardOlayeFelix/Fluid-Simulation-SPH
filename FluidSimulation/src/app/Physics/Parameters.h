@@ -13,11 +13,11 @@ struct BoundaryParameters {
 struct FluidParameters {
 	bool SimulationRunning;
 	float RestDensity = 6.0;
-	float FluidStiffness = 300000;
+	float FluidStiffness = 1'300'000.0f;
 	float Viscosity = 3000;
 	float ParticleSpacing = 10;
 	float SmoothingRadius{ 25 };
-	float ParticleMass = 1000;
+	float ParticleMass = RestDensity * ParticleSpacing * ParticleSpacing;
 	float Gamma1 = 0;
 	float Gamma2 = 0;
 	int FluidParticleCount = 1500;

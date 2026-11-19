@@ -17,7 +17,7 @@ Application::Application(ApplicationSpec appSpec) : m_AppSpec(appSpec)
     initImGui();
 
     m_SceneData = std::make_shared<SceneData>();
-    m_PhysicsSystem = std::make_shared<PhysicsSystem>(m_SceneData->PhysicsState, 1.0 / 120);
+    m_PhysicsSystem = std::make_shared<PhysicsSystem>(m_SceneData->PhysicsState, 1.0 / 160);
     m_SPHRenderLayer = std::make_shared<RenderLayer>(m_SceneData);
     m_ImGuiLayer = std::make_shared<ImGuiLayer>(m_SceneData, m_SPHRenderLayer);
 }

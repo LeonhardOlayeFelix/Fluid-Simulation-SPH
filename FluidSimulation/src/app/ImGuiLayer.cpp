@@ -95,8 +95,9 @@ void ImGuiLayer::DrawControlsPanel()
         if (changedSpacing || changedRestDensity) {
             fluid.ParticleMass = fluid.RestDensity * fluid.ParticleSpacing * fluid.ParticleSpacing;
             fluid.SmoothingRadius = 2.50f * fluid.ParticleSpacing;
+            
             m_SceneData->PhysicsState->RecalculateBoundaryParticles();
-
+            
             if (!fluid.SimulationRunning)
                 m_SceneData->PhysicsState->GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
         }
@@ -112,6 +113,7 @@ void ImGuiLayer::DrawControlsPanel()
     }
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::Checkbox("Match Fluid Particle Size to Spacing", &m_SceneData->MatchBallSizeToSpacing);
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
         ImGui::Checkbox("Show Kernel Radius", &m_SceneData->ShowKernel);
         ImGui::Checkbox("Show Boundary Particles", &m_SceneData->ShowBoundaryParticles);
