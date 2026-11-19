@@ -17,7 +17,7 @@ struct PhysicsState
 
     void RandomiseParticleData(int count);
     void GridParticleData(int count, float spacing);
-	void OnParticleDomainGeometryChanged();
+	void RecalculateBoundaryParticles();
 
 private:
 	

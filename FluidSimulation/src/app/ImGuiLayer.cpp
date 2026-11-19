@@ -43,7 +43,7 @@ void ImGuiLayer::DrawViewport()
     ImVec2 currSize = ImGui::GetContentRegionAvail();
     if (currSize.x != oldSize.x || currSize.y != oldSize.y) {
         m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
-        m_SceneData->PhysicsState->OnParticleDomainGeometryChanged();
+        m_SceneData->PhysicsState->RecalculateBoundaryParticles();
     }
 
     ImGui::Image(reinterpret_cast<void*>(m_SceneData->FramebufferTextureId), currSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -91,6 +91,7 @@ void ImGuiLayer::DrawControlsPanel()
         if (changedSpacing) {
             fluid.ParticleMass = fluid.RestDensity * fluid.ParticleSpacing * fluid.ParticleSpacing;
             fluid.SmoothingRadius = 2.50f * fluid.ParticleSpacing;
+            m_SceneData->PhysicsState->RecalculateBoundaryParticles();
         }
 
         ImGui::BeginDisabled();

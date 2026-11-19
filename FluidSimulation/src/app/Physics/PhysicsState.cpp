@@ -40,7 +40,7 @@ void PhysicsState::GridParticleData(int count, float spacing)
     Particles = std::move(particles);
 }
 
-void PhysicsState::OnParticleDomainGeometryChanged()
+void PhysicsState::RecalculateBoundaryParticles()
 {
     BoundingBox domain = BoundaryParameters.ParticleDomain;
 
