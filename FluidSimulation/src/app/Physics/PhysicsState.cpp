@@ -42,30 +42,34 @@ void PhysicsState::GridParticleData(int count, float spacing)
 
 void PhysicsState::RecalculateBoundaryParticles()
 {
-    BoundingBox domain = BoundaryParameters.ParticleDomain;
-
     float d = FluidParameters.ParticleSpacing;
+
+    BoundingBox domain = BoundaryParameters.ParticleDomain;
+    
+    //Boundary particles should be placed slightly outside of particle domain.
+    BoundingBox surfaceToSample = BoundingBox(domain.min() - glm::vec2{ d, d }, domain.max() + glm::vec2{ d, d });
+
 
     BoundaryParticles.clear();
 
-    int nx = std::max(1, (int)std::round(domain.width() / d));
-    int ny = std::max(1, (int)std::round(domain.height() / d));
+    int nx = std::max(1, (int)std::round(surfaceToSample.width() / d));
+    int ny = std::max(1, (int)std::round(surfaceToSample.height() / d));
 
-    float dx = domain.width() / nx;
-    float dy = domain.height() / ny;
+    float dx = surfaceToSample.width() / nx;
+    float dy = surfaceToSample.height() / ny;
 
     BoundaryParticles.reserve(2 * (nx + 1) + 2 * (ny - 1));
 
     for (int i = 0; i <= nx; i++) {
-        float x = domain.xmin() + i * dx;
-        BoundaryParticles.push_back(BoundaryParticle({ x, domain.ymin(), 0 }));
-        BoundaryParticles.push_back(BoundaryParticle({ x, domain.ymax(), 0 }));
+        float x = surfaceToSample.xmin() + i * dx;
+        BoundaryParticles.push_back(BoundaryParticle({ x, surfaceToSample.ymin(), 0 }));
+        BoundaryParticles.push_back(BoundaryParticle({ x, surfaceToSample.ymax(), 0 }));
     }
 
     for (int j = 1; j < ny; j++) {
-        float y = domain.ymin() + j * dy;
-        BoundaryParticles.push_back(BoundaryParticle({ domain.xmin(), y, 0 }));
-        BoundaryParticles.push_back(BoundaryParticle({ domain.xmax(), y, 0 }));
+        float y = surfaceToSample.ymin() + j * dy;
+        BoundaryParticles.push_back(BoundaryParticle({ surfaceToSample.xmin(), y, 0 }));
+        BoundaryParticles.push_back(BoundaryParticle({ surfaceToSample.xmax(), y, 0 }));
     }
 
     BoundaryParameters.Stale = true;
