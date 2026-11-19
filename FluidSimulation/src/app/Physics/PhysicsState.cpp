@@ -68,6 +68,8 @@ void PhysicsState::RecalculateBoundaryParticles()
         BoundaryParticles.push_back(BoundaryParticle({ domain.xmax(), y, 0 }));
     }
 
+    BoundaryParameters.Stale = true;
+
 }
 
 int PhysicsState::randomInt(int min, int max)

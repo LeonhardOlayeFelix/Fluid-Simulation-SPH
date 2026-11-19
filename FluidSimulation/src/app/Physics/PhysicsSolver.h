@@ -33,6 +33,8 @@ private:
 
 	void AdvanceParticles(double timeStep);
 	void UpdateGridSearch();
+	void UpdateBoundaryParticleGridSearch();
+	void UpdateFluidParticleGridSearch();
 	void UpdatePredictedPositions(double timeStep);
 	void UpdateParticleDensities();
 	void UpdateParticlePressures();

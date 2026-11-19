@@ -33,9 +33,26 @@ void PhysicsSolver::AdvanceParticles(double timeStep)
 	UpdateParticlePressureForceDensities();
 	UpdateParticleViscosityForceDensities();
 	UpdateActualPositions(timeStep);
+
+
 }
 
 void PhysicsSolver::UpdateGridSearch()
+{
+
+	if (m_PhysicsState->BoundaryParameters.Stale) {
+		UpdateBoundaryParticleGridSearch();
+		m_PhysicsState->BoundaryParameters.Stale = false;
+	}
+
+	UpdateFluidParticleGridSearch();
+
+}
+
+void PhysicsSolver::UpdateBoundaryParticleGridSearch()
+{}
+
+void PhysicsSolver::UpdateFluidParticleGridSearch()
 {
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 	std::vector<Particle>& particles = m_PhysicsState->Particles;
@@ -67,7 +84,6 @@ void PhysicsSolver::UpdateGridSearch()
 			lastSeenNum = m_SpatialLookup[i].first;
 		}
 	}
-
 }
 
 void PhysicsSolver::UpdatePredictedPositions(double timeStep)

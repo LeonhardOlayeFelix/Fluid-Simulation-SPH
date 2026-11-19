@@ -7,6 +7,7 @@
 struct BoundaryParameters {
 	BoundingBox ParticleDomain;
 	BoundingBox Viewport;
+	bool Stale = false;
 };
 
 struct FluidParameters {
