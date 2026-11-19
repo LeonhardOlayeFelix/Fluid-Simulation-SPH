@@ -40,11 +40,33 @@ void PhysicsState::GridParticleData(int count, float spacing)
     Particles = std::move(particles);
 }
 
-void PhysicsState::OnBoundaryGeometryChanged()
+void PhysicsState::OnParticleDomainGeometryChanged()
 {
-    BoundingBox currentDomain = BoundaryParameters.ParticleDomain;
+    BoundingBox domain = BoundaryParameters.ParticleDomain;
+
+    float d = FluidParameters.ParticleSpacing;
 
     BoundaryParticles.clear();
+
+    int nx = std::max(1, (int)std::round(domain.width() / d));
+    int ny = std::max(1, (int)std::round(domain.height() / d));
+
+    float dx = domain.width() / nx;
+    float dy = domain.height() / ny;
+
+    BoundaryParticles.reserve(2 * (nx + 1) + 2 * (ny - 1));
+
+    for (int i = 0; i <= nx; i++) {
+        float x = domain.xmin() + i * dx;
+        BoundaryParticles.push_back(BoundaryParticle({ x, domain.ymin(), 0 }));
+        BoundaryParticles.push_back(BoundaryParticle({ x, domain.ymax(), 0 }));
+    }
+
+    for (int j = 1; j < ny; j++) {
+        float y = domain.ymin() + j * dy;
+        BoundaryParticles.push_back(BoundaryParticle({ domain.xmin(), y, 0 }));
+        BoundaryParticles.push_back(BoundaryParticle({ domain.xmax(), y, 0 }));
+    }
 
 }
 

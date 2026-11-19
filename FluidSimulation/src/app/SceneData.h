@@ -24,6 +24,7 @@ struct SceneData
 	bool ShowForceArrow = false;
 	bool FlipForceArrow = false;
 	bool ShowKernel = false;
+	bool ShowBoundaryParticles = true;
 
 
 

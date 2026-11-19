@@ -10,6 +10,7 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_ForceDensityInstanceVbo = VertexBuffer::CreateEmpty();
     m_TranslationsInstanceVbo = VertexBuffer::CreateEmpty();
     m_VelocityInstanceVbo = VertexBuffer::CreateEmpty();
+    m_BoundaryTranslationsInstanceVbo = VertexBuffer::CreateEmpty();
 
     m_CircleVbo = VertexBuffer(circlePrimitive);
     m_CircleIbo = IndexBuffer(circlePrimitive);
@@ -19,6 +20,15 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_CircleVao.SetAttribDivisor(1, 1);
     m_CircleVao.SetAttribDivisor(2, 1);
     m_CircleVao.RecordIndexBuffer(m_CircleIbo);
+
+    m_BoundaryCircleVbo = VertexBuffer(circlePrimitive);
+    m_BoundaryCircleIbo = IndexBuffer(circlePrimitive);
+    m_BoundaryCircleVao.RecordVBOLayout(m_BoundaryCircleVbo, { 3 });
+    m_BoundaryCircleVao.RecordVBOLayout(m_BoundaryTranslationsInstanceVbo, { 3 });
+    m_BoundaryCircleVao.SetAttribDivisor(1, 1);
+    m_BoundaryCircleVao.RecordIndexBuffer(m_BoundaryCircleIbo);
+
+
 
     m_QuadVbo = VertexBuffer(squarePrimitive);
     m_QuadIbo = IndexBuffer(squarePrimitive);
@@ -38,6 +48,7 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_RadiusParticleShader = ShaderProgram("resources/shaders/2D/RadiusParticleShader.shader");
     m_VelocityParticleShader = ShaderProgram("resources/shaders/2D/VelocityParticleShader.shader");
     m_KernelShapeShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
+    m_WhiteBallShader = ShaderProgram("resources/shaders/2D/WhiteBallShader.shader");
 
     m_KernelBallShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
     m_ArrowShader = ShaderProgram("resources/shaders/2D/ArrowShader.shader");
@@ -71,7 +82,8 @@ void RenderLayer::OnRender()
 
     ReadSceneData();
 
-    std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
+    const std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
+    const std::vector<BoundaryParticle>& boundaryParticles = m_SceneData->PhysicsState->BoundaryParticles;
 
     if (!particles.empty())
     {
@@ -87,6 +99,12 @@ void RenderLayer::OnRender()
             DrawForceArrows(particles);
 
         DrawParticles(particles, specimenIndex, smoothingRadius);
+    }
+
+    if (m_SceneData->ShowBoundaryParticles) 
+    {
+        UpdateBoundaryInstanceBuffers(boundaryParticles);
+        DrawBoundaryParticles(boundaryParticles);
     }
 
     WriteSceneData();
@@ -131,6 +149,14 @@ void RenderLayer::DrawParticles(const std::vector<Particle>& particles, int spec
     RenderCommand::DrawElementsInstanced(m_CircleVao, shader, particles.size());
 }
 
+void RenderLayer::DrawBoundaryParticles(const std::vector<BoundaryParticle>& boundaryParticles)
+{
+    m_WhiteBallShader.SetUniform1f("u_BallRadius", PhysicsSolver::BallRadius);
+
+    RenderCommand::DrawElementsInstanced(m_BoundaryCircleVao, m_WhiteBallShader, boundaryParticles.size());
+
+}
+
 
 void RenderLayer::BeginFrame()
 {
@@ -166,9 +192,22 @@ void RenderLayer::UpdateInstanceBuffers(const std::vector<Particle>& particles)
         m_Velocities[i] = particles[i].Velocity;
     }
 
+
+
     m_TranslationsInstanceVbo.UpdateData(m_Translations.data(), m_Translations.size() * 3 * sizeof(float));
     m_ForceDensityInstanceVbo.UpdateData(m_ForceDensities.data(), m_ForceDensities.size() * 3 * sizeof(float));
     m_VelocityInstanceVbo.UpdateData(m_Velocities.data(), m_Velocities.size() * 3 * sizeof(float));
+}
+
+void RenderLayer::UpdateBoundaryInstanceBuffers(const std::vector<BoundaryParticle>& particles)
+{
+    m_BoundaryTranslations.resize(particles.size());
+
+    for (int i = 0; i < m_BoundaryTranslations.size(); i++) {
+        m_BoundaryTranslations[i] = particles[i].Position;
+    }
+
+    m_BoundaryTranslationsInstanceVbo.UpdateData(m_BoundaryTranslations.data(), m_BoundaryTranslations.size() * 3 * sizeof(float));
 }
 
 float RenderLayer::getAspectRatio()

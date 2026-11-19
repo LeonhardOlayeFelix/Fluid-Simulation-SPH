@@ -25,10 +25,12 @@ public:
 	void WriteSceneData();
 	void ReadSceneData();
 	void UpdateInstanceBuffers(const std::vector<Particle>& particles);
+	void UpdateBoundaryInstanceBuffers(const std::vector<BoundaryParticle>& particles);
 
 	inline unsigned int GetFrameBufferTextureId() { return m_ResolveFbo.GetColorTexture().GetId(); };
 	void OnGuiViewportSizeChanged(int width, int height);
 	void DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float h);
+	void DrawBoundaryParticles(const std::vector<BoundaryParticle>& boundaryParticles);
 	void DrawForceArrows(const std::vector<Particle>& particles);
 	void DrawKernelRadius(glm::vec3 position, float h);
 
@@ -40,19 +42,25 @@ private:
 	std::shared_ptr<SceneData> m_SceneData;
 
 	VertexArray m_CircleVao;
+	VertexArray m_BoundaryCircleVao;
 	VertexArray m_QuadVao;
 	VertexArray m_ArrowVao;
 
 	VertexBuffer m_CircleVbo;
+	VertexBuffer m_BoundaryCircleVbo;
 	VertexBuffer m_QuadVbo;
 	VertexBuffer m_ArrowVbo;
 
+
+
 	//Instance Vbos
 	VertexBuffer m_TranslationsInstanceVbo;
+	VertexBuffer m_BoundaryTranslationsInstanceVbo;
 	VertexBuffer m_ForceDensityInstanceVbo;
 	VertexBuffer m_VelocityInstanceVbo;
 
 	IndexBuffer m_CircleIbo;
+	IndexBuffer m_BoundaryCircleIbo;
 	IndexBuffer m_QuadIbo;
 	IndexBuffer m_ArrowIbo;
 
@@ -64,6 +72,7 @@ private:
 	ShaderProgram m_RadiusParticleShader;
 	ShaderProgram m_VelocityParticleShader;
 	ShaderProgram m_KernelShapeShader;
+	ShaderProgram m_WhiteBallShader;
 	ShaderProgram m_ArrowShader;
 
 	UniformBuffer m_MatricesUbo;
@@ -71,6 +80,7 @@ private:
 
 
 	std::vector<glm::vec3> m_Translations;
+	std::vector<glm::vec3> m_BoundaryTranslations;
 	std::vector<glm::vec3> m_ForceDensities;
 	std::vector<glm::vec3> m_Velocities;
 };

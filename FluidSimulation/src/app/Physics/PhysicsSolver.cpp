@@ -43,8 +43,6 @@ void PhysicsSolver::UpdateGridSearch()
 	m_SpatialLookup.resize(particles.size());
 	m_StartIndices.assign(particles.size(), UINT32_MAX);
 
-	//note to self- need to fix case where squares within the same 9 are mapped to the same key, so they are counted twice. Rare, but important.
-
 	for (int i = 0; i < m_SpatialLookup.size(); i++) {
 		Particle& particle = particles[i];
 

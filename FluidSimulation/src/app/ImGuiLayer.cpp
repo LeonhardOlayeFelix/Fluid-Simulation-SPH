@@ -43,7 +43,7 @@ void ImGuiLayer::DrawViewport()
     ImVec2 currSize = ImGui::GetContentRegionAvail();
     if (currSize.x != oldSize.x || currSize.y != oldSize.y) {
         m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
-        m_SceneData->PhysicsState->OnBoundaryGeometryChanged();
+        m_SceneData->PhysicsState->OnParticleDomainGeometryChanged();
     }
 
     ImGui::Image(reinterpret_cast<void*>(m_SceneData->FramebufferTextureId), currSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -104,6 +104,7 @@ void ImGuiLayer::DrawControlsPanel()
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
         ImGui::Checkbox("Show Kernel Radius", &m_SceneData->ShowKernel);
+        ImGui::Checkbox("Show Boundary Particles", &m_SceneData->ShowBoundaryParticles);
         ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
     }
 

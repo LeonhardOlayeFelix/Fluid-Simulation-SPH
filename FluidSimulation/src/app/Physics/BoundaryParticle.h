@@ -9,5 +9,8 @@ struct BoundaryParticle
 {
 public:
 	glm::vec3 Position{};
+
+	BoundaryParticle() = default;
+	BoundaryParticle(glm::vec3 position) : Position(position){};
 };
 
