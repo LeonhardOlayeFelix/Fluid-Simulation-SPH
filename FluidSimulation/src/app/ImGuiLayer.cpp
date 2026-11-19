@@ -61,7 +61,12 @@ void ImGuiLayer::DrawControlsPanel()
     if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
 
         bool a = ImGui::DragInt("Count", &m_SceneData->PhysicsState->FluidParameters.FluidParticleCount, 1.0, 1, 10000);
-        bool c = ImGui::DragFloat("Ball Radius", &PhysicsSolver::BallRadius, 0.1f, 0.1f, 50.0f);
+        bool c = ImGui::DragFloat("Fluid Particle Radius", &PhysicsSolver::FluidParticleRadius, 0.1f, 0.1f, 50.0f);
+
+        if (m_SceneData->ShowBoundaryParticles) 
+        {
+            ImGui::DragFloat("Boundary Particle Radius", &PhysicsSolver::BoundaryParticleRadius, 0.1f, 0.1f, 50.0f);
+        }
 
         if (a && !fluid.SimulationRunning)
         {

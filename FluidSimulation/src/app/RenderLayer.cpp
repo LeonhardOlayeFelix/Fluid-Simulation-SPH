@@ -136,7 +136,7 @@ void RenderLayer::DrawFluidParticles(const std::vector<FluidParticle>& particles
     //ShaderProgram& shader = m_ParticleShader;
     ShaderProgram& shader = m_VelocityParticleShader;
 
-    shader.SetUniform1f("u_BallRadius", PhysicsSolver::BallRadius);
+    shader.SetUniform1f("u_BallRadius", PhysicsSolver::FluidParticleRadius);
     shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
     shader.SetUniform1f("u_MaxVelocitySize", m_SceneData->VMax);
 
@@ -151,7 +151,7 @@ void RenderLayer::DrawFluidParticles(const std::vector<FluidParticle>& particles
 
 void RenderLayer::DrawBoundaryParticles(const std::vector<BoundaryParticle>& boundaryParticles)
 {
-    m_WhiteBallShader.SetUniform1f("u_BallRadius", PhysicsSolver::BallRadius);
+    m_WhiteBallShader.SetUniform1f("u_BallRadius", PhysicsSolver::BoundaryParticleRadius);
 
     RenderCommand::DrawElementsInstanced(m_BoundaryCircleVao, m_WhiteBallShader, boundaryParticles.size());
 
@@ -229,8 +229,10 @@ float RenderLayer::getMaxForceLength(const std::vector<FluidParticle>& particles
 
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
+    float d = m_SceneData->PhysicsState->FluidParameters.ParticleSpacing;
+
     m_SceneData->PhysicsState->BoundaryParameters.Viewport = BoundingBox({0, 0}, {width, height});
-    m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain = BoundingBox({ 0, 0 }, { width, height });
+    m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain = BoundingBox({ 0 + 2 * d, 0 + 2 * d }, { width - 2 * d, height - 2 * d });
 
     glViewport(0, 0, width, height);
     m_RenderFbo.Resize(width, height);

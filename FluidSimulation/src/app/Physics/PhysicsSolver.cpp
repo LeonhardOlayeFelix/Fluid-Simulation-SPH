@@ -401,25 +401,25 @@ void PhysicsSolver::DetectBoundaryCollision(FluidParticle& particle)
 {
 	const BoundingBox& bounds = m_PhysicsState->BoundaryParameters.ParticleDomain;
 
-	if (particle.Position.y - BallRadius <= bounds.ymin())
+	if (particle.Position.y - FluidParticleRadius <= bounds.ymin())
 	{
-		particle.Position.y = BallRadius + bounds.ymin();
+		particle.Position.y = FluidParticleRadius + bounds.ymin();
 		particle.Velocity.y = -particle.Velocity.y * CollisionDampingFactor;
 	}
-	else if (particle.Position.y + BallRadius >= bounds.ymax())
+	else if (particle.Position.y + FluidParticleRadius >= bounds.ymax())
 	{
-		particle.Position.y = bounds.ymax() - BallRadius;
+		particle.Position.y = bounds.ymax() - FluidParticleRadius;
 		particle.Velocity.y = -particle.Velocity.y * CollisionDampingFactor;
 	}
 
-	if (particle.Position.x - BallRadius <= bounds.xmin())
+	if (particle.Position.x - FluidParticleRadius <= bounds.xmin())
 	{
-		particle.Position.x = BallRadius + bounds.xmin();
+		particle.Position.x = FluidParticleRadius + bounds.xmin();
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
-	else if (particle.Position.x + BallRadius >= bounds.xmax())
+	else if (particle.Position.x + FluidParticleRadius >= bounds.xmax())
 	{
-		particle.Position.x = bounds.xmax() - BallRadius;
+		particle.Position.x = bounds.xmax() - FluidParticleRadius;
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
 }
