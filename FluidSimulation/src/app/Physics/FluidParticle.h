@@ -18,7 +18,7 @@ public:
 	float Pressure{ 0 };
 
 	FluidParticle() = default;
-
+	FluidParticle(glm::vec3 position) : Position(position) {};
 	FluidParticle(glm::vec2 position, glm::vec2 velocity)
 	{
 		Position = glm::vec3(position, 0);

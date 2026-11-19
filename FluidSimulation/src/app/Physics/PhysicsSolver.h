@@ -7,9 +7,11 @@
 #include "Parameters.h"
 #include "PhysicsState.h"
 #include <functional>
+#include <utility>
 
 class PhysicsSolver {
 public:
+
 	inline static float MetersGravity = -9.81;
 	inline static float PixelsPerMeter = 102;
 	inline static float Gravity = MetersGravity * PixelsPerMeter;
@@ -34,9 +36,12 @@ private:
 	std::vector<uint32_t> m_BoundaryStartIndices;  //query with cell key. Stores a list of (indicies) at which cells start appearing in spatialLookup
 
 	void AdvanceParticles(double timeStep);
-	void UpdateGridSearch();
 	void UpdateBoundaryParticleGridSearch();
 	void UpdateFluidParticleGridSearch();
+	void UpdateGammaCorrectionCoefficients();
+	GammaTemplate GenerateGammaCorrectionTemplate();
+	void UpdateGamma1(const GammaTemplate& templ);
+	void UpdateGamma2(const GammaTemplate& templ);
 	void UpdatePredictedPositions(double timeStep);
 	void UpdateParticleDensities();
 	void UpdateParticlePressures();
@@ -149,3 +154,8 @@ private:
 
 };
 
+struct GammaTemplate {
+	std::vector<FluidParticle> FluidParticles;
+	std::vector<BoundaryParticle> BoundaryParticles;
+
+};
