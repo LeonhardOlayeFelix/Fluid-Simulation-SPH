@@ -7,27 +7,22 @@
 
 struct SceneData
 {
-	unsigned int FramebufferTextureId{};
 
 	std::shared_ptr<PhysicsState> PhysicsState;
 
-	int numRows = 10;
-	int numCols = 10;
-
-
-	int ArrowLengthMax = 40;
-	int ArrowWidth = 2;
-	float VMax = 100;
-
-
 	bool ShowForceArrow = false;
 	bool ShowKernel = false;
-	bool ShowBoundaryParticles = true;
-	bool ShowParticleDomain = true;
+	bool ShowBoundaryParticles = false;
+	bool ShowParticleDomain = false;
 	bool MatchBallSizeToSpacing = false;
 	bool FlipForceArrow = false;
 
+	int ArrowLengthMax = 40;
+	int ArrowWidth = 2;
 
+	unsigned int FramebufferTextureId{};
+
+	float VMax = 100;
 
 	SceneData();
 };

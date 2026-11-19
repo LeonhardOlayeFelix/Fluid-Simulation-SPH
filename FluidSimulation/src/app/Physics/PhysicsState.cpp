@@ -1,23 +1,6 @@
 #include "PhysicsState.h"
 #include <random>
 
-void PhysicsState::RandomiseParticleData(int count)
-{
-
-    std::vector<FluidParticle> particles;
-    particles.reserve(count);
-
-    for (int i = 0; i < count; i++)
-    {
-        int xPos = randomIntNormal(0, BoundaryParameters.Viewport.width());
-        int yPos = randomIntNormal(0, BoundaryParameters.Viewport.height());
-
-        particles.emplace_back(glm::vec3{ xPos, yPos, 0 }, glm::vec3{});
-    }
-
-    FluidParticles = std::move(particles);
-}
-
 void PhysicsState::GridParticleData(int count, float spacing)
 {
     std::vector<FluidParticle> particles;
@@ -47,9 +30,7 @@ void PhysicsState::RecalculateBoundaryParticles()
 
     BoundingBox domain = BoundaryParameters.ParticleDomain;
     
-    //Boundary particles should be placed slightly outside of particle domain.
     BoundingBox surfaceToSample = BoundingBox(domain.min() - glm::vec2{ offset, offset }, domain.max() + glm::vec2{ offset, offset });
-
 
     BoundaryParticles.clear();
 
@@ -74,22 +55,4 @@ void PhysicsState::RecalculateBoundaryParticles()
     }
 
     BoundaryParameters.Stale = true;
-
-}
-
-int PhysicsState::randomInt(int min, int max)
-{
-    static std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<int> dist(min, max);
-    return dist(rng);
-}
-
-int PhysicsState::randomIntNormal(int min, int max)
-{
-    static std::mt19937 rng(std::random_device{}());
-    float mean = 0.5f * (min + max);
-    float stddev = (max - min) / 9.0f;
-    std::normal_distribution<float> dist(mean, stddev);
-    int value = (int)std::round(dist(rng));
-    return std::clamp(value, min, max);
 }

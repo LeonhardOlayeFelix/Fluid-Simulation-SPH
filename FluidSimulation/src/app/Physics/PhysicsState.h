@@ -13,14 +13,7 @@ struct PhysicsState
 	FluidParameters FluidParameters;
 	BoundaryParameters BoundaryParameters;
 
-	PhysicsState() = default;
-
-    void RandomiseParticleData(int count);
     void GridParticleData(int count, float spacing);
 	void RecalculateBoundaryParticles();
 
-private:
-	
-    int randomInt(int min, int max);
-	int randomIntNormal(int min, int max);
 };
