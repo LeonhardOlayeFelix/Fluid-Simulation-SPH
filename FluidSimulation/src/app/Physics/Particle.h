@@ -17,8 +17,6 @@ public:
 	float Density{ 0 };
 	float Pressure{ 0 };
 
-	float Mass{ 1000 };
-
 	Particle() = default;
 
 	Particle(glm::vec2 position, glm::vec2 velocity)

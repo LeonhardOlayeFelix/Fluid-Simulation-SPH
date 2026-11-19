@@ -63,6 +63,7 @@ private:
 	ShaderProgram m_ParticleShader;
 	ShaderProgram m_RadiusParticleShader;
 	ShaderProgram m_VelocityParticleShader;
+	ShaderProgram m_KernelShapeShader;
 	ShaderProgram m_ArrowShader;
 
 	UniformBuffer m_MatricesUbo;

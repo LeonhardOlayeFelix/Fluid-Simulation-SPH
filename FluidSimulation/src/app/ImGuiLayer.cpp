@@ -37,10 +37,13 @@ void ImGuiLayer::DrawViewport()
 {
     ImGui::Begin("Viewport");
 
-    auto oldSize = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize;
+    BoundingBox oldParticleDomain = m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain;
+
+    auto oldSize = oldParticleDomain.size();
     ImVec2 currSize = ImGui::GetContentRegionAvail();
     if (currSize.x != oldSize.x || currSize.y != oldSize.y) {
         m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
+        m_SceneData->PhysicsState->OnBoundaryGeometryChanged();
     }
 
     ImGui::Image(reinterpret_cast<void*>(m_SceneData->FramebufferTextureId), currSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -58,7 +61,8 @@ void ImGuiLayer::DrawControlsPanel()
     if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
 
         bool a = ImGui::DragInt("Count", &m_SceneData->PhysicsState->FluidParameters.ParticleCount, 1.0, 1, 10000);
-        bool b = ImGui::DragInt("Particle Spacing", &m_SceneData->ParticleGridSpacing, 1.0, 5, 50);
+        bool b = ImGui::DragInt("Particle Grid Spacing", &m_SceneData->ParticleGridSpacing, 1.0, 5, 50);
+        bool c = ImGui::DragFloat("Ball Radius", &PhysicsSolver::BallRadius, 0.1f, 0.1f, 50.0f);
 
         if ((a || b) && !fluid.SimulationRunning)
         {
@@ -79,14 +83,27 @@ void ImGuiLayer::DrawControlsPanel()
 
     if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) 
     {
+        ImGui::DragFloat("Rest Density (p0)", &fluid.RestDensity, 1, 0.1, 100.0);
+        ImGui::DragFloat("Stiffness (k)", &fluid.FluidStiffness, 1000, 1000, 10000000);
+        ImGui::DragFloat("Viscosity (v)", &fluid.Viscosity, 1000, 0, 10000000);
+        bool changedSpacing = ImGui::DragFloat("Particle Spacing (d)", &fluid.ParticleSpacing, 0.1f, 5.0f, 30.0f);
+
+        if (changedSpacing) {
+            fluid.ParticleMass = fluid.RestDensity * fluid.ParticleSpacing * fluid.ParticleSpacing;
+            fluid.SmoothingRadius = 2.50f * fluid.ParticleSpacing;
+        }
+
+        ImGui::BeginDisabled();
+        ImGui::DragFloat("Particle Mass (m)", &fluid.ParticleMass, 0.1f, 1.0f, 1000.0f);
         ImGui::DragFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 1, 20.0f, 50.0, "%.1f");
-        ImGui::DragFloat("Rest Density", &fluid.RestDensity,1 , 0.1, 100.0);
-        ImGui::DragFloat("Stiffness", &fluid.FluidStiffness,1000 , 1000, 10000000);
-        ImGui::DragFloat("Viscosity", &fluid.Viscosity, 1000 ,0, 10000000);
+        ImGui::EndDisabled();
+
+
     }
 
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
+        ImGui::Checkbox("Show Kernel Radius", &m_SceneData->ShowKernel);
         ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
     }
 
@@ -124,7 +141,7 @@ void ImGuiLayer::DrawInspector()
 void ImGuiLayer::DrawStats()
 {
     ImGuiIO& io = ImGui::GetIO();
-    const glm::vec2& viewport = m_SceneData->PhysicsState->BoundaryParameters.ViewportSize;
+    const BoundingBox& viewport = m_SceneData->PhysicsState->BoundaryParameters.Viewport;
 
     int width, height;
     glfwGetWindowSize(Application::Get()->GetWindow()->Handle(), &width, &height);
@@ -132,7 +149,7 @@ void ImGuiLayer::DrawStats()
     ImGui::Begin("Stats");
     ImGui::Text("%.1f FPS  |  %.3f ms/frame", io.Framerate, 1000.0f / io.Framerate);
     ImGui::Text("Particles: %d", (int)m_SceneData->PhysicsState->Particles.size());
-    ImGui::Text("Window: %d x %d  |  Viewport: %.0f x %.0f", width, height, viewport.x, viewport.y);
+    ImGui::Text("Window: %d x %d  |  Viewport: %.0f x %.0f", width, height, viewport.width(), viewport.height());
     ImGui::End();
 }
 

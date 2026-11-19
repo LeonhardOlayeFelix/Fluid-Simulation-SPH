@@ -109,6 +109,7 @@ void PhysicsSolver::UpdateParticleDensities()
 	float h2 = h * h;
 	float h8 = h2 * h2 * h2 * h2;
 	float coeff = 4.0f / (PI * h8);
+	float particleMass = m_PhysicsState->FluidParameters.ParticleMass;
 
 	for (Particle& pi : particles) {
 
@@ -119,7 +120,7 @@ void PhysicsSolver::UpdateParticleDensities()
 				glm::vec3 d = pi.PredictedPosition - pj.PredictedPosition;
 				float r2 = glm::dot(d, d);
 
-				pi.Density += pj.Mass * poly6Kernel(r2, h2, coeff);
+				pi.Density += particleMass * poly6Kernel(r2, h2, coeff);
 
 			});
 
@@ -133,7 +134,7 @@ void PhysicsSolver::UpdateParticlePressures()
 
 	for (int i = 0; i < m_PhysicsState->Particles.size(); i++) {
 		Particle& source = m_PhysicsState->Particles[i];
-		source.Pressure = stiffness * (source.Density - restDensity);
+		source.Pressure = std::max(0.0f, stiffness * (source.Density - restDensity));
 		//source.Pressure = stiffness * (source.Density - restDensity);
 	}
 }
@@ -147,6 +148,7 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 	float h5 = h2 * h2 * h;
 	float h8 = h2 * h2 * h2 * h2;
 	float coeff = -30.0f / (PI * h5);
+	float particleMass = m_PhysicsState->FluidParameters.ParticleMass;
 
 	for (Particle& pi : particles) {
 
@@ -159,7 +161,7 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 
 			float symmetrisedPressure = (pi.Pressure + pj.Pressure) / 2;
 
-			pi.PressureForceDensity += pj.Mass * symmetrisedPressure / pj.Density * spikyKernelGradient(r, r2, h, h2, coeff);
+			pi.PressureForceDensity += particleMass * symmetrisedPressure / pj.Density * spikyKernelGradient(r, r2, h, h2, coeff);
 
 			});
 
@@ -176,7 +178,7 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 	float h2 = h * h;
 	float h5 = h2 * h2 * h;
 	float coeff = 40 / (PI * h5);
-
+	float particleMass = m_PhysicsState->FluidParameters.ParticleMass;
 
 	for (Particle& pi : particles) {
 
@@ -189,7 +191,7 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 
 			glm::vec3 symmetrisedVelocity = (pj.Velocity - pi.Velocity);
 
-			pi.ViscousForceDensity += pj.Mass * symmetrisedVelocity / pj.Density * viscosityLaplacianKernel2D(r2, h, h2, coeff);
+			pi.ViscousForceDensity += particleMass * symmetrisedVelocity / pj.Density * viscosityLaplacianKernel2D(r2, h, h2, coeff);
 
 			});
 
@@ -203,27 +205,27 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 
 void PhysicsSolver::DetectBoundaryCollision(Particle& particle)
 {
-	const BoundaryParameters& bounds = m_PhysicsState->BoundaryParameters;
+	const BoundingBox& bounds = m_PhysicsState->BoundaryParameters.ParticleDomain;
 
-	if (particle.Position.y - BallRadius <= 0.0f)
+	if (particle.Position.y - BallRadius <= bounds.ymin())
 	{
-		particle.Position.y = BallRadius;
+		particle.Position.y = BallRadius + bounds.ymin();
 		particle.Velocity.y = -particle.Velocity.y * CollisionDampingFactor;
 	}
-	else if (particle.Position.y + BallRadius >= bounds.ViewportSize.y)
+	else if (particle.Position.y + BallRadius >= bounds.ymax())
 	{
-		particle.Position.y = bounds.ViewportSize.y - BallRadius;
+		particle.Position.y = bounds.ymax() - BallRadius;
 		particle.Velocity.y = -particle.Velocity.y * CollisionDampingFactor;
 	}
 
-	if (particle.Position.x - BallRadius <= 0.0f)
+	if (particle.Position.x - BallRadius <= bounds.xmin())
 	{
-		particle.Position.x = BallRadius;
+		particle.Position.x = BallRadius + bounds.xmin();
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
-	else if (particle.Position.x + BallRadius >= bounds.ViewportSize.x)
+	else if (particle.Position.x + BallRadius >= bounds.xmax())
 	{
-		particle.Position.x = bounds.ViewportSize.x - BallRadius;
+		particle.Position.x = bounds.xmax() - BallRadius;
 		particle.Velocity.x = -particle.Velocity.x * CollisionDampingFactor;
 	}
 }

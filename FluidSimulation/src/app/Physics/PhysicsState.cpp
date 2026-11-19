@@ -9,8 +9,8 @@ void PhysicsState::RandomiseParticleData(int count)
 
     for (int i = 0; i < count; i++)
     {
-        int xPos = randomIntNormal(0, BoundaryParameters.ViewportSize.x);
-        int yPos = randomIntNormal(0, BoundaryParameters.ViewportSize.y);
+        int xPos = randomIntNormal(0, BoundaryParameters.Viewport.width());
+        int yPos = randomIntNormal(0, BoundaryParameters.Viewport.height());
 
         particles.emplace_back(glm::vec3{ xPos, yPos, 0 }, glm::vec3{});
     }
@@ -25,7 +25,7 @@ void PhysicsState::GridParticleData(int count, float spacing)
 
     int sideLength = (int)std::ceil(std::sqrt((float)count));
 
-    glm::vec2 centre = BoundaryParameters.ViewportSize / 2.0f;
+    glm::vec2 centre = BoundaryParameters.ParticleDomain.centre();
     float gridWidth = (sideLength - 1) * spacing;
     glm::vec2 origin = centre - glm::vec2(gridWidth / 2.0f);
 
@@ -38,6 +38,14 @@ void PhysicsState::GridParticleData(int count, float spacing)
     }
 
     Particles = std::move(particles);
+}
+
+void PhysicsState::OnBoundaryGeometryChanged()
+{
+    BoundingBox currentDomain = BoundaryParameters.ParticleDomain;
+
+    BoundaryParticles.clear();
+
 }
 
 int PhysicsState::randomInt(int min, int max)

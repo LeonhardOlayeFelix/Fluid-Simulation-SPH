@@ -3,20 +3,21 @@
 #include <glm/glm.hpp>
 #include "Particle.h"
 #include "Parameters.h"
+#include "BoundaryParticle.h"
 
 struct PhysicsState
 {
 	std::vector<Particle> Particles;
+	std::vector<BoundaryParticle> BoundaryParticles;
 
 	FluidParameters FluidParameters;
-
 	BoundaryParameters BoundaryParameters;
 
 	PhysicsState() = default;
 
     void RandomiseParticleData(int count);
     void GridParticleData(int count, float spacing);
-    
+	void OnBoundaryGeometryChanged();
 
 private:
 	

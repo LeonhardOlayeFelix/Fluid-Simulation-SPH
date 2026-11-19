@@ -37,6 +37,7 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_ParticleShader = ShaderProgram("resources/shaders/2D/ParticleShader.shader");
     m_RadiusParticleShader = ShaderProgram("resources/shaders/2D/RadiusParticleShader.shader");
     m_VelocityParticleShader = ShaderProgram("resources/shaders/2D/VelocityParticleShader.shader");
+    m_KernelShapeShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
 
     m_KernelBallShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
     m_ArrowShader = ShaderProgram("resources/shaders/2D/ArrowShader.shader");
@@ -44,11 +45,13 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_MatricesUbo = UniformBuffer(sizeof(glm::mat4));
     m_MatricesUbo.BindToPoint(0);
 
-    m_RenderFbo = FrameBuffer(m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y, 6);
+    BoundingBox Viewport = m_SceneData->PhysicsState->BoundaryParameters.Viewport;
+
+    m_RenderFbo = FrameBuffer(Viewport.width(), Viewport.height(), 6);
     m_RenderFbo.AddAttachment(AttachmentTarget::Color, AttachmentStorage::Texture);
     m_RenderFbo.AddAttachment(AttachmentTarget::DepthStencil, AttachmentStorage::RenderBuffer);
 
-    m_ResolveFbo = FrameBuffer(m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x, m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y);
+    m_ResolveFbo = FrameBuffer(Viewport.width(), Viewport.height());
     m_ResolveFbo.AddAttachment(AttachmentTarget::Color, AttachmentStorage::Texture);
 }
 
@@ -93,9 +96,10 @@ void RenderLayer::OnRender()
 
 void RenderLayer::DrawKernelRadius(glm::vec3 position, float h)
 {
-    m_RadiusParticleShader.SetUniformMat4f("u_Model", glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f)));
+    glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f));
+    m_KernelShapeShader.SetUniformMat4f("u_Model", model);
 
-    RenderCommand::DrawElements(m_QuadVao, m_RadiusParticleShader);
+    RenderCommand::DrawElements(m_QuadVao, m_KernelShapeShader);
 }
 
 void RenderLayer::DrawForceArrows(const std::vector<Particle>& particles)
@@ -169,7 +173,9 @@ void RenderLayer::UpdateInstanceBuffers(const std::vector<Particle>& particles)
 
 float RenderLayer::getAspectRatio()
 {
-    return (float)m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.x / m_SceneData->PhysicsState->BoundaryParameters.ViewportSize.y;
+    BoundingBox viewport = m_SceneData->PhysicsState->BoundaryParameters.Viewport;
+
+    return viewport.width() / viewport.height();
 }
 
 float RenderLayer::getMaxForceLength(const std::vector<Particle>& particles)
@@ -184,7 +190,8 @@ float RenderLayer::getMaxForceLength(const std::vector<Particle>& particles)
 
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
-    m_SceneData->PhysicsState->BoundaryParameters.ViewportSize = { width, height };
+    m_SceneData->PhysicsState->BoundaryParameters.Viewport = BoundingBox({0, 0}, {width, height});
+    m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain = BoundingBox({ 0, 0 }, { width, height });
 
     glViewport(0, 0, width, height);
     m_RenderFbo.Resize(width, height);

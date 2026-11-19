@@ -2,9 +2,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "BoundingBox.h"
 
 struct BoundaryParameters {
-	glm::vec2 ViewportSize{ };
+	BoundingBox ParticleDomain;
+	BoundingBox Viewport;
 };
 
 struct FluidParameters {
@@ -12,6 +14,8 @@ struct FluidParameters {
 	float RestDensity = 6.0;
 	float FluidStiffness = 300000;
 	float Viscosity = 3000;
+	float ParticleSpacing = 10;
 	float SmoothingRadius{ 25 };
-	int ParticleCount = 3000;
+	float ParticleMass = 1000;
+	int ParticleCount = 1500;
 };
