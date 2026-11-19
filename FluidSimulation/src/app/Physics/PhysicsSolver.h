@@ -9,6 +9,12 @@
 #include <functional>
 #include <utility>
 
+struct GammaTemplate {
+	std::vector<FluidParticle> FluidParticles;
+	std::vector<BoundaryParticle> BoundaryParticles;
+
+};
+
 class PhysicsSolver {
 public:
 
@@ -154,8 +160,3 @@ private:
 
 };
 
-struct GammaTemplate {
-	std::vector<FluidParticle> FluidParticles;
-	std::vector<BoundaryParticle> BoundaryParticles;
-
-};
