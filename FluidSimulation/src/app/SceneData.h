@@ -14,7 +14,6 @@ struct SceneData
 	int numRows = 10;
 	int numCols = 10;
 
-	int ParticleGridSpacing = 10;
 
 	int ArrowLengthMax = 40;
 	int ArrowWidth = 2;
