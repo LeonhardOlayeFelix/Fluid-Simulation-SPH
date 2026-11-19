@@ -1,5 +1,5 @@
 #include "PhysicsSolver.h"
-#include "Particle.h"
+#include "FluidParticle.h"
 #include <cstdint>
 #include <algorithm>
 #include <utility>
@@ -24,7 +24,7 @@ uint32_t PhysicsSolver::HashCell(int x, int y, uint32_t n) {
 
 void PhysicsSolver::AdvanceParticles(double timeStep)
 {
-	if (!m_PhysicsState->FluidParameters.SimulationRunning || m_PhysicsState->Particles.size() == 0) return;
+	if (!m_PhysicsState->FluidParameters.SimulationRunning || m_PhysicsState->FluidParticles.size() == 0) return;
 
 	UpdatePredictedPositions(timeStep);
 	UpdateGridSearch();
@@ -55,13 +55,13 @@ void PhysicsSolver::UpdateBoundaryParticleGridSearch()
 void PhysicsSolver::UpdateFluidParticleGridSearch()
 {
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
-	std::vector<Particle>& particles = m_PhysicsState->Particles;
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 
 	m_SpatialLookup.resize(particles.size());
 	m_StartIndices.assign(particles.size(), UINT32_MAX);
 
 	for (int i = 0; i < m_SpatialLookup.size(); i++) {
-		Particle& particle = particles[i];
+		FluidParticle& particle = particles[i];
 
 		int cellX = std::floor(particle.PredictedPosition.x / h);
 		int cellY = std::floor(particle.PredictedPosition.y / h);
@@ -88,11 +88,11 @@ void PhysicsSolver::UpdateFluidParticleGridSearch()
 
 void PhysicsSolver::UpdatePredictedPositions(double timeStep)
 {
-	std::vector<Particle>& particles = m_PhysicsState->Particles;
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 
 	float dt = (float)timeStep;
 
-	for (Particle& particle : particles)
+	for (FluidParticle& particle : particles)
 	{
 		particle.Velocity = particle.Velocity + dt * glm::vec3(0, Gravity, 0);
 		particle.PredictedPosition = particle.Position + dt * particle.Velocity;
@@ -103,9 +103,9 @@ void PhysicsSolver::UpdatePredictedPositions(double timeStep)
 void PhysicsSolver::UpdateActualPositions(double timeStep)
 {
 	float dt = (float)timeStep;
-	std::vector<Particle>& particles = m_PhysicsState->Particles;
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 
-	for (Particle& particle : particles)
+	for (FluidParticle& particle : particles)
 	{
 		glm::vec3 f_i = particle.RecalculateResultantForceDensity();
 		particle.Acceleration = f_i / particle.Density;
@@ -118,18 +118,18 @@ void PhysicsSolver::UpdateActualPositions(double timeStep)
 
 void PhysicsSolver::UpdateParticleDensities()
 {
-	std::vector<Particle>& particles = m_PhysicsState->Particles;
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 	float h2 = h * h;
 	float h8 = h2 * h2 * h2 * h2;
 	float coeff = 4.0f / (PI * h8);
 	float particleMass = m_PhysicsState->FluidParameters.ParticleMass;
 
-	for (Particle& pi : particles) {
+	for (FluidParticle& pi : particles) {
 
 		pi.Density = 0;
 
-		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
+		ForEachFluidNeighbour(pi.PredictedPosition, [&](const FluidParticle& pj) {
 
 				glm::vec3 d = pi.PredictedPosition - pj.PredictedPosition;
 				float r2 = glm::dot(d, d);
@@ -146,8 +146,8 @@ void PhysicsSolver::UpdateParticlePressures()
 	float stiffness = m_PhysicsState->FluidParameters.FluidStiffness;
 	float restDensity = m_PhysicsState->FluidParameters.RestDensity;
 
-	for (int i = 0; i < m_PhysicsState->Particles.size(); i++) {
-		Particle& source = m_PhysicsState->Particles[i];
+	for (int i = 0; i < m_PhysicsState->FluidParticles.size(); i++) {
+		FluidParticle& source = m_PhysicsState->FluidParticles[i];
 		source.Pressure = std::max(0.0f, stiffness * (source.Density - restDensity));
 		//source.Pressure = stiffness * (source.Density - restDensity);
 	}
@@ -155,7 +155,7 @@ void PhysicsSolver::UpdateParticlePressures()
 
 void PhysicsSolver::UpdateParticlePressureForceDensities()
 {
-	std::vector<Particle>& particles = m_PhysicsState->Particles;
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 	float h2 = h * h;
@@ -164,11 +164,11 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 	float coeff = -30.0f / (PI * h5);
 	float particleMass = m_PhysicsState->FluidParameters.ParticleMass;
 
-	for (Particle& pi : particles) {
+	for (FluidParticle& pi : particles) {
 
 		pi.PressureForceDensity = glm::vec3(0);
 
-		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
+		ForEachFluidNeighbour(pi.PredictedPosition, [&](const FluidParticle& pj) {
 
 			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
 			float r2 = glm::dot(r, r);
@@ -186,7 +186,7 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 
 void PhysicsSolver::UpdateParticleViscosityForceDensities()
 {
-	std::vector<Particle>& particles = m_PhysicsState->Particles;
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 	float h2 = h * h;
@@ -194,11 +194,11 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 	float coeff = 40 / (PI * h5);
 	float particleMass = m_PhysicsState->FluidParameters.ParticleMass;
 
-	for (Particle& pi : particles) {
+	for (FluidParticle& pi : particles) {
 
 		pi.ViscousForceDensity = glm::vec3(0);
 
-		ForEachNeighbour(pi.PredictedPosition, [&](const Particle& pj) {
+		ForEachFluidNeighbour(pi.PredictedPosition, [&](const FluidParticle& pj) {
 
 			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
 			float r2 = glm::dot(r, r);
@@ -217,7 +217,7 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 
 
 
-void PhysicsSolver::DetectBoundaryCollision(Particle& particle)
+void PhysicsSolver::DetectBoundaryCollision(FluidParticle& particle)
 {
 	const BoundingBox& bounds = m_PhysicsState->BoundaryParameters.ParticleDomain;
 

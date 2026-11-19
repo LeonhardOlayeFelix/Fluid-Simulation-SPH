@@ -1,13 +1,13 @@
 #pragma once
 #include <vector>
 #include <glm/glm.hpp>
-#include "Particle.h"
+#include "FluidParticle.h"
 #include "Parameters.h"
 #include "BoundaryParticle.h"
 
 struct PhysicsState
 {
-	std::vector<Particle> Particles;
+	std::vector<FluidParticle> FluidParticles;
 	std::vector<BoundaryParticle> BoundaryParticles;
 
 	FluidParameters FluidParameters;

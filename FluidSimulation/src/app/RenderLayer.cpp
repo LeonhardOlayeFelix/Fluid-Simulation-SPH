@@ -82,28 +82,28 @@ void RenderLayer::OnRender()
 
     ReadSceneData();
 
-    const std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
+    const std::vector<FluidParticle>& fluidParticles = m_SceneData->PhysicsState->FluidParticles;
     const std::vector<BoundaryParticle>& boundaryParticles = m_SceneData->PhysicsState->BoundaryParticles;
 
-    if (!particles.empty())
+    if (!fluidParticles.empty())
     {
-        int specimenIndex = particles.size() / 4;
+        int specimenIndex = fluidParticles.size() / 4;
         float smoothingRadius = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
 
-        UpdateInstanceBuffers(particles);
+        UpdateFluidParticleInstanceBuffers(fluidParticles);
 
         if (m_SceneData->ShowKernel)
-            DrawKernelRadius(particles[specimenIndex].Position, smoothingRadius);
+            DrawKernelRadius(fluidParticles[specimenIndex].Position, smoothingRadius);
 
         if (m_SceneData->ShowForceArrow)
-            DrawForceArrows(particles);
+            DrawForceArrows(fluidParticles);
 
-        DrawParticles(particles, specimenIndex, smoothingRadius);
+        DrawFluidParticles(fluidParticles, specimenIndex, smoothingRadius);
     }
 
     if (m_SceneData->ShowBoundaryParticles) 
     {
-        UpdateBoundaryInstanceBuffers(boundaryParticles);
+        UpdateBoundaryParticleInstanceBuffers(boundaryParticles);
         DrawBoundaryParticles(boundaryParticles);
     }
 
@@ -120,7 +120,7 @@ void RenderLayer::DrawKernelRadius(glm::vec3 position, float h)
     RenderCommand::DrawElements(m_QuadVao, m_KernelShapeShader);
 }
 
-void RenderLayer::DrawForceArrows(const std::vector<Particle>& particles)
+void RenderLayer::DrawForceArrows(const std::vector<FluidParticle>& particles)
 {
     m_ArrowShader.SetUniform1f("u_ArrowLengthMax", m_SceneData->ArrowLengthMax);
     m_ArrowShader.SetUniform1f("u_ArrowWidth", m_SceneData->ArrowWidth);
@@ -130,7 +130,7 @@ void RenderLayer::DrawForceArrows(const std::vector<Particle>& particles)
     RenderCommand::DrawElementsInstanced(m_ArrowVao, m_ArrowShader, particles.size());
 }
 
-void RenderLayer::DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float smoothingRadius)
+void RenderLayer::DrawFluidParticles(const std::vector<FluidParticle>& particles, int specimenIndex, float smoothingRadius)
 {
     const float h2 = smoothingRadius * smoothingRadius;
     //ShaderProgram& shader = m_ParticleShader;
@@ -180,7 +180,7 @@ void RenderLayer::ReadSceneData()
 
 }
 
-void RenderLayer::UpdateInstanceBuffers(const std::vector<Particle>& particles)
+void RenderLayer::UpdateFluidParticleInstanceBuffers(const std::vector<FluidParticle>& particles)
 {
     m_Translations.resize(particles.size());
     m_ForceDensities.resize(particles.size());
@@ -199,7 +199,7 @@ void RenderLayer::UpdateInstanceBuffers(const std::vector<Particle>& particles)
     m_VelocityInstanceVbo.UpdateData(m_Velocities.data(), m_Velocities.size() * 3 * sizeof(float));
 }
 
-void RenderLayer::UpdateBoundaryInstanceBuffers(const std::vector<BoundaryParticle>& particles)
+void RenderLayer::UpdateBoundaryParticleInstanceBuffers(const std::vector<BoundaryParticle>& particles)
 {
     m_BoundaryTranslations.resize(particles.size());
 
@@ -217,11 +217,11 @@ float RenderLayer::getAspectRatio()
     return viewport.width() / viewport.height();
 }
 
-float RenderLayer::getMaxForceLength(const std::vector<Particle>& particles)
+float RenderLayer::getMaxForceLength(const std::vector<FluidParticle>& particles)
 {
     float max = 0;
 
-    for (const Particle& particle : particles)
+    for (const FluidParticle& particle : particles)
         max = std::max(max, glm::dot(particle.ResultantForceDensity, particle.ResultantForceDensity));
 
     return std::sqrt(max);

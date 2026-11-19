@@ -24,19 +24,19 @@ public:
 	void EndFrame();
 	void WriteSceneData();
 	void ReadSceneData();
-	void UpdateInstanceBuffers(const std::vector<Particle>& particles);
-	void UpdateBoundaryInstanceBuffers(const std::vector<BoundaryParticle>& particles);
+	void UpdateFluidParticleInstanceBuffers(const std::vector<FluidParticle>& particles);
+	void UpdateBoundaryParticleInstanceBuffers(const std::vector<BoundaryParticle>& particles);
 
 	inline unsigned int GetFrameBufferTextureId() { return m_ResolveFbo.GetColorTexture().GetId(); };
 	void OnGuiViewportSizeChanged(int width, int height);
-	void DrawParticles(const std::vector<Particle>& particles, int specimenIndex, float h);
+	void DrawFluidParticles(const std::vector<FluidParticle>& particles, int specimenIndex, float h);
 	void DrawBoundaryParticles(const std::vector<BoundaryParticle>& boundaryParticles);
-	void DrawForceArrows(const std::vector<Particle>& particles);
+	void DrawForceArrows(const std::vector<FluidParticle>& particles);
 	void DrawKernelRadius(glm::vec3 position, float h);
 
 private:
 	float getAspectRatio();
-	float getMaxForceLength(const std::vector<Particle>& particles);
+	float getMaxForceLength(const std::vector<FluidParticle>& particles);
 
 private:
 	std::shared_ptr<SceneData> m_SceneData;

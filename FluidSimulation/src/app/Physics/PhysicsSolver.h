@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
-#include "Particle.h"
+#include "FluidParticle.h"
 #include "Parameters.h"
 #include "PhysicsState.h"
 #include <functional>
@@ -41,16 +41,16 @@ private:
 	void UpdateParticlePressureForceDensities();
 	void UpdateParticleViscosityForceDensities();
 	void UpdateActualPositions(double timeStep);
-	void DetectBoundaryCollision(Particle& particle);
+	void DetectBoundaryCollision(FluidParticle& particle);
 	uint32_t HashCell(int x, int y, uint32_t n);
 
 	template <typename Callback>
-	void ForEachNeighbour(const glm::vec3& position, Callback callback) {
+	void ForEachFluidNeighbour(const glm::vec3& position, Callback callback) {
 
 		//function which searches all the neighbors of a particle using a spatialLookup and StartIndices array.
 		//Avoids duplicate counting within the same 9.
 
-		std::vector<Particle>& particles = m_PhysicsState->Particles;
+		std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 		float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 
 		int cellX = std::floor(position.x / h);
@@ -83,7 +83,7 @@ private:
 
 					if (m_SpatialLookup[i].first != cellKey) break;
 
-					const Particle& pj = particles[m_SpatialLookup[i].second];
+					const FluidParticle& pj = particles[m_SpatialLookup[i].second];
 
 					callback(pj);
 

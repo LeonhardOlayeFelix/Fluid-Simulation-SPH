@@ -91,7 +91,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\app\Physics\BoundingBox.cpp" />
-    <ClCompile Include="src\app\Physics\BoundaryParticle.cpp" />
     <ClCompile Include="src\app\Physics\PhysicsSolver.cpp" />
     <ClCompile Include="src\app\ImGuiLayer.cpp" />
     <ClCompile Include="src\app\Physics\PhysicsState.cpp" />
@@ -129,7 +128,7 @@
     <ClInclude Include="src\app\Physics\BoundingBox.h" />
     <ClInclude Include="src\app\Physics\BoundaryParticle.h" />
     <ClInclude Include="src\app\Physics\Parameters.h" />
-    <ClInclude Include="src\app\Physics\Particle.h" />
+    <ClInclude Include="src\app\Physics\FluidParticle.h" />
     <ClInclude Include="src\app\Physics\PhysicsSolver.h" />
     <ClInclude Include="src\app\Physics\PhysicsState.h" />
     <ClInclude Include="src\app\Physics\PhysicsSystem.h" />

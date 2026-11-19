@@ -111,9 +111,6 @@
     <ClCompile Include="src\core\abstraction\UniformBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\Physics\BoundaryParticle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\app\Physics\BoundingBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -212,7 +209,7 @@
     <ClInclude Include="src\app\Physics\PhysicsSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Physics\Particle.h">
+    <ClInclude Include="src\app\Physics\FluidParticle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\app\Physics\Parameters.h">

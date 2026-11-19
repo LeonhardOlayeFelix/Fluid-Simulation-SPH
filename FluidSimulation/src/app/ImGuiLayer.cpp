@@ -60,17 +60,17 @@ void ImGuiLayer::DrawControlsPanel()
 
     if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-        bool a = ImGui::DragInt("Count", &m_SceneData->PhysicsState->FluidParameters.ParticleCount, 1.0, 1, 10000);
+        bool a = ImGui::DragInt("Count", &m_SceneData->PhysicsState->FluidParameters.FluidParticleCount, 1.0, 1, 10000);
         bool b = ImGui::DragInt("Particle Grid Spacing", &m_SceneData->ParticleGridSpacing, 1.0, 5, 50);
         bool c = ImGui::DragFloat("Ball Radius", &PhysicsSolver::BallRadius, 0.1f, 0.1f, 50.0f);
 
         if ((a || b) && !fluid.SimulationRunning)
         {
-            m_SceneData->PhysicsState->GridParticleData(m_SceneData->PhysicsState->FluidParameters.ParticleCount, m_SceneData->ParticleGridSpacing);
+            m_SceneData->PhysicsState->GridParticleData(m_SceneData->PhysicsState->FluidParameters.FluidParticleCount, m_SceneData->ParticleGridSpacing);
         }
 
         if (ImGui::Button("Set"))
-            m_SceneData->PhysicsState->GridParticleData(m_SceneData->PhysicsState->FluidParameters.ParticleCount, m_SceneData->ParticleGridSpacing);
+            m_SceneData->PhysicsState->GridParticleData(m_SceneData->PhysicsState->FluidParameters.FluidParticleCount, m_SceneData->ParticleGridSpacing);
     }
 
     if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -116,7 +116,7 @@ void ImGuiLayer::DrawInspector()
 {
     ImGui::Begin("Inspector");
 
-    std::vector<Particle>& particles = m_SceneData->PhysicsState->Particles;
+    std::vector<FluidParticle>& particles = m_SceneData->PhysicsState->FluidParticles;
     if (particles.empty()) {
         ImGui::TextDisabled("No particles");
         ImGui::End();
@@ -124,7 +124,7 @@ void ImGuiLayer::DrawInspector()
     }
 
     int specimenIndex = (int)particles.size() / 2;
-    Particle& specimen = particles[specimenIndex];
+    FluidParticle& specimen = particles[specimenIndex];
 
     ImGui::Text("Particle #%d", specimenIndex);
     ImGui::DragFloat3("Position", glm::value_ptr(specimen.Position), 1, 0.0f, 1000.0f);
@@ -150,7 +150,7 @@ void ImGuiLayer::DrawStats()
 
     ImGui::Begin("Stats");
     ImGui::Text("%.1f FPS  |  %.3f ms/frame", io.Framerate, 1000.0f / io.Framerate);
-    ImGui::Text("Particles: %d", (int)m_SceneData->PhysicsState->Particles.size());
+    ImGui::Text("Particles: %d", (int)m_SceneData->PhysicsState->FluidParticles.size());
     ImGui::Text("Window: %d x %d  |  Viewport: %.0f x %.0f", width, height, viewport.width(), viewport.height());
     ImGui::End();
 }

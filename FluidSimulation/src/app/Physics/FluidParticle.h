@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-struct Particle {
+struct FluidParticle {
 public:
 	glm::vec3 Position{};
 	glm::vec3 PredictedPosition{};
@@ -17,9 +17,9 @@ public:
 	float Density{ 0 };
 	float Pressure{ 0 };
 
-	Particle() = default;
+	FluidParticle() = default;
 
-	Particle(glm::vec2 position, glm::vec2 velocity)
+	FluidParticle(glm::vec2 position, glm::vec2 velocity)
 	{
 		Position = glm::vec3(position, 0);
 		Velocity = glm::vec3(velocity, 0);

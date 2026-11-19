@@ -18,5 +18,5 @@ struct FluidParameters {
 	float ParticleSpacing = 10;
 	float SmoothingRadius{ 25 };
 	float ParticleMass = 1000;
-	int ParticleCount = 1500;
+	int FluidParticleCount = 1500;
 };

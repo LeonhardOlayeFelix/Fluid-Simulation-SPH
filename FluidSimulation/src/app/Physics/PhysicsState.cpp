@@ -4,7 +4,7 @@
 void PhysicsState::RandomiseParticleData(int count)
 {
 
-    std::vector<Particle> particles;
+    std::vector<FluidParticle> particles;
     particles.reserve(count);
 
     for (int i = 0; i < count; i++)
@@ -15,12 +15,12 @@ void PhysicsState::RandomiseParticleData(int count)
         particles.emplace_back(glm::vec3{ xPos, yPos, 0 }, glm::vec3{});
     }
 
-    Particles = std::move(particles);
+    FluidParticles = std::move(particles);
 }
 
 void PhysicsState::GridParticleData(int count, float spacing)
 {
-    std::vector<Particle> particles;
+    std::vector<FluidParticle> particles;
     particles.reserve(count);
 
     int sideLength = (int)std::ceil(std::sqrt((float)count));
@@ -37,7 +37,7 @@ void PhysicsState::GridParticleData(int count, float spacing)
         particles.emplace_back(position, glm::vec3{});
     }
 
-    Particles = std::move(particles);
+    FluidParticles = std::move(particles);
 }
 
 void PhysicsState::RecalculateBoundaryParticles()
