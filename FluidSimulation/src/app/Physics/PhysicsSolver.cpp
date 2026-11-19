@@ -67,7 +67,6 @@ void PhysicsSolver::UpdateBoundaryParticleGridSearch()
 
 	std::sort(m_BoundarySpatialLookup.begin(), m_BoundarySpatialLookup.end());
 
-
 	uint32_t lastSeenNum = -1;
 
 	for (int i = 0; i < m_BoundarySpatialLookup.size(); i++) {
@@ -100,7 +99,6 @@ void PhysicsSolver::UpdateFluidParticleGridSearch()
 	}
 
 	std::sort(m_FluidSpatialLookup.begin(), m_FluidSpatialLookup.end());
-
 
 	uint32_t lastSeenNum = -1;
 
@@ -225,9 +223,10 @@ void PhysicsSolver::UpdateGamma2(const GammaTemplate & templ)
 		c2 += spikyKernelGradient(r, r2, h, h2, coeff);
 	}
 
-	float c3 = glm::dot(c2, c2);
+	float numerator = glm::dot(c1, c2);
+	float denominator = glm::dot(c2, c2);
 
-	fluid.Gamma2 = -(glm::dot(c1, c2)) / c3;
+	fluid.Gamma2 = - numerator / denominator;
 
 
 }
@@ -367,16 +366,17 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 void PhysicsSolver::UpdateParticleViscosityForceDensities()
 {
 	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
+	FluidParameters& fluid = m_PhysicsState->FluidParameters;
 
-	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+	float h = fluid.SmoothingRadius;
 	float h2 = h * h;
 	float h5 = h2 * h2 * h;
 	float coeff = 40 / (PI * h5);
-	float particleMass = m_PhysicsState->FluidParameters.ParticleMass;
+	float particleMass = fluid.ParticleMass;
 
 	for (FluidParticle& pi : particles) {
 
-		pi.ViscousForceDensity = glm::vec3(0);
+		glm::vec3 summation{};
 
 		ForEachFluidNeighbour(pi.PredictedPosition, [&](const FluidParticle& pj) {
 
@@ -385,11 +385,11 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 
 			glm::vec3 symmetrisedVelocity = (pj.Velocity - pi.Velocity);
 
-			pi.ViscousForceDensity += particleMass * symmetrisedVelocity / pj.Density * viscosityLaplacianKernel2D(r2, h, h2, coeff);
+			summation += symmetrisedVelocity / pj.Density * viscosityLaplacianKernel2D(r2, h, h2, coeff);
 
 			});
 
-		pi.ViscousForceDensity *= m_PhysicsState->FluidParameters.Viscosity;
+		pi.ViscousForceDensity = fluid.Viscosity * particleMass * summation;
 
 	}
 

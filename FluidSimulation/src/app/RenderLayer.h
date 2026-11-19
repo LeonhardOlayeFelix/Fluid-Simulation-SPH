@@ -34,6 +34,7 @@ public:
 	void DrawForceArrows(const std::vector<FluidParticle>& particles);
 	void DrawKernelRadiusFallOff(glm::vec3 position, float h);
 	void DrawKernelRadiusOutline(glm::vec3 position, float h);
+	void DrawBoundingBox(BoundingBox box);
 
 private:
 	float getAspectRatio();
@@ -74,6 +75,7 @@ private:
 	ShaderProgram m_VelocityParticleShader;
 	ShaderProgram m_KernelRadiusFallOffShader;
 	ShaderProgram m_KernelRadiusOutlineShader;
+	ShaderProgram m_BoundingBoxOutlineShader;
 	ShaderProgram m_WhiteBallShader;
 	ShaderProgram m_ArrowShader;
 

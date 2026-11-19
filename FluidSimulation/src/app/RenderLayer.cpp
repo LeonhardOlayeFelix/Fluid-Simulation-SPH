@@ -28,8 +28,6 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_BoundaryCircleVao.SetAttribDivisor(1, 1);
     m_BoundaryCircleVao.RecordIndexBuffer(m_BoundaryCircleIbo);
 
-
-
     m_QuadVbo = VertexBuffer(squarePrimitive);
     m_QuadIbo = IndexBuffer(squarePrimitive);
     m_QuadVao.RecordVBOLayout(m_QuadVbo, {3, 2});
@@ -49,6 +47,7 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_VelocityParticleShader = ShaderProgram("resources/shaders/2D/VelocityParticleShader.shader");
     m_KernelRadiusFallOffShader = ShaderProgram("resources/shaders/2D/KernelRadiusFallOffShader.shader");
     m_KernelRadiusOutlineShader = ShaderProgram("resources/shaders/2D/KernelRadiusOutlineShader.shader");
+    m_BoundingBoxOutlineShader = ShaderProgram("resources/shaders/2D/BoundingBoxOutlineShader.shader");
     m_WhiteBallShader = ShaderProgram("resources/shaders/2D/WhiteBallShader.shader");
 
     m_KernelBallShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
@@ -105,6 +104,14 @@ void RenderLayer::OnRender()
             DrawForceArrows(fluidParticles);
     }
 
+    if (m_SceneData->ShowParticleDomain) 
+    {
+        DrawBoundingBox(m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain);
+
+
+
+    }
+
     if (m_SceneData->ShowBoundaryParticles) 
     {
         UpdateBoundaryParticleInstanceBuffers(boundaryParticles);
@@ -130,6 +137,18 @@ void RenderLayer::DrawKernelRadiusOutline(glm::vec3 position, float h)
     m_KernelRadiusOutlineShader.SetUniformMat4f("u_Model", model);
 
     RenderCommand::DrawElements(m_QuadVao, m_KernelRadiusOutlineShader);
+}
+
+void RenderLayer::DrawBoundingBox(BoundingBox box)
+{
+    glm::vec2 scale = box.ndcScaleFactor();
+    glm::vec2 trans = box.ndcTranslation();
+
+    glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), { trans.x, trans.y, 0 }), { scale.x, scale.y, 1.0f });
+    m_BoundingBoxOutlineShader.SetUniformMat4f("u_Model", model);
+
+    RenderCommand::DrawElements(m_QuadVao, m_BoundingBoxOutlineShader);
+
 }
 
 void RenderLayer::DrawForceArrows(const std::vector<FluidParticle>& particles)

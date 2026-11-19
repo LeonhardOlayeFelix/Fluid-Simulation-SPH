@@ -116,6 +116,7 @@ void ImGuiLayer::DrawControlsPanel()
         ImGui::Checkbox("Match Fluid Particle Size to Spacing", &m_SceneData->MatchBallSizeToSpacing);
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
         ImGui::Checkbox("Show Kernel Radius", &m_SceneData->ShowKernel);
+        ImGui::Checkbox("Show Boundary", &m_SceneData->ShowParticleDomain);
         ImGui::Checkbox("Show Boundary Particles", &m_SceneData->ShowBoundaryParticles);
         ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
     }

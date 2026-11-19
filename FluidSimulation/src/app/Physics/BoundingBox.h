@@ -27,6 +27,8 @@ public:
 	inline glm::vec2 size() const { return { width(), height() }; }
 	inline glm::vec2 min() const { return m_Min; }
 	inline glm::vec2 max() const { return m_Max; }
+	inline glm::vec2 ndcScaleFactor() const { return { width() / 2, height() / 2 }; };
+	inline glm::vec2 ndcTranslation() const { return { xcentre(), ycentre() }; };
 
 };
 
