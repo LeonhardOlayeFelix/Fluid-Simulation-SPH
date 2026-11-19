@@ -50,17 +50,48 @@ void PhysicsSolver::UpdateGridSearch()
 }
 
 void PhysicsSolver::UpdateBoundaryParticleGridSearch()
-{}
+{
+	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+	std::vector<BoundaryParticle>& particles = m_PhysicsState->BoundaryParticles;
+
+	m_BoundarySpatialLookup.resize(particles.size());
+	m_BoundaryStartIndices.assign(particles.size(), UINT32_MAX);
+
+	for (int i = 0; i < m_BoundarySpatialLookup.size(); i++) {
+		BoundaryParticle& particle = particles[i];
+
+		int cellX = std::floor(particle.Position.x / h);
+		int cellY = std::floor(particle.Position.y / h);
+
+		uint32_t key = HashCell(cellX, cellY, (uint32_t)particles.size());
+
+		m_BoundarySpatialLookup[i].first = key;
+		m_BoundarySpatialLookup[i].second = i;
+
+	}
+
+	std::sort(m_BoundarySpatialLookup.begin(), m_BoundarySpatialLookup.end());
+
+
+	uint32_t lastSeenNum = -1;
+
+	for (int i = 0; i < m_BoundarySpatialLookup.size(); i++) {
+		if (m_BoundarySpatialLookup[i].first != lastSeenNum) {
+			m_BoundaryStartIndices[m_BoundarySpatialLookup[i].first] = i;
+			lastSeenNum = m_BoundarySpatialLookup[i].first;
+		}
+	}
+}
 
 void PhysicsSolver::UpdateFluidParticleGridSearch()
 {
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 
-	m_SpatialLookup.resize(particles.size());
-	m_StartIndices.assign(particles.size(), UINT32_MAX);
+	m_FluidSpatialLookup.resize(particles.size());
+	m_FluidStartIndices.assign(particles.size(), UINT32_MAX);
 
-	for (int i = 0; i < m_SpatialLookup.size(); i++) {
+	for (int i = 0; i < m_FluidSpatialLookup.size(); i++) {
 		FluidParticle& particle = particles[i];
 
 		int cellX = std::floor(particle.PredictedPosition.x / h);
@@ -68,20 +99,20 @@ void PhysicsSolver::UpdateFluidParticleGridSearch()
 
 		uint32_t key = HashCell(cellX, cellY, (uint32_t)particles.size());
 
-		m_SpatialLookup[i].first = key;
-		m_SpatialLookup[i].second = i;
+		m_FluidSpatialLookup[i].first = key;
+		m_FluidSpatialLookup[i].second = i;
 
 	}
 
-	std::sort(m_SpatialLookup.begin(), m_SpatialLookup.end());
+	std::sort(m_FluidSpatialLookup.begin(), m_FluidSpatialLookup.end());
 
 
 	uint32_t lastSeenNum = -1;
 
-	for (int i = 0; i < m_SpatialLookup.size(); i++) {
-		if (m_SpatialLookup[i].first != lastSeenNum) {
-			m_StartIndices[m_SpatialLookup[i].first] = i;
-			lastSeenNum = m_SpatialLookup[i].first;
+	for (int i = 0; i < m_FluidSpatialLookup.size(); i++) {
+		if (m_FluidSpatialLookup[i].first != lastSeenNum) {
+			m_FluidStartIndices[m_FluidSpatialLookup[i].first] = i;
+			lastSeenNum = m_FluidSpatialLookup[i].first;
 		}
 	}
 }
