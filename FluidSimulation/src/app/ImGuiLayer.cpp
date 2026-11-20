@@ -87,6 +87,12 @@ void ImGuiLayer::DrawControlsPanel()
         bool changedSpacing = ImGui::DragFloat("Particle Spacing (d)", &fluid.ParticleSpacing, 0.1f, 5.0f, 30.0f);
         ImGui::Checkbox("Ignore Boundary Particles", &fluid.IgnoreBoundaryParticles);
 
+        static const char* solverNames[] = { "SESPH", "IISPH" };
+        int solverIndex = (int)fluid.PressureSolver;
+
+        if (ImGui::Combo("Pressure Solver", &solverIndex, solverNames, 2))
+            fluid.PressureSolver = (PressureSolverMethod)solverIndex;
+
         if (changedSpacing || changedRestDensity)
         {
             fluid.ParticleMass = fluid.RestDensity * fluid.ParticleSpacing * fluid.ParticleSpacing;
@@ -154,7 +160,6 @@ void ImGuiLayer::DrawInspector()
     ImGui::DragFloat2("Position", glm::value_ptr(specimen.Position), 1, 0.0f, 1000.0f);
     ImGui::BeginDisabled();
     ImGui::InputFloat2("Velocity", glm::value_ptr(specimen.Velocity), "%.3f");
-    ImGui::InputFloat2("Acceleration", glm::value_ptr(specimen.Acceleration), "%.3f");
     ImGui::EndDisabled();
 
     //sph scalar quantities

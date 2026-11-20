@@ -8,12 +8,15 @@
 struct FluidParticle {
 public:
 	glm::vec3 Position{};
-	glm::vec3 PredictedPosition{};
 	glm::vec3 Velocity{};
-	glm::vec3 Acceleration{};
-	glm::vec3 PressureForceDensity{};
+	glm::vec3 PredictedVelocity{};
 	glm::vec3 ViscousForceDensity{};
-	glm::vec3 ResultantForceDensity{};
+	glm::vec3 GravityForceDensity{};
+	glm::vec3 SurfaceTensionForceDensity{};
+	glm::vec3 PressureForceDensity{};
+
+	glm::vec3 NonPressureResultantForceDensity{};
+
 	float Density{ 0 };
 	float Pressure{ 0 };
 
@@ -25,10 +28,22 @@ public:
 		Velocity = glm::vec3(velocity, 0);
 	}
 
-	glm::vec3 RecalculateResultantForceDensity()
-	{
-		ResultantForceDensity = PressureForceDensity + ViscousForceDensity;
-		return ResultantForceDensity;
+	glm::vec3 RecalculateNonPressureResultantForceDensity() {
 
+		NonPressureResultantForceDensity = GravityForceDensity + ViscousForceDensity + SurfaceTensionForceDensity;
+		return NonPressureResultantForceDensity;
 	}
+
+	glm::vec3 GetNonPressureAcceleration() const {
+		return NonPressureResultantForceDensity / Density;
+	}
+
+	glm::vec3 GetPressureAcceleration() const {
+		return PressureForceDensity / Density;
+	}
+
+	glm::vec3 GetTotalResultantForceDensity() const {
+		return NonPressureResultantForceDensity + PressureForceDensity;
+	}
+
 };

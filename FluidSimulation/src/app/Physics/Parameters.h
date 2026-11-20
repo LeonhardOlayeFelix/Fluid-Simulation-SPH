@@ -10,7 +10,15 @@ struct BoundaryParameters {
 	bool Stale = false;
 };
 
+enum class PressureSolverMethod {
+	SESPH,
+	IISPH
+};
+
 struct FluidParameters {
+
+	PressureSolverMethod PressureSolver = PressureSolverMethod::SESPH;
+
 	bool SimulationRunning;
 	bool IgnoreBoundaryParticles = false;
 

@@ -219,7 +219,7 @@ void RenderLayer::UpdateFluidParticleInstanceBuffers(const std::vector<FluidPart
 
     for (int i = 0; i < m_Translations.size(); i++) {
         m_Translations[i] = particles[i].Position;
-        m_ForceDensities[i] = particles[i].ResultantForceDensity;
+        m_ForceDensities[i] = particles[i].GetTotalResultantForceDensity();
         m_Velocities[i] = particles[i].Velocity;
     }
 
@@ -253,7 +253,7 @@ float RenderLayer::getMaxForceLength(const std::vector<FluidParticle>& particles
     float max = 0;
 
     for (const FluidParticle& particle : particles)
-        max = std::max(max, glm::dot(particle.ResultantForceDensity, particle.ResultantForceDensity));
+        max = std::max(max, glm::dot(particle.GetTotalResultantForceDensity(), particle.GetTotalResultantForceDensity()));
 
     return std::sqrt(max);
 }
