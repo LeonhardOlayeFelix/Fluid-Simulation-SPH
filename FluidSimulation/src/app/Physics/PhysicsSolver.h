@@ -37,8 +37,7 @@ private:
 	std::vector<std::pair<uint32_t, uint32_t>> m_BoundarySpatialLookup; //query with particle index. Stores a list fo (Cell key, Particle Index) pairs
 	std::vector<uint32_t> m_BoundaryStartIndices;  //query with cell key. Stores a list of (indicies) at which cells start appearing in spatialLookup
 
-	void UpdateBoundaryParticleNeighborSearchGrid();
-	void UpdateFluidParticleNeighborGridSearch();
+	void UpdateNeighborGridSearch();
 	void UpdateGammaCorrectionCoefficients();
 	void UpdatePredictedVelocities(double timeStep);
 	void UpdateParticleDensities();
@@ -62,6 +61,8 @@ private:
 	void updateGamma2(const GammaTemplate& templ);
 	void updateParticlePressuresSESPH();
 	void updateParticlePressuresIISPH();
+	void updateBoundaryParticleNeighborSearchGrid();
+	void updateFluidParticleNeighborGridSearch();
 
 	template <typename Callback>
 	void ForEachFluidNeighbour(const glm::vec3& position, Callback callback) {
