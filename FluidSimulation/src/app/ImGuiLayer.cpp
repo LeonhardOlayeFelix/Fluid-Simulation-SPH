@@ -57,70 +57,77 @@ void ImGuiLayer::DrawControlsPanel()
     FluidParameters& fluid = state.FluidParameters;
 
     ImGui::Begin("Controls");
+    ImGui::PushItemWidth(100);
 
-    if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen)) {
-
-        bool a = ImGui::DragInt("Count", &m_SceneData->PhysicsState->FluidParameters.FluidParticleCount, 1.0, 1, 10000);
-        bool c = ImGui::DragFloat("Fluid Particle Radius", &PhysicsSolver::FluidParticleRadius, 0.1f, 0.1f, 50.0f);
-
-        if (m_SceneData->ShowBoundaryParticles) 
-        {
-            ImGui::DragFloat("Boundary Particle Radius", &PhysicsSolver::BoundaryParticleRadius, 0.1f, 0.1f, 50.0f);
-        }
-
-        if (a && !fluid.SimulationRunning)
-        {
-            m_SceneData->PhysicsState->GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
-        }
-
-        if (ImGui::Button("Set"))
-            m_SceneData->PhysicsState->GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
-    }
-
-    if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen)) {
-
+    //simulation
+    if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
         if (ImGui::Button(fluid.SimulationRunning ? "Pause Simulation" : "Begin Simulation"))
             fluid.SimulationRunning = !fluid.SimulationRunning;
-
-        ImGui::DragFloat("Collision Damping", &PhysicsSolver::CollisionDampingFactor, 0.01, 0.0f, 1.0f, "%.2f");
     }
 
-    if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen)) 
+    //scene setup: initial particle layout
+    if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        bool changedRestDensity = ImGui::DragFloat("Rest Density (p0)", &fluid.RestDensity, 1, 0.1, 100.0);
+        bool a = ImGui::DragInt("Count", &fluid.FluidParticleCount, 1.0, 1, 10000);
+
+        if (a && !fluid.SimulationRunning)
+            state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
+
+        if (ImGui::Button("Set"))
+            state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
+    }
+
+    //fluid's physical parameters
+    if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        bool changedRestDensity = ImGui::DragFloat("Rest Density (p0)", &fluid.RestDensity, 1, 1.0, 100.0);
         ImGui::DragFloat("Stiffness (k)", &fluid.FluidStiffness, 1000, 1000, 10000000);
         ImGui::DragFloat("Viscosity (v)", &fluid.Viscosity, 1000, 0, 10000000);
         bool changedSpacing = ImGui::DragFloat("Particle Spacing (d)", &fluid.ParticleSpacing, 0.1f, 5.0f, 30.0f);
+        ImGui::Checkbox("Ignore Boundary Particles", &fluid.IgnoreBoundaryParticles);
 
-        if (changedSpacing || changedRestDensity) {
+        if (changedSpacing || changedRestDensity)
+        {
             fluid.ParticleMass = fluid.RestDensity * fluid.ParticleSpacing * fluid.ParticleSpacing;
             fluid.SmoothingRadius = 2.50f * fluid.ParticleSpacing;
-            
-            m_SceneData->PhysicsState->RecalculateBoundaryParticles();
-            
+
+            state.RecalculateBoundaryParticles();
+
             if (!fluid.SimulationRunning)
-                m_SceneData->PhysicsState->GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
+                state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
         }
 
+        ImGui::SeparatorText("Derived");
         ImGui::BeginDisabled();
-        ImGui::DragFloat("Particle Mass (m)", &fluid.ParticleMass, 0.1f, 1.0f, 1000.0f);
-        ImGui::DragFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 1, 20.0f, 50.0, "%.1f");
-        ImGui::DragFloat("Gamma Correction 1 (γ1)", &fluid.Gamma1, 0.01f, 0.01f, 1000.0f);
-        ImGui::DragFloat("Gamma Correction 2 (γ2)", &fluid.Gamma2, 0.01f, 0.01f, 1000.0f);
+        ImGui::DragFloat("Particle Mass (m)", &fluid.ParticleMass);
+        ImGui::DragFloat("Smoothing Radius (h)", &fluid.SmoothingRadius, 1, 0, 0, "%.1f");
+        ImGui::DragFloat("Gamma Correction 1 (γ1)", &fluid.Gamma1);
+        ImGui::DragFloat("Gamma Correction 2 (γ2)", &fluid.Gamma2);
         ImGui::EndDisabled();
-
-
     }
 
-    if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen)) {
+    //visualisation... no effect on physics
+    if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::SeparatorText("Fluid Particles");
         ImGui::Checkbox("Match Fluid Particle Size to Spacing", &m_SceneData->MatchBallSizeToSpacing);
+        ImGui::BeginDisabled(m_SceneData->MatchBallSizeToSpacing);
+        ImGui::DragFloat("Fluid Particle Radius", &PhysicsSolver::FluidParticleRadius, 0.1f, 0.1f, 50.0f);
+        ImGui::EndDisabled();
+        ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
+
+        ImGui::SeparatorText("Overlays");
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
         ImGui::Checkbox("Show Kernel Radius", &m_SceneData->ShowKernel);
+
+        ImGui::SeparatorText("Boundary");
         ImGui::Checkbox("Show Boundary", &m_SceneData->ShowParticleDomain);
         ImGui::Checkbox("Show Boundary Particles", &m_SceneData->ShowBoundaryParticles);
-        ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
+        if (m_SceneData->ShowBoundaryParticles)
+            ImGui::DragFloat("Boundary Particle Radius", &PhysicsSolver::BoundaryParticleRadius, 0.1f, 0.1f, 50.0f);
     }
-
+    ImGui::PopItemWidth();
     ImGui::End();
 }
 
@@ -138,17 +145,33 @@ void ImGuiLayer::DrawInspector()
     int specimenIndex = (int)particles.size() / 2;
     FluidParticle& specimen = particles[specimenIndex];
 
-    ImGui::Text("Particle #%d", specimenIndex);
-    ImGui::DragFloat3("Position", glm::value_ptr(specimen.Position), 1, 0.0f, 1000.0f);
+    ImGui::PushItemWidth(200);
 
+    ImGui::Text("Particle #%d", specimenIndex);
+
+    //kinematics
+    ImGui::SeparatorText("Kinematics");
+    ImGui::DragFloat2("Position", glm::value_ptr(specimen.Position), 1, 0.0f, 1000.0f);
     ImGui::BeginDisabled();
-    ImGui::InputFloat("Density", &specimen.Density, 0.0f, 0.0f, "%.3f");
-    ImGui::InputFloat3("Velocity", glm::value_ptr(specimen.Velocity), "%.3f");
-    ImGui::InputFloat("Pressure", &specimen.Pressure, 0.0f, 0.0f, "%.3f");
-    ImGui::InputFloat3("Pressure Force Density", glm::value_ptr(specimen.PressureForceDensity), "%.3f");
-    ImGui::InputFloat3("Viscous Force Density", glm::value_ptr(specimen.ViscousForceDensity), "%.3f");
+    ImGui::InputFloat2("Velocity", glm::value_ptr(specimen.Velocity), "%.3f");
+    ImGui::InputFloat2("Acceleration", glm::value_ptr(specimen.Acceleration), "%.3f");
     ImGui::EndDisabled();
 
+    //sph scalar quantities
+    ImGui::SeparatorText("SPH Scalar Fields");
+    ImGui::BeginDisabled();
+    ImGui::InputFloat("Density", &specimen.Density, 0.0f, 0.0f, "%.3f");
+    ImGui::InputFloat("Pressure", &specimen.Pressure, 0.0f, 0.0f, "%.3f");
+    ImGui::EndDisabled();
+
+    //sph vector quantites
+    ImGui::SeparatorText("SPH Vector Fields");
+    ImGui::BeginDisabled();
+    ImGui::InputFloat2("Pressure Force Density", glm::value_ptr(specimen.PressureForceDensity), "%.3f");
+    ImGui::InputFloat2("Viscous Force Density", glm::value_ptr(specimen.ViscousForceDensity), "%.3f");
+    ImGui::EndDisabled();
+
+    ImGui::PopItemWidth();
     ImGui::End();
 }
 

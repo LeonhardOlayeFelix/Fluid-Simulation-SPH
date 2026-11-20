@@ -228,7 +228,6 @@ void PhysicsSolver::UpdateGamma2(const GammaTemplate & templ)
 
 	fluid.Gamma2 = - numerator / denominator;
 
-
 }
 
 void PhysicsSolver::UpdatePredictedPositions(double timeStep)
@@ -289,14 +288,16 @@ void PhysicsSolver::UpdateParticleDensities()
 
 		float boundaryTerm = 0;
 
-		ForEachBoundaryNeighbour(pi.PredictedPosition, [&](const BoundaryParticle& pj) {
+		if (!fluid.IgnoreBoundaryParticles) 
+		{
+			ForEachBoundaryNeighbour(pi.PredictedPosition, [&](const BoundaryParticle& pj) {
 
 				glm::vec3 d = pi.PredictedPosition - pj.Position;
 				float r2 = glm::dot(d, d);
 
 				boundaryTerm += poly6Kernel(r2, h2, coeff);
-
 			});
+		}
 
 		boundaryTerm *= particleMass;
 
@@ -346,18 +347,21 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 
 		glm::vec3 boundaryTerm{};
 
-		ForEachBoundaryNeighbour(pi.PredictedPosition, [&](const BoundaryParticle& pj) {
+		if (!fluid.IgnoreBoundaryParticles)
+		{
 
-			glm::vec3 r = pi.PredictedPosition - pj.Position;
-			float r2 = glm::dot(r, r);
+			ForEachBoundaryNeighbour(pi.PredictedPosition, [&](const BoundaryParticle& pj) {
 
-			boundaryTerm += spikyKernelGradient(r, r2, h, h2, coeff);
+				glm::vec3 r = pi.PredictedPosition - pj.Position;
+				float r2 = glm::dot(r, r);
 
-			});
+				boundaryTerm += spikyKernelGradient(r, r2, h, h2, coeff);
+
+				});
+		}
 
 		boundaryTerm *= pi.Pressure * 2 * particleMass / (pi.Density * pi.Density);
 
-		//needs to be multiplied by density to make it a force density.
 		pi.PressureForceDensity = pi.Density * (-fluidTerm - fluid.Gamma2 * boundaryTerm);
 
 	}
