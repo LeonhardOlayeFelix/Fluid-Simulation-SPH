@@ -60,6 +60,8 @@ private:
 	GammaTemplate generateGammaCorrectionTemplate();
 	void updateGamma1(const GammaTemplate& templ);
 	void updateGamma2(const GammaTemplate& templ);
+	void updateParticlePressuresSESPH();
+	void updateParticlePressuresIISPH();
 
 	template <typename Callback>
 	void ForEachFluidNeighbour(const glm::vec3& position, Callback callback) {

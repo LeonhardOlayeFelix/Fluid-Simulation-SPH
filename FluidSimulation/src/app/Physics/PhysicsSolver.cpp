@@ -163,6 +163,7 @@ void PhysicsSolver::UpdateParticleNonPressureForceDensities()
 	UpdateParticleGravityForceDensities();
 	UpdateParticleSurfaceTensionForceDensities();
 }
+
 void PhysicsSolver::UpdateParticleViscosityForceDensities()
 {
 	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
@@ -226,12 +227,15 @@ void PhysicsSolver::UpdatePredictedVelocities(double timeStep)
 
 void PhysicsSolver::UpdateParticlePressures()
 {
-	float stiffness = m_PhysicsState->FluidParameters.FluidStiffness;
-	float restDensity = m_PhysicsState->FluidParameters.RestDensity;
-
-	for (int i = 0; i < m_PhysicsState->FluidParticles.size(); i++) {
-		FluidParticle& source = m_PhysicsState->FluidParticles[i];
-		source.Pressure = std::max(0.0f, stiffness * (source.Density - restDensity));
+	const FluidParameters& fluid = m_PhysicsState->FluidParameters;
+	
+	if (fluid.PressureSolver == PressureSolverMethod::SESPH) 
+	{
+		updateParticlePressuresSESPH();
+	}
+	else if (fluid.PressureSolver == PressureSolverMethod::IISPH) 
+	{
+		updateParticlePressuresIISPH();
 	}
 }
 
@@ -482,5 +486,23 @@ void PhysicsSolver::updateGamma2(const GammaTemplate& templ)
 	float denominator = glm::dot(c2, c2);
 
 	fluid.Gamma2 = -numerator / denominator;
+
+}
+
+void PhysicsSolver::updateParticlePressuresSESPH()
+{
+	const FluidParameters& fluid = m_PhysicsState->FluidParameters;
+
+	float stiffness = fluid.Stiffness;
+	float restDensity = fluid.RestDensity;
+
+	for (int i = 0; i < m_PhysicsState->FluidParticles.size(); i++) {
+		FluidParticle& source = m_PhysicsState->FluidParticles[i];
+		source.Pressure = std::max(0.0f, stiffness * (source.Density - restDensity));
+	}
+}
+
+void PhysicsSolver::updateParticlePressuresIISPH()
+{
 
 }
