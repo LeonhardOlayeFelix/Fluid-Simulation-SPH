@@ -8,11 +8,13 @@
 struct FluidParticle {
 public:
 	glm::vec3 Position{};
+	glm::vec3 PredictedVelocity{};
 	glm::vec3 PredictedPosition{};
 	glm::vec3 Velocity{};
 	glm::vec3 Acceleration{};
 	glm::vec3 PressureForceDensity{};
 	glm::vec3 ViscousForceDensity{};
+	glm::vec3 GravityForceDensity{};
 	glm::vec3 ResultantForceDensity{};
 	float Density{ 0 };
 	float Pressure{ 0 };

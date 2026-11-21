@@ -30,11 +30,6 @@ public:
 
 	void Update(double timeStep);
 
-	static float poly6Kernel(float r2, float h2, float coeff);
-	static float viscosityLaplacianKernel2D(float r2, float h, float h2, float coeff);
-	static glm::vec3 poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff);
-	static glm::vec3 spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff);
-
 private:
 	std::shared_ptr<PhysicsState> m_PhysicsState;
 	std::vector<std::pair<uint32_t, uint32_t>> m_FluidSpatialLookup; //query with particle index. Stores a list fo (Cell key, Particle Index) pairs
@@ -42,21 +37,27 @@ private:
 	std::vector<std::pair<uint32_t, uint32_t>> m_BoundarySpatialLookup; //query with particle index. Stores a list fo (Cell key, Particle Index) pairs
 	std::vector<uint32_t> m_BoundaryStartIndices;  //query with cell key. Stores a list of (indicies) at which cells start appearing in spatialLookup
 
-	void AdvanceParticles(double timeStep);
+	void UpdatePredictedProperties(double timeStep);
+	void UpdateGridSearch();
 	void UpdateBoundaryParticleGridSearch();
-	void UpdateFluidParticleGridSearch();
 	void UpdateGammaCorrectionCoefficients();
-	GammaTemplate GenerateGammaCorrectionTemplate();
-	void UpdateGamma1(const GammaTemplate& templ);
-	void UpdateGamma2(const GammaTemplate& templ);
-	void UpdatePredictedPositions(double timeStep);
+	void UpdateFluidParticleGridSearch();
 	void UpdateParticleDensities();
 	void UpdateParticlePressures();
 	void UpdateParticlePressureForceDensities();
 	void UpdateParticleViscosityForceDensities();
-	void UpdateActualPositions(double timeStep);
+	void UpdateActualProperties(double timeStep);
 	void DetectBoundaryCollision(FluidParticle& particle);
-	uint32_t HashCell(int x, int y, uint32_t n);
+
+	uint32_t hashCell(int x, int y, uint32_t n);
+	GammaTemplate generateGammaCorrectionTemplate();
+	void updateGamma1(const GammaTemplate& templ);
+	void updateGamma2(const GammaTemplate& templ);
+	static float poly6Kernel(float r2, float h2, float coeff);
+	static glm::vec3 poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff);
+	static glm::vec3 spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff);
+	static float viscosityLaplacianKernel2D(float r2, float h, float h2, float coeff);
+
 
 	template <typename Callback>
 	void ForEachFluidNeighbour(const glm::vec3& position, Callback callback) {
@@ -78,7 +79,7 @@ private:
 				int cellToSearchX = cellX + rowOffset;
 				int cellToSearchY = cellY + colOffset;
 
-				uint32_t cellKey = HashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
+				uint32_t cellKey = hashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
 
 				bool alreadySearched = false;
 				for (int k = 0; k < searchedKeyCount; k++) {
@@ -129,7 +130,7 @@ private:
 				int cellToSearchX = cellX + rowOffset;
 				int cellToSearchY = cellY + colOffset;
 
-				uint32_t cellKey = HashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
+				uint32_t cellKey = hashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
 
 				bool alreadySearched = false;
 				for (int k = 0; k < searchedKeyCount; k++) {
