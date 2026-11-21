@@ -40,7 +40,7 @@ void PhysicsSolver::UpdatePredictedProperties(double timeStep)
 
 	for (FluidParticle& particle : particles)
 	{
-		particle.PredictedVelocity = particle.Velocity + dt * glm::vec3(0, Gravity, 0);
+		particle.PredictedVelocity = particle.Velocity + dt * getResultantPredictionForce();
 		particle.PredictedPosition = particle.Position + dt * particle.PredictedVelocity;
 	}
 }
@@ -50,12 +50,12 @@ void PhysicsSolver::UpdateSpatialHashGrids()
 	if (m_PhysicsState->BoundaryParameters.Stale)
 	{
 		updateBoundaryParticleSpatialHashGrid();
-		updateBoundaryNeighborIndices();
 		updateGammaCorrectionCoefficients();
 	}
 
 	updateFluidParticleSpatialHashGrid();
 	updateFluidNeighborIndices();
+	updateBoundaryNeighborIndices();
 }
 
 void PhysicsSolver::UpdateParticleDensities()
@@ -87,7 +87,7 @@ void PhysicsSolver::UpdateParticleDensities()
 
 		float boundaryTerm = 0;
 
-		if (!fluid.IgnoreBoundaryParticles) 
+		if (fluid.InfluencedByBoundaryParticles) 
 		{
 			ForEachBoundaryNeighbour(i, [&](const BoundaryParticle& pj) {
 
@@ -152,7 +152,7 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 
 		glm::vec3 boundaryTerm{};
 
-		if (!fluid.IgnoreBoundaryParticles)
+		if (fluid.InfluencedByBoundaryParticles)
 		{
 
 			ForEachBoundaryNeighbour(i, [&](const BoundaryParticle& pj) {
@@ -209,6 +209,55 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 void PhysicsSolver::UpdateParticleSurfaceTensionForceDensities()
 {
 
+
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
+	const FluidParameters& fluid = m_PhysicsState->FluidParameters;
+
+	float h = fluid.SmoothingRadius;
+	float h2 = h * h;
+	float h8 = h2 * h2 * h2 * h2;
+	float gradientCoeff = -24.0f / (PI * h8);
+	float laplacianCoeff = -48.0f / (PI * h8);
+
+	
+
+	for (int i = 0; i < particles.size(); i++) {
+
+		FluidParticle& pi = particles[i];
+
+		if (!fluid.InfluencedBySurfaceTension) {
+			pi.SurfaceTensionForceDensity = glm::vec3(0);
+			continue;
+		}
+
+		glm::vec3 gradientSummation{};
+		float laplacianSummation = 0;
+
+		ForEachFluidNeighbour(i, [&](const FluidParticle& pj) {
+
+			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
+			float r2 = glm::dot(r, r);
+
+			gradientSummation += (1 / pj.Density) * poly6KernelGradient(r, r2, h2, gradientCoeff);
+			laplacianSummation += (1 / pj.Density) * poly6KernelLaplacian(r2, h2, laplacianCoeff);
+
+			});
+
+		glm::vec3 colorFieldGradient = fluid.ParticleMass * gradientSummation;
+		float colorFieldLaplacian = fluid.ParticleMass * laplacianSummation;
+
+		glm::vec3 n = colorFieldGradient;
+
+		float l = fluid.SurfaceTensionThreshold;
+
+		if (glm::dot(n, n) > l * l) 
+		{
+			float kappa = -(colorFieldLaplacian) / glm::length(n);
+			pi.SurfaceTensionForceDensity = fluid.TensionCoefficient * kappa * n;
+		}
+		else
+			pi.SurfaceTensionForceDensity = glm::vec3(0);
+	}
 }
 
 void PhysicsSolver::UpdateActualProperties(double timeStep)
@@ -254,9 +303,12 @@ void PhysicsSolver::DetectBoundaryCollision(FluidParticle& particle)
 	}
 }
 
+glm::vec3 PhysicsSolver::getResultantPredictionForce()
+{
+	const FluidParameters& fluid = m_PhysicsState->FluidParameters;
 
-
-
+	return fluid.InfluencedByGravity ? glm::vec3(0, Gravity, 0) : glm::vec3(0);
+}
 
 void PhysicsSolver::updateBoundaryParticleSpatialHashGrid()
 {
@@ -608,6 +660,15 @@ glm::vec3 PhysicsSolver::poly6KernelGradient(glm::vec3 r, float r2, float h2, fl
 	float diff = h2 - r2;
 
 	return coeff * diff * diff * r;
+}
+
+float PhysicsSolver::poly6KernelLaplacian(float r2, float h2, float coeff)
+{
+	if (r2 >= h2) return 0.0f;
+
+	float diff = h2 - r2;
+
+	return coeff * diff * (h2 - 3.0f * r2);
 }
 
 glm::vec3 PhysicsSolver::spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff)

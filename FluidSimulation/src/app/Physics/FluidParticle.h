@@ -12,9 +12,11 @@ public:
 	glm::vec3 PredictedPosition{};
 	glm::vec3 Velocity{};
 	glm::vec3 Acceleration{};
+
 	glm::vec3 PressureForceDensity{};
 	glm::vec3 ViscousForceDensity{};
 	glm::vec3 SurfaceTensionForceDensity{};
+	glm::vec3 ColorFieldGradient{};
 
 	glm::vec3 ResultantForceDensity{};
 	float Density{ 0 };
@@ -30,7 +32,7 @@ public:
 
 	glm::vec3 RecalculateResultantForceDensity()
 	{
-		ResultantForceDensity = PressureForceDensity + ViscousForceDensity;
+		ResultantForceDensity = PressureForceDensity + ViscousForceDensity + SurfaceTensionForceDensity;
 		return ResultantForceDensity;
 
 	}

@@ -12,7 +12,9 @@ struct BoundaryParameters {
 
 struct FluidParameters {
 	bool SimulationRunning;
-	bool IgnoreBoundaryParticles = false;
+	bool InfluencedByBoundaryParticles = true;
+	bool InfluencedByGravity = true;
+	bool InfluencedBySurfaceTension = true;
 	bool ClampPressure = true;
 
 	int FluidParticleCount = 1500;
@@ -21,10 +23,11 @@ struct FluidParameters {
 	float ParticleSpacing = 10;
 	float SmoothingRadius{ 25 };
 	float ParticleMass = RestDensity * ParticleSpacing * ParticleSpacing;
+	float SurfaceTensionThreshold = 0.1 / SmoothingRadius;
 
 	float Stiffness = 1'300'000.0f;
 	float Viscosity = 10000;
 	float Gamma1 = 0;
 	float Gamma2 = 0;
-	float TensionCoefficient = 1;
+	float TensionCoefficient = 4000000;
 };

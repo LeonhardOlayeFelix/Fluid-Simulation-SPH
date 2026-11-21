@@ -53,6 +53,7 @@ private:
 	void UpdateActualProperties(double timeStep);
 	void DetectBoundaryCollision(FluidParticle& particle);
 
+	glm::vec3 getResultantPredictionForce();
 	void updateBoundaryParticleSpatialHashGrid();
 	void updateFluidParticleSpatialHashGrid();
 	void updateFluidNeighborIndices();
@@ -64,6 +65,7 @@ private:
 	void updateGamma2(const GammaTemplate& templ);
 	static float poly6Kernel(float r2, float h2, float coeff);
 	static glm::vec3 poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff);
+	static float poly6KernelLaplacian(float r2, float h2, float coeff);
 	static glm::vec3 spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff);
 	static float viscosityLaplacianKernel2D(float r2, float h, float h2, float coeff);
 

@@ -81,15 +81,21 @@ void ImGuiLayer::DrawControlsPanel()
     //fluid's physical parameters
     if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen))
     {
+        ImGui::SeparatorText("Influences");
+        ImGui::Checkbox("Influenced by Gravity", &fluid.InfluencedByGravity);
+        ImGui::Checkbox("Influenced by Surface Tension", &fluid.InfluencedBySurfaceTension);
+        ImGui::Checkbox("Influenced by Boundary Particles", &fluid.InfluencedByBoundaryParticles);
+
+
         ImGui::SeparatorText("Coefficients");
         ImGui::DragFloat("Stiffness (k)", &fluid.Stiffness, 1000, 1000, 10000000);
         ImGui::DragFloat("Viscosity (v)", &fluid.Viscosity, 1000, 0, 10000000);
-        ImGui::DragFloat("Tension (o)", &fluid.TensionCoefficient, 1, 0, 1000000);
+        ImGui::DragFloat("Tension (o)", &fluid.TensionCoefficient, 1, 0, 10000000);
 
         ImGui::SeparatorText("Other ");
         bool changedRestDensity = ImGui::DragFloat("Rest Density (p0)", &fluid.RestDensity, 1, 1.0, 100.0);
         bool changedSpacing = ImGui::DragFloat("Particle Spacing (d)", &fluid.ParticleSpacing, 0.1f, 5.0f, 30.0f);
-        ImGui::Checkbox("Ignore Boundary Particles", &fluid.IgnoreBoundaryParticles);
+        ImGui::DragFloat("Surface Tension Threshold (l)", &fluid.SurfaceTensionThreshold, 0.1, 0.1, 100.0);
         ImGui::Checkbox("Clamp Pressure (>0)", &fluid.ClampPressure);
 
         if (changedSpacing || changedRestDensity)
