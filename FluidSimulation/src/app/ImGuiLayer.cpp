@@ -82,10 +82,11 @@ void ImGuiLayer::DrawControlsPanel()
     if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen))
     {
         bool changedRestDensity = ImGui::DragFloat("Rest Density (p0)", &fluid.RestDensity, 1, 1.0, 100.0);
-        ImGui::DragFloat("Stiffness (k)", &fluid.FluidStiffness, 1000, 1000, 10000000);
+        ImGui::DragFloat("Stiffness (k)", &fluid.Stiffness, 1000, 1000, 10000000);
         ImGui::DragFloat("Viscosity (v)", &fluid.Viscosity, 1000, 0, 10000000);
         bool changedSpacing = ImGui::DragFloat("Particle Spacing (d)", &fluid.ParticleSpacing, 0.1f, 5.0f, 30.0f);
         ImGui::Checkbox("Ignore Boundary Particles", &fluid.IgnoreBoundaryParticles);
+        ImGui::Checkbox("Clamp Pressure (>0)", &fluid.ClampPressure);
 
         if (changedSpacing || changedRestDensity)
         {

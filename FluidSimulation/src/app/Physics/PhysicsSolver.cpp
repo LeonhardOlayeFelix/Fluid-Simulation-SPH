@@ -105,12 +105,16 @@ void PhysicsSolver::UpdateParticleDensities()
 
 void PhysicsSolver::UpdateParticlePressures()
 {
-	float stiffness = m_PhysicsState->FluidParameters.FluidStiffness;
-	float restDensity = m_PhysicsState->FluidParameters.RestDensity;
+	const FluidParameters& fluid = m_PhysicsState->FluidParameters;
+
+	float stiffness = fluid.Stiffness;
+	float restDensity = fluid.RestDensity;
 
 	for (int i = 0; i < m_PhysicsState->FluidParticles.size(); i++) {
 		FluidParticle& source = m_PhysicsState->FluidParticles[i];
-		source.Pressure = std::max(0.0f, stiffness * (source.Density - restDensity));
+
+		float pressure = stiffness * (source.Density - restDensity);
+		source.Pressure = fluid.ClampPressure ? std::max(0.0f, pressure) : pressure;
 	}
 }
 
