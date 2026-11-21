@@ -14,7 +14,7 @@ void PhysicsSolver::Update(double timeStep)
 
 	UpdatePredictedProperties(timeStep);
 
-	UpdateGridSearch();
+	UpdateSpatialHashGrids();
 
 	UpdateParticleDensities();
 
@@ -43,17 +43,17 @@ void PhysicsSolver::UpdatePredictedProperties(double timeStep)
 	}
 }
 
-void PhysicsSolver::UpdateGridSearch()
+void PhysicsSolver::UpdateSpatialHashGrids()
 {
 	if (m_PhysicsState->BoundaryParameters.Stale)
 	{
-		updateBoundaryParticleGridSearch();
-		updateFluidBoundaryNeighborLists();
+		updateBoundaryParticleSpatialHashGrid();
+		updateBoundaryNeighborIndices();
 		updateGammaCorrectionCoefficients();
 	}
 
-	updateFluidParticleGridSearch();
-	updateFluidFluidNeighborLists();
+	updateFluidParticleSpatialHashGrid();
+	updateFluidNeighborIndices();
 }
 
 void PhysicsSolver::UpdateParticleDensities()
@@ -247,7 +247,7 @@ void PhysicsSolver::DetectBoundaryCollision(FluidParticle& particle)
 
 
 
-void PhysicsSolver::updateBoundaryParticleGridSearch()
+void PhysicsSolver::updateBoundaryParticleSpatialHashGrid()
 {
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 	std::vector<BoundaryParticle>& particles = m_PhysicsState->BoundaryParticles;
@@ -280,7 +280,7 @@ void PhysicsSolver::updateBoundaryParticleGridSearch()
 	}
 }
 
-void PhysicsSolver::updateFluidParticleGridSearch()
+void PhysicsSolver::updateFluidParticleSpatialHashGrid()
 {
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
@@ -313,7 +313,7 @@ void PhysicsSolver::updateFluidParticleGridSearch()
 	}
 }
 
-void PhysicsSolver::updateFluidFluidNeighborLists()
+void PhysicsSolver::updateFluidNeighborIndices()
 {
 	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 	if (particles.empty()) return;
@@ -380,7 +380,7 @@ void PhysicsSolver::updateFluidFluidNeighborLists()
 	m_BoundaryNeighborIndices[particles.size()] = m_FluidNeighborIndices.size();
 }
 
-void PhysicsSolver::updateFluidBoundaryNeighborLists()
+void PhysicsSolver::updateBoundaryNeighborIndices()
 {
 	std::vector<FluidParticle>& fluidParticles = m_PhysicsState->FluidParticles;
 	std::vector<BoundaryParticle>& boundaryParticles = m_PhysicsState->BoundaryParticles;

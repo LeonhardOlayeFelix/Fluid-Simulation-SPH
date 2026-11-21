@@ -44,7 +44,7 @@ private:
 
 
 	void UpdatePredictedProperties(double timeStep);
-	void UpdateGridSearch();
+	void UpdateSpatialHashGrids();
 	void UpdateParticleDensities();
 	void UpdateParticlePressures();
 	void UpdateParticlePressureForceDensities();
@@ -52,10 +52,10 @@ private:
 	void UpdateActualProperties(double timeStep);
 	void DetectBoundaryCollision(FluidParticle& particle);
 
-	void updateBoundaryParticleGridSearch();
-	void updateFluidParticleGridSearch();
-	void updateFluidFluidNeighborLists();
-	void updateFluidBoundaryNeighborLists();
+	void updateBoundaryParticleSpatialHashGrid();
+	void updateFluidParticleSpatialHashGrid();
+	void updateFluidNeighborIndices();
+	void updateBoundaryNeighborIndices();
 	void updateGammaCorrectionCoefficients();
 	uint32_t hashCell(int x, int y, uint32_t n);
 	GammaTemplate generateGammaCorrectionTemplate();
