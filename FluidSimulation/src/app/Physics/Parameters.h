@@ -15,6 +15,8 @@ struct FluidParameters {
 	bool InfluencedByBoundaryParticles = true;
 	bool InfluencedByGravity = true;
 	bool InfluencedBySurfaceTension = true;
+	bool InfluencedByPressure = true;
+
 	bool ClampPressure = true;
 
 	int FluidParticleCount = 1500;

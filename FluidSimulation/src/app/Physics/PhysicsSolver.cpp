@@ -113,7 +113,14 @@ void PhysicsSolver::UpdateParticlePressures()
 	float restDensity = fluid.RestDensity;
 
 	for (int i = 0; i < m_PhysicsState->FluidParticles.size(); i++) {
+
 		FluidParticle& source = m_PhysicsState->FluidParticles[i];
+
+		if (!fluid.InfluencedByPressure) 
+		{
+			source.Pressure = 0;
+			continue;
+		}
 
 		float pressure = stiffness * (source.Density - restDensity);
 		source.Pressure = fluid.ClampPressure ? std::max(0.0f, pressure) : pressure;

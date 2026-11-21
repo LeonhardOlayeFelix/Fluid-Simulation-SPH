@@ -83,6 +83,7 @@ void ImGuiLayer::DrawControlsPanel()
     {
         ImGui::SeparatorText("Influences");
         ImGui::Checkbox("Influenced by Gravity", &fluid.InfluencedByGravity);
+        ImGui::Checkbox("Influenced by Pressure", &fluid.InfluencedByPressure);
         ImGui::Checkbox("Influenced by Surface Tension", &fluid.InfluencedBySurfaceTension);
         ImGui::Checkbox("Influenced by Boundary Particles", &fluid.InfluencedByBoundaryParticles);
 
