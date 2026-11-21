@@ -54,8 +54,8 @@ void PhysicsSolver::UpdateSpatialHashGrids()
 	}
 
 	updateFluidParticleSpatialHashGrid();
-	updateFluidNeighborIndices();
-	updateBoundaryNeighborIndices();
+	updateFluidNeighborLists();
+	updateBoundaryNeighborLists();
 }
 
 void PhysicsSolver::UpdateParticleDensities()
@@ -376,22 +376,22 @@ void PhysicsSolver::updateFluidParticleSpatialHashGrid()
 	}
 }
 
-void PhysicsSolver::updateFluidNeighborIndices()
+void PhysicsSolver::updateFluidNeighborLists()
 {
 	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 	if (particles.empty()) return;
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 
 	m_FluidNeighborIndices.clear();
-	m_BoundaryNeighborIndices.clear();
+	m_FluidNeighborOffsets.clear();
 	m_FluidNeighborIndices.reserve(32 * particles.size());
-	m_BoundaryNeighborIndices.resize(particles.size() + 1);
+	m_FluidNeighborOffsets.resize(particles.size() + 1);
 
 	for (int i = 0; i < particles.size(); i++) {
 
 		const FluidParticle& particle = particles[i];
 
-		m_BoundaryNeighborIndices[i] = m_FluidNeighborIndices.size();
+		m_FluidNeighborOffsets[i] = m_FluidNeighborIndices.size();
 
 		int cellX = std::floor(particle.PredictedPosition.x / h);
 		int cellY = std::floor(particle.PredictedPosition.y / h);
@@ -440,10 +440,10 @@ void PhysicsSolver::updateFluidNeighborIndices()
 
 	}
 
-	m_BoundaryNeighborIndices[particles.size()] = m_FluidNeighborIndices.size();
+	m_FluidNeighborOffsets[particles.size()] = m_FluidNeighborIndices.size();
 }
 
-void PhysicsSolver::updateBoundaryNeighborIndices()
+void PhysicsSolver::updateBoundaryNeighborLists()
 {
 	std::vector<FluidParticle>& fluidParticles = m_PhysicsState->FluidParticles;
 	std::vector<BoundaryParticle>& boundaryParticles = m_PhysicsState->BoundaryParticles;
@@ -451,16 +451,16 @@ void PhysicsSolver::updateBoundaryNeighborIndices()
 	if (fluidParticles.empty()) return;
 	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 
-	m_FluidNeighborOffsets.clear();
+	m_BoundaryNeighborIndices.clear();
 	m_BoundaryNeighborOffsets.clear();
-	m_FluidNeighborOffsets.reserve(32 * boundaryParticles.size());
+	m_BoundaryNeighborIndices.reserve(32 * boundaryParticles.size());
 	m_BoundaryNeighborOffsets.resize(fluidParticles.size() + 1);
 
 	for (int i = 0; i < fluidParticles.size(); i++) {
 
 		const FluidParticle& particle = fluidParticles[i];
 
-		m_BoundaryNeighborOffsets[i] = m_FluidNeighborOffsets.size();
+		m_BoundaryNeighborOffsets[i] = m_BoundaryNeighborIndices.size();
 
 		if (boundaryParticles.empty()) continue;
 
@@ -502,7 +502,7 @@ void PhysicsSolver::updateBoundaryNeighborIndices()
 					float r2 = glm::dot(r, r);
 
 					if (r2 < h * h)
-						m_FluidNeighborOffsets.push_back(neighborIndex);
+						m_BoundaryNeighborIndices.push_back(neighborIndex);
 
 				}
 
@@ -511,7 +511,7 @@ void PhysicsSolver::updateBoundaryNeighborIndices()
 
 	}
 
-	m_BoundaryNeighborOffsets[fluidParticles.size()] = m_FluidNeighborOffsets.size();
+	m_BoundaryNeighborOffsets[fluidParticles.size()] = m_BoundaryNeighborIndices.size();
 }
 
 

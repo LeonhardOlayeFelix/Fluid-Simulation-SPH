@@ -38,8 +38,8 @@ private:
 	std::vector<uint32_t> m_BoundaryCellStarts;                         // by cell key: first entry in m_BoundaryCellEntries, or UINT32_MAX
 
 	std::vector<uint32_t> m_FluidNeighborIndices;                       // fluid neighbours of every fluid particle, one after another
-	std::vector<uint32_t> m_FluidNeighborOffsets;                       // size N+1: particle i's range is [offsets[i], offsets[i+1])
 	std::vector<uint32_t> m_BoundaryNeighborIndices;                    // boundary neighbours of every fluid particle, one after another
+	std::vector<uint32_t> m_FluidNeighborOffsets;						// size N+1: particle i's range is [offsets[i], offsets[i+1])
 	std::vector<uint32_t> m_BoundaryNeighborOffsets;                    // size N+1: particle i's range is [offsets[i], offsets[i+1])
 
 
@@ -56,8 +56,8 @@ private:
 	glm::vec3 getResultantPredictionForce();
 	void updateBoundaryParticleSpatialHashGrid();
 	void updateFluidParticleSpatialHashGrid();
-	void updateFluidNeighborIndices();
-	void updateBoundaryNeighborIndices();
+	void updateFluidNeighborLists();
+	void updateBoundaryNeighborLists();
 	void updateGammaCorrectionCoefficients();
 	uint32_t hashCell(int x, int y, uint32_t n);
 	GammaTemplate generateGammaCorrectionTemplate();
@@ -75,9 +75,9 @@ private:
 
 		std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
 
-		uint32_t offset = m_BoundaryNeighborIndices[particleIndex];
+		uint32_t offset = m_FluidNeighborOffsets[particleIndex];
 
-		uint32_t numNeighbors = m_BoundaryNeighborIndices[particleIndex + 1] - offset;
+		uint32_t numNeighbors = m_FluidNeighborOffsets[particleIndex + 1] - offset;
 
 		for (uint32_t i = offset; i < offset + numNeighbors; i++) {
 
@@ -101,7 +101,7 @@ private:
 
 		for (uint32_t i = offset; i < offset + numNeighbors; i++) {
 
-			uint32_t neighborIndex = m_FluidNeighborOffsets[i];
+			uint32_t neighborIndex = m_BoundaryNeighborIndices[i];
 
 			const BoundaryParticle& pj = particles[neighborIndex];
 
