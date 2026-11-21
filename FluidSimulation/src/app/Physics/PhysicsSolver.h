@@ -32,16 +32,19 @@ public:
 
 private:
 	std::shared_ptr<PhysicsState> m_PhysicsState;
-	std::vector<std::pair<uint32_t, uint32_t>> m_FluidSpatialLookup; //query with particle index. Stores a list fo (Cell key, Particle Index) pairs
-	std::vector<uint32_t> m_FluidStartIndices;  //query with cell key. Stores a list of (indicies) at which cells start appearing in spatialLookup
-	std::vector<std::pair<uint32_t, uint32_t>> m_BoundarySpatialLookup; //query with particle index. Stores a list fo (Cell key, Particle Index) pairs
-	std::vector<uint32_t> m_BoundaryStartIndices;  //query with cell key. Stores a list of (indicies) at which cells start appearing in spatialLookup
+	std::vector<std::pair<uint32_t, uint32_t>> m_FluidCellEntries;      // (cell key, fluid index) pairs, sorted by key
+	std::vector<uint32_t> m_FluidCellStarts;                            // by cell key: first entry in m_FluidCellEntries, or UINT32_MAX
+	std::vector<std::pair<uint32_t, uint32_t>> m_BoundaryCellEntries;   // (cell key, boundary index) pairs, sorted by key
+	std::vector<uint32_t> m_BoundaryCellStarts;                         // by cell key: first entry in m_BoundaryCellEntries, or UINT32_MAX
+
+	std::vector<uint32_t> m_FluidNeighborIndices;                       // fluid neighbours of every fluid particle, one after another
+	std::vector<uint32_t> m_FluidNeighborOffsets;                       // size N+1: particle i's range is [offsets[i], offsets[i+1])
+	std::vector<uint32_t> m_BoundaryNeighborIndices;                    // boundary neighbours of every fluid particle, one after another
+	std::vector<uint32_t> m_BoundaryNeighborOffsets;                    // size N+1: particle i's range is [offsets[i], offsets[i+1])
+
 
 	void UpdatePredictedProperties(double timeStep);
 	void UpdateGridSearch();
-	void UpdateBoundaryParticleGridSearch();
-	void UpdateGammaCorrectionCoefficients();
-	void UpdateFluidParticleGridSearch();
 	void UpdateParticleDensities();
 	void UpdateParticlePressures();
 	void UpdateParticlePressureForceDensities();
@@ -49,6 +52,11 @@ private:
 	void UpdateActualProperties(double timeStep);
 	void DetectBoundaryCollision(FluidParticle& particle);
 
+	void updateBoundaryParticleGridSearch();
+	void updateFluidParticleGridSearch();
+	void updateFluidFluidNeighborLists();
+	void updateFluidBoundaryNeighborLists();
+	void updateGammaCorrectionCoefficients();
 	uint32_t hashCell(int x, int y, uint32_t n);
 	GammaTemplate generateGammaCorrectionTemplate();
 	void updateGamma1(const GammaTemplate& templ);
@@ -60,104 +68,43 @@ private:
 
 
 	template <typename Callback>
-	void ForEachFluidNeighbour(const glm::vec3& position, Callback callback) {
-
-		//function which searches all the neighbors of a particle using a spatialLookup and StartIndices array.
+	void ForEachFluidNeighbour(uint32_t particleIndex, Callback callback) {
 
 		std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
-		if (particles.empty()) return;
-		float h = m_PhysicsState->FluidParameters.SmoothingRadius;
 
-		int cellX = std::floor(position.x / h);
-		int cellY = std::floor(position.y / h);
+		uint32_t offset = m_BoundaryNeighborIndices[particleIndex];
 
-		uint32_t searchedKeys[9];
-		int searchedKeyCount = 0;
+		uint32_t numNeighbors = m_BoundaryNeighborIndices[particleIndex + 1] - offset;
 
-		for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
-			for (int colOffset = -1; colOffset <= 1; colOffset++) {
-				int cellToSearchX = cellX + rowOffset;
-				int cellToSearchY = cellY + colOffset;
+		for (uint32_t i = offset; i < offset + numNeighbors; i++) {
 
-				uint32_t cellKey = hashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
+			uint32_t neighborIndex = m_FluidNeighborIndices[i];
 
-				bool alreadySearched = false;
-				for (int k = 0; k < searchedKeyCount; k++) {
-					if (searchedKeys[k] == cellKey) {
-						alreadySearched = true;
-						break;
-					}
-				}
-				if (alreadySearched) continue;
+			const FluidParticle& pj = particles[neighborIndex];
 
-				searchedKeys[searchedKeyCount++] = cellKey;
+			callback(pj);
 
-				uint32_t startParticleIndex = m_FluidStartIndices[cellKey];
-
-				for (uint32_t i = startParticleIndex; i < m_FluidSpatialLookup.size(); i++) {
-
-					if (m_FluidSpatialLookup[i].first != cellKey) break;
-
-					const FluidParticle& pj = particles[m_FluidSpatialLookup[i].second];
-
-					callback(pj);
-
-				}
-
-			}
 		}
-
 	}
 
 	template <typename Callback>
-	void ForEachBoundaryNeighbour(const glm::vec3& position, Callback callback) {
-
-		//function which searches all the boundary neighbours of a position using the boundary spatialLookup and StartIndices arrays.
+	void ForEachBoundaryNeighbour(uint32_t particleIndex, Callback callback) {
 
 		std::vector<BoundaryParticle>& particles = m_PhysicsState->BoundaryParticles;
-		if (particles.empty()) return;
 
-		float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+		uint32_t offset = m_BoundaryNeighborOffsets[particleIndex];
 
-		int cellX = std::floor(position.x / h);
-		int cellY = std::floor(position.y / h);
+		uint32_t numNeighbors = m_BoundaryNeighborOffsets[particleIndex + 1] - offset;
 
-		uint32_t searchedKeys[9];
-		int searchedKeyCount = 0;
+		for (uint32_t i = offset; i < offset + numNeighbors; i++) {
 
-		for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
-			for (int colOffset = -1; colOffset <= 1; colOffset++) {
-				int cellToSearchX = cellX + rowOffset;
-				int cellToSearchY = cellY + colOffset;
+			uint32_t neighborIndex = m_FluidNeighborOffsets[i];
 
-				uint32_t cellKey = hashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
+			const BoundaryParticle& pj = particles[neighborIndex];
 
-				bool alreadySearched = false;
-				for (int k = 0; k < searchedKeyCount; k++) {
-					if (searchedKeys[k] == cellKey) {
-						alreadySearched = true;
-						break;
-					}
-				}
-				if (alreadySearched) continue;
+			callback(pj);
 
-				searchedKeys[searchedKeyCount++] = cellKey;
-
-				uint32_t startParticleIndex = m_BoundaryStartIndices[cellKey];
-
-				for (uint32_t i = startParticleIndex; i < m_BoundarySpatialLookup.size(); i++) {
-
-					if (m_BoundarySpatialLookup[i].first != cellKey) break;
-
-					const BoundaryParticle& pb = particles[m_BoundarySpatialLookup[i].second];
-
-					callback(pb);
-
-				}
-
-			}
 		}
-
 	}
 
 };

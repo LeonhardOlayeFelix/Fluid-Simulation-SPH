@@ -47,86 +47,13 @@ void PhysicsSolver::UpdateGridSearch()
 {
 	if (m_PhysicsState->BoundaryParameters.Stale)
 	{
-		UpdateBoundaryParticleGridSearch();
-		UpdateGammaCorrectionCoefficients();
+		updateBoundaryParticleGridSearch();
+		updateFluidBoundaryNeighborLists();
+		updateGammaCorrectionCoefficients();
 	}
 
-	UpdateFluidParticleGridSearch();
-}
-
-void PhysicsSolver::UpdateBoundaryParticleGridSearch()
-{
-	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
-	std::vector<BoundaryParticle>& particles = m_PhysicsState->BoundaryParticles;
-
-	m_BoundarySpatialLookup.resize(particles.size());
-	m_BoundaryStartIndices.assign(particles.size(), UINT32_MAX);
-
-	for (int i = 0; i < m_BoundarySpatialLookup.size(); i++) {
-		BoundaryParticle& particle = particles[i];
-
-		int cellX = std::floor(particle.Position.x / h);
-		int cellY = std::floor(particle.Position.y / h);
-
-		uint32_t key = hashCell(cellX, cellY, (uint32_t)particles.size());
-
-		m_BoundarySpatialLookup[i].first = key;
-		m_BoundarySpatialLookup[i].second = i;
-
-	}
-
-	std::sort(m_BoundarySpatialLookup.begin(), m_BoundarySpatialLookup.end());
-
-	uint32_t lastSeenNum = -1;
-
-	for (int i = 0; i < m_BoundarySpatialLookup.size(); i++) {
-		if (m_BoundarySpatialLookup[i].first != lastSeenNum) {
-			m_BoundaryStartIndices[m_BoundarySpatialLookup[i].first] = i;
-			lastSeenNum = m_BoundarySpatialLookup[i].first;
-		}
-	}
-}
-
-void PhysicsSolver::UpdateGammaCorrectionCoefficients()
-{
-	GammaTemplate templ = generateGammaCorrectionTemplate();
-
-	updateGamma1(templ);
-	updateGamma2(templ);
-
-}
-
-void PhysicsSolver::UpdateFluidParticleGridSearch()
-{
-	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
-	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
-
-	m_FluidSpatialLookup.resize(particles.size());
-	m_FluidStartIndices.assign(particles.size(), UINT32_MAX);
-
-	for (int i = 0; i < m_FluidSpatialLookup.size(); i++) {
-		FluidParticle& particle = particles[i];
-
-		int cellX = std::floor(particle.PredictedPosition.x / h);
-		int cellY = std::floor(particle.PredictedPosition.y / h);
-
-		uint32_t key = hashCell(cellX, cellY, (uint32_t)particles.size());
-
-		m_FluidSpatialLookup[i].first = key;
-		m_FluidSpatialLookup[i].second = i;
-
-	}
-
-	std::sort(m_FluidSpatialLookup.begin(), m_FluidSpatialLookup.end());
-
-	uint32_t lastSeenNum = -1;
-
-	for (int i = 0; i < m_FluidSpatialLookup.size(); i++) {
-		if (m_FluidSpatialLookup[i].first != lastSeenNum) {
-			m_FluidStartIndices[m_FluidSpatialLookup[i].first] = i;
-			lastSeenNum = m_FluidSpatialLookup[i].first;
-		}
-	}
+	updateFluidParticleGridSearch();
+	updateFluidFluidNeighborLists();
 }
 
 void PhysicsSolver::UpdateParticleDensities()
@@ -140,11 +67,12 @@ void PhysicsSolver::UpdateParticleDensities()
 	float coeff = 4.0f / (PI * h8);
 	float particleMass = fluid.ParticleMass;
 
-	for (FluidParticle& pi : particles) {
+	for (int i = 0; i < particles.size(); i++) {
 
+		FluidParticle& pi = particles[i];
 		float fluidTerm = 0;
 
-		ForEachFluidNeighbour(pi.PredictedPosition, [&](const FluidParticle& pj) {
+		ForEachFluidNeighbour(i, [&](const FluidParticle& pj) {
 
 				glm::vec3 d = pi.PredictedPosition - pj.PredictedPosition;
 				float r2 = glm::dot(d, d);
@@ -159,7 +87,7 @@ void PhysicsSolver::UpdateParticleDensities()
 
 		if (!fluid.IgnoreBoundaryParticles) 
 		{
-			ForEachBoundaryNeighbour(pi.PredictedPosition, [&](const BoundaryParticle& pj) {
+			ForEachBoundaryNeighbour(i, [&](const BoundaryParticle& pj) {
 
 				glm::vec3 d = pi.PredictedPosition - pj.Position;
 				float r2 = glm::dot(d, d);
@@ -197,11 +125,13 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 	float coeff = -30.0f / (PI * h5);
 	float particleMass = m_PhysicsState->FluidParameters.ParticleMass;
 
-	for (FluidParticle& pi : particles) {
+	for (int i = 0; i < particles.size(); i++) {
+
+		FluidParticle& pi = particles[i];
 
 		glm::vec3 fluidTerm{};
 
-		ForEachFluidNeighbour(pi.PredictedPosition, [&](const FluidParticle& pj) {
+		ForEachFluidNeighbour(i, [&](const FluidParticle& pj) {
 
 			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
 			float r2 = glm::dot(r, r);
@@ -219,7 +149,7 @@ void PhysicsSolver::UpdateParticlePressureForceDensities()
 		if (!fluid.IgnoreBoundaryParticles)
 		{
 
-			ForEachBoundaryNeighbour(pi.PredictedPosition, [&](const BoundaryParticle& pj) {
+			ForEachBoundaryNeighbour(i, [&](const BoundaryParticle& pj) {
 
 				glm::vec3 r = pi.PredictedPosition - pj.Position;
 				float r2 = glm::dot(r, r);
@@ -247,11 +177,13 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 	float coeff = 40 / (PI * h5);
 	float particleMass = fluid.ParticleMass;
 
-	for (FluidParticle& pi : particles) {
+	for (int i = 0; i < particles.size(); i++) {
+
+		FluidParticle& pi = particles[i];
 
 		glm::vec3 summation{};
 
-		ForEachFluidNeighbour(pi.PredictedPosition, [&](const FluidParticle& pj) {
+		ForEachFluidNeighbour(i, [&](const FluidParticle& pj) {
 
 			glm::vec3 r = pi.PredictedPosition - pj.PredictedPosition;
 			float r2 = glm::dot(r, r);
@@ -311,6 +243,224 @@ void PhysicsSolver::DetectBoundaryCollision(FluidParticle& particle)
 	}
 }
 
+
+
+
+
+void PhysicsSolver::updateBoundaryParticleGridSearch()
+{
+	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+	std::vector<BoundaryParticle>& particles = m_PhysicsState->BoundaryParticles;
+
+	m_BoundaryCellEntries.resize(particles.size());
+	m_BoundaryCellStarts.assign(particles.size(), UINT32_MAX);
+
+	for (int i = 0; i < m_BoundaryCellEntries.size(); i++) {
+		BoundaryParticle& particle = particles[i];
+
+		int cellX = std::floor(particle.Position.x / h);
+		int cellY = std::floor(particle.Position.y / h);
+
+		uint32_t key = hashCell(cellX, cellY, (uint32_t)particles.size());
+
+		m_BoundaryCellEntries[i].first = key;
+		m_BoundaryCellEntries[i].second = i;
+
+	}
+
+	std::sort(m_BoundaryCellEntries.begin(), m_BoundaryCellEntries.end());
+
+	uint32_t lastSeenNum = -1;
+
+	for (int i = 0; i < m_BoundaryCellEntries.size(); i++) {
+		if (m_BoundaryCellEntries[i].first != lastSeenNum) {
+			m_BoundaryCellStarts[m_BoundaryCellEntries[i].first] = i;
+			lastSeenNum = m_BoundaryCellEntries[i].first;
+		}
+	}
+}
+
+void PhysicsSolver::updateFluidParticleGridSearch()
+{
+	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
+
+	m_FluidCellEntries.resize(particles.size());
+	m_FluidCellStarts.assign(particles.size(), UINT32_MAX);
+
+	for (int i = 0; i < m_FluidCellEntries.size(); i++) {
+		FluidParticle& particle = particles[i];
+
+		int cellX = std::floor(particle.PredictedPosition.x / h);
+		int cellY = std::floor(particle.PredictedPosition.y / h);
+
+		uint32_t key = hashCell(cellX, cellY, (uint32_t)particles.size());
+
+		m_FluidCellEntries[i].first = key;
+		m_FluidCellEntries[i].second = i;
+
+	}
+
+	std::sort(m_FluidCellEntries.begin(), m_FluidCellEntries.end());
+
+	uint32_t lastSeenNum = -1;
+
+	for (int i = 0; i < m_FluidCellEntries.size(); i++) {
+		if (m_FluidCellEntries[i].first != lastSeenNum) {
+			m_FluidCellStarts[m_FluidCellEntries[i].first] = i;
+			lastSeenNum = m_FluidCellEntries[i].first;
+		}
+	}
+}
+
+void PhysicsSolver::updateFluidFluidNeighborLists()
+{
+	std::vector<FluidParticle>& particles = m_PhysicsState->FluidParticles;
+	if (particles.empty()) return;
+	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+
+	m_FluidNeighborIndices.clear();
+	m_BoundaryNeighborIndices.clear();
+	m_FluidNeighborIndices.reserve(32 * particles.size());
+	m_BoundaryNeighborIndices.resize(particles.size() + 1);
+
+	for (int i = 0; i < particles.size(); i++) {
+
+		const FluidParticle& particle = particles[i];
+
+		m_BoundaryNeighborIndices[i] = m_FluidNeighborIndices.size();
+
+		int cellX = std::floor(particle.PredictedPosition.x / h);
+		int cellY = std::floor(particle.PredictedPosition.y / h);
+
+		uint32_t searchedKeys[9];
+		int searchedKeyCount = 0;
+
+		for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+			for (int colOffset = -1; colOffset <= 1; colOffset++) {
+				int cellToSearchX = cellX + rowOffset;
+				int cellToSearchY = cellY + colOffset;
+
+				uint32_t cellKey = hashCell(cellToSearchX, cellToSearchY, (uint32_t)particles.size());
+
+				bool alreadySearched = false;
+				for (int k = 0; k < searchedKeyCount; k++) {
+					if (searchedKeys[k] == cellKey) {
+						alreadySearched = true;
+						break;
+					}
+				}
+				if (alreadySearched) continue;
+
+				searchedKeys[searchedKeyCount++] = cellKey;
+
+				uint32_t startParticleIndex = m_FluidCellStarts[cellKey];
+
+				for (uint32_t lookUpIndex = startParticleIndex; lookUpIndex < m_FluidCellEntries.size(); lookUpIndex++) {
+
+					if (m_FluidCellEntries[lookUpIndex].first != cellKey) break;
+
+					uint32_t neighborIndex = m_FluidCellEntries[lookUpIndex].second;
+
+					const FluidParticle& neighbor = particles[neighborIndex];
+
+					glm::vec3 r = particle.PredictedPosition - neighbor.PredictedPosition;
+					float r2 = glm::dot(r, r);
+
+					if (r2 < h * h)
+						m_FluidNeighborIndices.push_back(neighborIndex);
+
+				}
+
+			}
+		}
+
+	}
+
+	m_BoundaryNeighborIndices[particles.size()] = m_FluidNeighborIndices.size();
+}
+
+void PhysicsSolver::updateFluidBoundaryNeighborLists()
+{
+	std::vector<FluidParticle>& fluidParticles = m_PhysicsState->FluidParticles;
+	std::vector<BoundaryParticle>& boundaryParticles = m_PhysicsState->BoundaryParticles;
+
+	if (fluidParticles.empty()) return;
+	float h = m_PhysicsState->FluidParameters.SmoothingRadius;
+
+	m_FluidNeighborOffsets.clear();
+	m_BoundaryNeighborOffsets.clear();
+	m_FluidNeighborOffsets.reserve(32 * boundaryParticles.size());
+	m_BoundaryNeighborOffsets.resize(fluidParticles.size() + 1);
+
+	for (int i = 0; i < fluidParticles.size(); i++) {
+
+		const FluidParticle& particle = fluidParticles[i];
+
+		m_BoundaryNeighborOffsets[i] = m_FluidNeighborOffsets.size();
+
+		if (boundaryParticles.empty()) continue;
+
+		int cellX = std::floor(particle.PredictedPosition.x / h);
+		int cellY = std::floor(particle.PredictedPosition.y / h);
+
+		uint32_t searchedKeys[9];
+		int searchedKeyCount = 0;
+
+		for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+			for (int colOffset = -1; colOffset <= 1; colOffset++) {
+				int cellToSearchX = cellX + rowOffset;
+				int cellToSearchY = cellY + colOffset;
+
+				uint32_t cellKey = hashCell(cellToSearchX, cellToSearchY, (uint32_t)boundaryParticles.size());
+
+				bool alreadySearched = false;
+				for (int k = 0; k < searchedKeyCount; k++) {
+					if (searchedKeys[k] == cellKey) {
+						alreadySearched = true;
+						break;
+					}
+				}
+				if (alreadySearched) continue;
+
+				searchedKeys[searchedKeyCount++] = cellKey;
+
+				uint32_t startParticleIndex = m_BoundaryCellStarts[cellKey];
+
+				for (uint32_t lookUpIndex = startParticleIndex; lookUpIndex < m_BoundaryCellEntries.size(); lookUpIndex++) {
+
+					if (m_BoundaryCellEntries[lookUpIndex].first != cellKey) break;
+
+					uint32_t neighborIndex = m_BoundaryCellEntries[lookUpIndex].second;
+
+					const BoundaryParticle& neighbor = boundaryParticles[neighborIndex];
+
+					glm::vec3 r = particle.PredictedPosition - neighbor.Position;
+					float r2 = glm::dot(r, r);
+
+					if (r2 < h * h)
+						m_FluidNeighborOffsets.push_back(neighborIndex);
+
+				}
+
+			}
+		}
+
+	}
+
+	m_BoundaryNeighborOffsets[fluidParticles.size()] = m_FluidNeighborOffsets.size();
+}
+
+
+void PhysicsSolver::updateGammaCorrectionCoefficients()
+{
+	GammaTemplate templ = generateGammaCorrectionTemplate();
+
+	updateGamma1(templ);
+	updateGamma2(templ);
+
+}
+
 uint32_t PhysicsSolver::hashCell(int x, int y, uint32_t n) {
 	constexpr uint32_t p1 = 73856093u;
 	constexpr uint32_t p2 = 19349663u;
@@ -319,6 +469,7 @@ uint32_t PhysicsSolver::hashCell(int x, int y, uint32_t n) {
 
 	return key % n;
 }
+
 GammaTemplate PhysicsSolver::generateGammaCorrectionTemplate()
 {
 	//setup template, then compute coefficients.
@@ -350,6 +501,7 @@ GammaTemplate PhysicsSolver::generateGammaCorrectionTemplate()
 
 	return templ;
 }
+
 void PhysicsSolver::updateGamma1(const GammaTemplate& templ)
 {
 	const FluidParticle& testParticle = templ.FluidParticles[0];
@@ -388,6 +540,7 @@ void PhysicsSolver::updateGamma1(const GammaTemplate& templ)
 
 	fluid.Gamma1 = (c1 - c2) / c3;
 }
+
 void PhysicsSolver::updateGamma2(const GammaTemplate& templ)
 {
 	const FluidParticle& testParticle = templ.FluidParticles[0];
@@ -427,6 +580,7 @@ void PhysicsSolver::updateGamma2(const GammaTemplate& templ)
 	fluid.Gamma2 = -numerator / denominator;
 
 }
+
 float PhysicsSolver::poly6Kernel(float r2, float h2, float coeff)
 {
 	if (r2 >= h2) return 0.0f;
@@ -435,6 +589,7 @@ float PhysicsSolver::poly6Kernel(float r2, float h2, float coeff)
 
 	return coeff * diff * diff * diff;
 }
+
 glm::vec3 PhysicsSolver::poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff)
 {
 	if (r2 >= h2) return glm::vec3(0);
@@ -443,6 +598,7 @@ glm::vec3 PhysicsSolver::poly6KernelGradient(glm::vec3 r, float r2, float h2, fl
 
 	return coeff * diff * diff * r;
 }
+
 glm::vec3 PhysicsSolver::spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff)
 {
 	if (r2 == 0.0f || r2 >= h2) return glm::vec3(0);
@@ -453,6 +609,7 @@ glm::vec3 PhysicsSolver::spikyKernelGradient(glm::vec3 r, float r2, float h, flo
 
 	return coeff * diff * diff * (r / dst);
 }
+
 float PhysicsSolver::viscosityLaplacianKernel2D(float r2, float h, float h2, float coeff)
 {
 	if (r2 == 0.0f || r2 >= h2) return 0.0;
