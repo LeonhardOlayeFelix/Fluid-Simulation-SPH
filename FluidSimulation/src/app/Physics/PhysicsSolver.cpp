@@ -24,6 +24,8 @@ void PhysicsSolver::Update(double timeStep)
 
 	UpdateParticleViscosityForceDensities();
 
+	UpdateParticleSurfaceTensionForceDensities();
+
 	UpdateActualProperties(timeStep);
 
 	m_PhysicsState->BoundaryParameters.Stale = false;
@@ -201,6 +203,11 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 		pi.ViscousForceDensity = fluid.Viscosity * particleMass * summation;
 
 	}
+
+}
+
+void PhysicsSolver::UpdateParticleSurfaceTensionForceDensities()
+{
 
 }
 

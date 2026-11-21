@@ -49,6 +49,7 @@ private:
 	void UpdateParticlePressures();
 	void UpdateParticlePressureForceDensities();
 	void UpdateParticleViscosityForceDensities();
+	void UpdateParticleSurfaceTensionForceDensities();
 	void UpdateActualProperties(double timeStep);
 	void DetectBoundaryCollision(FluidParticle& particle);
 

@@ -14,7 +14,8 @@ public:
 	glm::vec3 Acceleration{};
 	glm::vec3 PressureForceDensity{};
 	glm::vec3 ViscousForceDensity{};
-	glm::vec3 GravityForceDensity{};
+	glm::vec3 SurfaceTensionForceDensity{};
+
 	glm::vec3 ResultantForceDensity{};
 	float Density{ 0 };
 	float Pressure{ 0 };

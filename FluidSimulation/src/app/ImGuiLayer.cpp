@@ -81,9 +81,13 @@ void ImGuiLayer::DrawControlsPanel()
     //fluid's physical parameters
     if (ImGui::CollapsingHeader("Fluid (SPH)", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        bool changedRestDensity = ImGui::DragFloat("Rest Density (p0)", &fluid.RestDensity, 1, 1.0, 100.0);
+        ImGui::SeparatorText("Coefficients");
         ImGui::DragFloat("Stiffness (k)", &fluid.Stiffness, 1000, 1000, 10000000);
         ImGui::DragFloat("Viscosity (v)", &fluid.Viscosity, 1000, 0, 10000000);
+        ImGui::DragFloat("Tension (o)", &fluid.TensionCoefficient, 1, 0, 1000000);
+
+        ImGui::SeparatorText("Other ");
+        bool changedRestDensity = ImGui::DragFloat("Rest Density (p0)", &fluid.RestDensity, 1, 1.0, 100.0);
         bool changedSpacing = ImGui::DragFloat("Particle Spacing (d)", &fluid.ParticleSpacing, 0.1f, 5.0f, 30.0f);
         ImGui::Checkbox("Ignore Boundary Particles", &fluid.IgnoreBoundaryParticles);
         ImGui::Checkbox("Clamp Pressure (>0)", &fluid.ClampPressure);
@@ -98,6 +102,9 @@ void ImGuiLayer::DrawControlsPanel()
             if (!fluid.SimulationRunning)
                 state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
         }
+
+
+
 
         ImGui::SeparatorText("Derived");
         ImGui::BeginDisabled();
