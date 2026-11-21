@@ -14,11 +14,20 @@ public:
 	glm::vec3 GravityForceDensity{};
 	glm::vec3 SurfaceTensionForceDensity{};
 	glm::vec3 PressureForceDensity{};
-
 	glm::vec3 NonPressureResultantForceDensity{};
 
 	float Density{ 0 };
+	float PredictedDensity{ 0 };
 	float Pressure{ 0 };
+	float PredictedVelocityDivergence{ 0 };
+
+	//iterative solver variables.
+	float AP_i{ 0 };
+	float s_i{ 0 };
+	float a_ii{ 0 };
+	glm::vec3 d_ii{};
+	glm::vec3 a_ip{ };
+
 
 	FluidParticle() = default;
 	FluidParticle(glm::vec3 position) : Position(position) {};

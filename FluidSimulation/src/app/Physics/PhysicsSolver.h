@@ -39,28 +39,32 @@ private:
 
 	void UpdateNeighborGridSearch();
 	void UpdateGammaCorrectionCoefficients();
-	void UpdatePredictedVelocities(double timeStep);
 	void UpdateParticleDensities();
-	void UpdateParticlePressures();
 	void UpdateParticleNonPressureForceDensities();
-	void UpdateParticlePressureForceDensities();
 	void UpdateParticleViscosityForceDensities();
-	void UpdateParticleGravityForceDensities();
 	void UpdateParticleSurfaceTensionForceDensities();
+	void UpdateParticleGravityForceDensities();
+	void UpdatePredictedVelocities(double timeStep);
+	void UpdatePredictedDensities(double timeStep);
+	void UpdatePredictedVelocityDivergence();
+	void UpdateParticlePressures(double timestep);
+	void UpdateParticlePressureForceDensities();
 	void IntegrateParticles(double timeStep);
 	void DetectBoundaryCollision(FluidParticle& particle);
 
-	static float poly6Kernel(float r2, float h2, float coeff);
+	//static float poly6Kernel(float r2, float h2, float coeff);
 	static float viscosityLaplacianKernel2D(float r2, float h, float h2, float coeff);
-	static glm::vec3 poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff);
-	static glm::vec3 spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff);
+	//static glm::vec3 poly6KernelGradient(glm::vec3 r, float r2, float h2, float coeff);
+	//static glm::vec3 spikyKernelGradient(glm::vec3 r, float r2, float h, float h2, float coeff);
+	static float cubicSplineKernel(float r, float h, float coeff);
+	static glm::vec3 cubicSplineKernelGradient(glm::vec3 r, float rLen, float h, float coeff);
 
 	uint32_t hashCell(int x, int y, uint32_t n);
 	GammaTemplate generateGammaCorrectionTemplate();
 	void updateGamma1(const GammaTemplate& templ);
 	void updateGamma2(const GammaTemplate& templ);
 	void updateParticlePressuresSESPH();
-	void updateParticlePressuresIISPH();
+	void updateParticlePressuresIISPH(double timestep);
 	void updateBoundaryParticleNeighborSearchGrid();
 	void updateFluidParticleNeighborGridSearch();
 

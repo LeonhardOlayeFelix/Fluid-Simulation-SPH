@@ -22,14 +22,15 @@ struct FluidParameters {
 	bool SimulationRunning;
 	bool IgnoreBoundaryParticles = false;
 
-	int FluidParticleCount = 1500;
+	int FluidParticleCount = 1'000;
 
-	float RestDensity = 6.0;
-	float Stiffness = 1'300'000.0f;
-	float Viscosity = 10000;
+	float RestDensity = 6;
+	float Stiffness = 1'300'000;
+	float Viscosity = 30'000;
 	float ParticleSpacing = 10;
-	float SmoothingRadius{ 25 };
+	float SmoothingRadius = 25;
 	float ParticleMass = RestDensity * ParticleSpacing * ParticleSpacing;
 	float Gamma1 = 0;
 	float Gamma2 = 0;
+	float IISPHRelaxationCoefficient = 0.5;
 };
