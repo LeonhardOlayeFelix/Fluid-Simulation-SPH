@@ -20,7 +20,7 @@ struct SceneData
 
 
 	bool ShowForceArrow = false;
-	bool ShowKernel = false;
+	bool ShowKernelRadius = false;
 	bool ShowBoundaryParticles = false;
 	bool ShowParticleDomain = false;
 	bool MatchBallSizeToSpacing = false;

@@ -154,7 +154,6 @@ void ImGuiLayer::DrawVisualisationControlPanel()
 
         ImGui::SeparatorText("Overlays");
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
-        ImGui::Checkbox("Show Kernel Radius", &m_SceneData->ShowKernel);
 
         ImGui::SeparatorText("Boundary");
         ImGui::Checkbox("Show Boundary", &m_SceneData->ShowParticleDomain);
@@ -182,10 +181,11 @@ void ImGuiLayer::DrawVisualisationControlPanel()
             ImGui::PushItemWidth(200);
             ImGui::ColorEdit3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleColor), ImGuiColorEditFlags_PickerHueWheel);
             ImGui::ColorEdit3("Specimen Particle Color", glm::value_ptr(m_SceneData->SpecimenParticleColor), ImGuiColorEditFlags_PickerHueWheel);
-            ImGui::Checkbox("Highlight Neighbors (h)", &m_SceneData->HighlightSpecimenNeighbors);
-
+            ImGui::Checkbox("Show Kernel Radius (=h)", &m_SceneData->ShowKernelRadius);
+            ImGui::Checkbox("Highlight Neighbors (<h)", &m_SceneData->HighlightSpecimenNeighbors);
             if (m_SceneData->HighlightSpecimenNeighbors)
                 ImGui::ColorEdit3("Highlight Color", glm::value_ptr(m_SceneData->SpecimenNeighborColor), ImGuiColorEditFlags_PickerHueWheel);
+
 
             ImGui::PopItemWidth();
         }

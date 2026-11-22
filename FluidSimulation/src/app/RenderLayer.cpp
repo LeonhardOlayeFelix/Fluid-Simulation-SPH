@@ -93,12 +93,12 @@ void RenderLayer::OnRender()
     {
         UpdateFluidParticleInstanceBuffers(fluidParticles);
 
-        if (m_SceneData->ShowKernel)
+        if (m_SceneData->ShowKernelRadius)
             DrawKernelRadiusFallOff(fluidParticles[m_SceneData->SpecimenIndex].Position);
 
         DrawFluidParticles(fluidParticles);
 
-        if (m_SceneData->ShowKernel)
+        if (m_SceneData->ShowKernelRadius)
             DrawKernelRadiusOutline(fluidParticles[m_SceneData->SpecimenIndex].Position);
 
         if (m_SceneData->ShowForceArrow)
