@@ -267,9 +267,13 @@ void PhysicsSolver::UpdateParticleSurfaceTensionForceDensities()
 		{
 			float kappa = -(colorFieldLaplacian) / glm::length(n);
 			pi.SurfaceTensionForceDensity = fluid.TensionCoefficient * kappa * n;
+			pi.ColorFieldGradient = n;
 		}
-		else
+		else 
+		{
 			pi.SurfaceTensionForceDensity = glm::vec3(0);
+			pi.ColorFieldGradient = glm::vec3(0);
+		}
 	}
 }
 

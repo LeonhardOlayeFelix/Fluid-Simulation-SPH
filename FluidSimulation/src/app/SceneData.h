@@ -5,10 +5,18 @@
 #include <memory>
 #include "Physics/PhysicsState.h"
 
+enum class FluidParticleShaderTypes {
+	PlainShader,
+	VelocityShader,
+	SurfaceTensionShader,
+};
+
+
 struct SceneData
 {
 
 	std::shared_ptr<PhysicsState> PhysicsState;
+
 
 	bool ShowForceArrow = false;
 	bool ShowKernel = false;
@@ -19,10 +27,13 @@ struct SceneData
 
 	int ArrowLengthMax = 40;
 	int ArrowWidth = 2;
+	int SpecimenIndex = 0;
 
 	unsigned int FramebufferTextureId{};
 
 	float VMax = 100;
+
+	FluidParticleShaderTypes FluidParticleShader = FluidParticleShaderTypes::VelocityShader;
 
 	SceneData();
 };

@@ -29,14 +29,16 @@ public:
 
 	inline unsigned int GetFrameBufferTextureId() { return m_ResolveFbo.GetColorTexture().GetId(); };
 	void OnGuiViewportSizeChanged(int width, int height);
-	void DrawFluidParticles(const std::vector<FluidParticle>& particles, int specimenIndex, float h);
+	void DrawFluidParticles(const std::vector<FluidParticle>& particles);
 	void DrawBoundaryParticles(const std::vector<BoundaryParticle>& boundaryParticles);
 	void DrawForceArrows(const std::vector<FluidParticle>& particles);
-	void DrawKernelRadiusFallOff(glm::vec3 position, float h);
-	void DrawKernelRadiusOutline(glm::vec3 position, float h);
+	void DrawKernelRadiusFallOff(glm::vec3 position);
+	void DrawKernelRadiusOutline(glm::vec3 position);
 	void DrawBoundingBox(BoundingBox box);
 
 private:
+	ShaderProgram& selectFluidParticleShader();
+	void setFluidParticleShaderUniforms(ShaderProgram& shader);
 	float getAspectRatio();
 	float getMaxForceLength(const std::vector<FluidParticle>& particles);
 
@@ -56,10 +58,11 @@ private:
 
 
 	//Instance Vbos
-	VertexBuffer m_TranslationsInstanceVbo;
+	VertexBuffer m_FluidTranslationsInstanceVbo;
 	VertexBuffer m_BoundaryTranslationsInstanceVbo;
-	VertexBuffer m_ForceDensityInstanceVbo;
-	VertexBuffer m_VelocityInstanceVbo;
+	VertexBuffer m_FluidForceDensityInstanceVbo;
+	VertexBuffer m_FluidVelocityInstanceVbo;
+	VertexBuffer m_FluidColorFieldInstanceVbo;
 
 	IndexBuffer m_CircleIbo;
 	IndexBuffer m_BoundaryCircleIbo;
@@ -69,10 +72,10 @@ private:
 	FrameBuffer m_RenderFbo;
 	FrameBuffer m_ResolveFbo;
 
-	ShaderProgram m_KernelBallShader;
-	ShaderProgram m_ParticleShader;
 	ShaderProgram m_RadiusParticleShader;
+	ShaderProgram m_PlainParticleShader;
 	ShaderProgram m_VelocityParticleShader;
+	ShaderProgram m_SurfaceParticleShader;
 	ShaderProgram m_KernelRadiusFallOffShader;
 	ShaderProgram m_KernelRadiusOutlineShader;
 	ShaderProgram m_BoundingBoxOutlineShader;
@@ -83,9 +86,10 @@ private:
 
 
 
-	std::vector<glm::vec3> m_Translations;
+	std::vector<glm::vec3> m_FluidTranslations;
 	std::vector<glm::vec3> m_BoundaryTranslations;
-	std::vector<glm::vec3> m_ForceDensities;
-	std::vector<glm::vec3> m_Velocities;
+	std::vector<glm::vec3> m_FluidForceDensities;
+	std::vector<glm::vec3> m_FluidVelocities;
+	std::vector<glm::vec3> m_FluidColorFieldGradients;
 };
 

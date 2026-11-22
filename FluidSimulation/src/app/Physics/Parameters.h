@@ -26,7 +26,7 @@ struct FluidParameters {
 	float ParticleSpacing = 10;
 	float SmoothingRadius{ 25 };
 	float ParticleMass = RestDensity * ParticleSpacing * ParticleSpacing;
-	float SurfaceTensionThreshold = 0.1 / SmoothingRadius;
+	float SurfaceTensionThreshold = 0.75 / SmoothingRadius;
 
 	float Stiffness = 1'300'000.0f;
 	float Viscosity = 10000;

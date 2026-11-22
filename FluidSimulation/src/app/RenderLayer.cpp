@@ -7,18 +7,21 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     Primitive circlePrimitive = Primitives::Circle(16);
     Primitive squarePrimitive = Primitives::NDCQuad();
 
-    m_ForceDensityInstanceVbo = VertexBuffer::CreateEmpty();
-    m_TranslationsInstanceVbo = VertexBuffer::CreateEmpty();
-    m_VelocityInstanceVbo = VertexBuffer::CreateEmpty();
+    m_FluidForceDensityInstanceVbo = VertexBuffer::CreateEmpty();
+    m_FluidTranslationsInstanceVbo = VertexBuffer::CreateEmpty();
+    m_FluidVelocityInstanceVbo = VertexBuffer::CreateEmpty();
+    m_FluidColorFieldInstanceVbo = VertexBuffer::CreateEmpty();
     m_BoundaryTranslationsInstanceVbo = VertexBuffer::CreateEmpty();
 
     m_CircleVbo = VertexBuffer(circlePrimitive);
     m_CircleIbo = IndexBuffer(circlePrimitive);
     m_CircleVao.RecordVBOLayout(m_CircleVbo, { 3 });
-    m_CircleVao.RecordVBOLayout(m_TranslationsInstanceVbo, { 3 });
-    m_CircleVao.RecordVBOLayout(m_VelocityInstanceVbo, { 3 });
+    m_CircleVao.RecordVBOLayout(m_FluidTranslationsInstanceVbo, { 3 });
+    m_CircleVao.RecordVBOLayout(m_FluidVelocityInstanceVbo, { 3 });
+    m_CircleVao.RecordVBOLayout(m_FluidColorFieldInstanceVbo, { 3 });
     m_CircleVao.SetAttribDivisor(1, 1);
     m_CircleVao.SetAttribDivisor(2, 1);
+    m_CircleVao.SetAttribDivisor(3, 1);
     m_CircleVao.RecordIndexBuffer(m_CircleIbo);
 
     m_BoundaryCircleVbo = VertexBuffer(circlePrimitive);
@@ -36,22 +39,21 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_ArrowVbo = VertexBuffer(squarePrimitive);
     m_ArrowIbo = IndexBuffer(squarePrimitive);
     m_ArrowVao.RecordVBOLayout(m_ArrowVbo, { 3, 2 });
-    m_ArrowVao.RecordVBOLayout(m_TranslationsInstanceVbo, { 3 });
-    m_ArrowVao.RecordVBOLayout(m_ForceDensityInstanceVbo, { 3 });
+    m_ArrowVao.RecordVBOLayout(m_FluidTranslationsInstanceVbo, { 3 });
+    m_ArrowVao.RecordVBOLayout(m_FluidForceDensityInstanceVbo, { 3 });
     m_ArrowVao.RecordIndexBuffer(m_ArrowIbo);
     m_ArrowVao.SetAttribDivisor(2, 1);
     m_ArrowVao.SetAttribDivisor(3, 1);
 
-    m_ParticleShader = ShaderProgram("resources/shaders/2D/ParticleShader.shader");
-    m_RadiusParticleShader = ShaderProgram("resources/shaders/2D/RadiusParticleShader.shader");
+    m_PlainParticleShader = ShaderProgram("resources/shaders/2D/PlainParticleShader.shader");
     m_VelocityParticleShader = ShaderProgram("resources/shaders/2D/VelocityParticleShader.shader");
+    m_SurfaceParticleShader = ShaderProgram("resources/shaders/2D/SurfaceParticleShader.shader");
     m_KernelRadiusFallOffShader = ShaderProgram("resources/shaders/2D/KernelRadiusFallOffShader.shader");
     m_KernelRadiusOutlineShader = ShaderProgram("resources/shaders/2D/KernelRadiusOutlineShader.shader");
     m_BoundingBoxOutlineShader = ShaderProgram("resources/shaders/2D/BoundingBoxOutlineShader.shader");
     m_WhiteBallShader = ShaderProgram("resources/shaders/2D/WhiteBallShader.shader");
-
-    m_KernelBallShader = ShaderProgram("resources/shaders/2D/KernelShapeShader.shader");
     m_ArrowShader = ShaderProgram("resources/shaders/2D/ArrowShader.shader");
+    m_RadiusParticleShader = ShaderProgram("resources/shaders/2D/RadiusParticleShader.shader");
 
     m_MatricesUbo = UniformBuffer(sizeof(glm::mat4));
     m_MatricesUbo.BindToPoint(0);
@@ -87,18 +89,15 @@ void RenderLayer::OnRender()
 
     if (!fluidParticles.empty())
     {
-        int specimenIndex = fluidParticles.size() / 4;
-        float smoothingRadius = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
-
         UpdateFluidParticleInstanceBuffers(fluidParticles);
 
         if (m_SceneData->ShowKernel)
-            DrawKernelRadiusFallOff(fluidParticles[specimenIndex].Position, smoothingRadius); //outline needs to appear behind
+            DrawKernelRadiusFallOff(fluidParticles[m_SceneData->SpecimenIndex].Position);
 
-        DrawFluidParticles(fluidParticles, specimenIndex, smoothingRadius);
+        DrawFluidParticles(fluidParticles);
 
         if (m_SceneData->ShowKernel)
-            DrawKernelRadiusOutline(fluidParticles[specimenIndex].Position, smoothingRadius); //outline needs to appear in front
+            DrawKernelRadiusOutline(fluidParticles[m_SceneData->SpecimenIndex].Position);
 
         if (m_SceneData->ShowForceArrow)
             DrawForceArrows(fluidParticles);
@@ -107,9 +106,6 @@ void RenderLayer::OnRender()
     if (m_SceneData->ShowParticleDomain) 
     {
         DrawBoundingBox(m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain);
-
-
-
     }
 
     if (m_SceneData->ShowBoundaryParticles) 
@@ -123,16 +119,20 @@ void RenderLayer::OnRender()
     EndFrame();
 }
 
-void RenderLayer::DrawKernelRadiusFallOff(glm::vec3 position, float h)
+void RenderLayer::DrawKernelRadiusFallOff(glm::vec3 position)
 {
+    float h = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
+
     glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f));
     m_KernelRadiusFallOffShader.SetUniformMat4f("u_Model", model);
 
     RenderCommand::DrawElements(m_QuadVao, m_KernelRadiusFallOffShader);
 }
 
-void RenderLayer::DrawKernelRadiusOutline(glm::vec3 position, float h)
+void RenderLayer::DrawKernelRadiusOutline(glm::vec3 position)
 {
+    float h = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
+
     glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f));
     m_KernelRadiusOutlineShader.SetUniformMat4f("u_Model", model);
 
@@ -161,21 +161,11 @@ void RenderLayer::DrawForceArrows(const std::vector<FluidParticle>& particles)
     RenderCommand::DrawElementsInstanced(m_ArrowVao, m_ArrowShader, particles.size());
 }
 
-void RenderLayer::DrawFluidParticles(const std::vector<FluidParticle>& particles, int specimenIndex, float smoothingRadius)
+void RenderLayer::DrawFluidParticles(const std::vector<FluidParticle>& particles)
 {
-    const FluidParameters& fluid = m_SceneData->PhysicsState->FluidParameters;
-    const float h2 = smoothingRadius * smoothingRadius;
-    ShaderProgram& shader = m_VelocityParticleShader;
+    ShaderProgram& shader = selectFluidParticleShader();
 
-    shader.SetUniform1f("u_BallRadius", (m_SceneData->MatchBallSizeToSpacing ? fluid.ParticleSpacing / 2 : PhysicsSolver::FluidParticleRadius));
-    shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
-    shader.SetUniform1f("u_MaxVelocitySize", m_SceneData->VMax);
-
-    if (m_SceneData->ShowKernel)
-    {
-        shader.SetUniform1f("u_SmoothingRadiusSquared", h2);
-        shader.SetUniform3f("u_SpecimenPosition", particles[specimenIndex].Position);
-    }
+    setFluidParticleShaderUniforms(shader);
 
     RenderCommand::DrawElementsInstanced(m_CircleVao, shader, particles.size());
 }
@@ -213,21 +203,26 @@ void RenderLayer::ReadSceneData()
 
 void RenderLayer::UpdateFluidParticleInstanceBuffers(const std::vector<FluidParticle>& particles)
 {
-    m_Translations.resize(particles.size());
-    m_ForceDensities.resize(particles.size());
-    m_Velocities.resize(particles.size());
+    m_FluidTranslations.resize(particles.size());
+    m_FluidForceDensities.resize(particles.size());
+    m_FluidVelocities.resize(particles.size());
+    m_FluidColorFieldGradients.resize(particles.size());
 
-    for (int i = 0; i < m_Translations.size(); i++) {
-        m_Translations[i] = particles[i].Position;
-        m_ForceDensities[i] = particles[i].ResultantForceDensity;
-        m_Velocities[i] = particles[i].Velocity;
+
+    for (int i = 0; i < m_FluidTranslations.size(); i++) {
+        m_FluidTranslations[i] = particles[i].Position;
+        m_FluidForceDensities[i] = particles[i].ResultantForceDensity;
+        m_FluidVelocities[i] = particles[i].Velocity;
+        m_FluidColorFieldGradients[i] = particles[i].ColorFieldGradient;
+
     }
 
 
 
-    m_TranslationsInstanceVbo.UpdateData(m_Translations.data(), m_Translations.size() * 3 * sizeof(float));
-    m_ForceDensityInstanceVbo.UpdateData(m_ForceDensities.data(), m_ForceDensities.size() * 3 * sizeof(float));
-    m_VelocityInstanceVbo.UpdateData(m_Velocities.data(), m_Velocities.size() * 3 * sizeof(float));
+    m_FluidTranslationsInstanceVbo.UpdateData(m_FluidTranslations.data(), m_FluidTranslations.size() * 3 * sizeof(float));
+    m_FluidForceDensityInstanceVbo.UpdateData(m_FluidForceDensities.data(), m_FluidForceDensities.size() * 3 * sizeof(float));
+    m_FluidVelocityInstanceVbo.UpdateData(m_FluidVelocities.data(), m_FluidVelocities.size() * 3 * sizeof(float));
+    m_FluidColorFieldInstanceVbo.UpdateData(m_FluidColorFieldGradients.data(), m_FluidColorFieldGradients.size() * 3 * sizeof(float));
 }
 
 void RenderLayer::UpdateBoundaryParticleInstanceBuffers(const std::vector<BoundaryParticle>& particles)
@@ -239,6 +234,40 @@ void RenderLayer::UpdateBoundaryParticleInstanceBuffers(const std::vector<Bounda
     }
 
     m_BoundaryTranslationsInstanceVbo.UpdateData(m_BoundaryTranslations.data(), m_BoundaryTranslations.size() * 3 * sizeof(float));
+}
+
+ShaderProgram& RenderLayer::selectFluidParticleShader()
+{
+
+    if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::PlainShader)
+        return m_PlainParticleShader;
+    if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::VelocityShader)
+        return m_VelocityParticleShader;
+    if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::SurfaceTensionShader)
+        return m_SurfaceParticleShader;
+
+}
+
+void RenderLayer::setFluidParticleShaderUniforms(ShaderProgram& shader)
+{
+    const FluidParameters& fluid = m_SceneData->PhysicsState->FluidParameters;
+    const std::vector<FluidParticle>& fluidParticles = m_SceneData->PhysicsState->FluidParticles;
+
+    if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::VelocityShader)
+    {
+        shader.SetUniform1f("u_MaxVelocitySize", m_SceneData->VMax);
+    }
+    if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::SurfaceTensionShader)
+    {
+        shader.SetUniform1f("u_SurfaceTensionThreshold", fluid.SurfaceTensionThreshold);
+    }
+    if (m_SceneData->ShowKernel)
+    {
+        shader.SetUniform1f("u_SmoothingRadiusSquared", fluid.SmoothingRadius * fluid.SmoothingRadius);
+        shader.SetUniform3f("u_SpecimenPosition", fluidParticles[m_SceneData->SpecimenIndex].Position);
+    }
+
+    shader.SetUniform1f("u_BallRadius", (m_SceneData->MatchBallSizeToSpacing ? fluid.ParticleSpacing / 2 : PhysicsSolver::FluidParticleRadius));
 }
 
 float RenderLayer::getAspectRatio()

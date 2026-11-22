@@ -102,7 +102,7 @@ void ImGuiLayer::DrawSimulationControlsControlPanel()
         ImGui::SeparatorText("Other ");
         bool changedRestDensity = ImGui::DragFloat("Rest Density (p0)", &fluid.RestDensity, 1, 1.0, 100.0);
         bool changedSpacing = ImGui::DragFloat("Particle Spacing (d)", &fluid.ParticleSpacing, 0.1f, 5.0f, 30.0f);
-        ImGui::DragFloat("Surface Tension Threshold (l)", &fluid.SurfaceTensionThreshold, 0.1, 0.1, 100.0);
+        ImGui::DragFloat("Surface Tension Threshold (l)", &fluid.SurfaceTensionThreshold, 0.0001, 0.0001, 0.1);
         ImGui::Checkbox("Clamp Pressure (>0)", &fluid.ClampPressure);
 
         if (changedSpacing || changedRestDensity)
@@ -151,7 +151,6 @@ void ImGuiLayer::DrawVisualisationControlPanel()
         ImGui::BeginDisabled(m_SceneData->MatchBallSizeToSpacing);
         ImGui::DragFloat("Fluid Particle Radius", &PhysicsSolver::FluidParticleRadius, 0.1f, 0.1f, 50.0f);
         ImGui::EndDisabled();
-        ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
 
         ImGui::SeparatorText("Overlays");
         ImGui::Checkbox("Show Pressure Force", &m_SceneData->ShowForceArrow);
@@ -162,6 +161,20 @@ void ImGuiLayer::DrawVisualisationControlPanel()
         ImGui::Checkbox("Show Boundary Particles", &m_SceneData->ShowBoundaryParticles);
         if (m_SceneData->ShowBoundaryParticles)
             ImGui::DragFloat("Boundary Particle Radius", &PhysicsSolver::BoundaryParticleRadius, 0.1f, 0.1f, 50.0f);
+
+        ImGui::SeparatorText("Shading");
+        static const char* particleShaderNames[] = { "Plain Shader", "Velocity Shader", "Surface Tension Shader" };
+
+        ImGui::PushItemWidth(200);
+        int shaderIndex = (int)m_SceneData->FluidParticleShader;
+        if (ImGui::Combo("Fluid Shader", &shaderIndex, particleShaderNames, IM_ARRAYSIZE(particleShaderNames)))
+            m_SceneData->FluidParticleShader = (FluidParticleShaderTypes)shaderIndex;
+        ImGui::PopItemWidth();
+
+        if (shaderIndex == (int)FluidParticleShaderTypes::VelocityShader)
+            ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
+
+
     }
     ImGui::PopItemWidth();
     ImGui::End();
@@ -205,6 +218,7 @@ void ImGuiLayer::DrawInspector()
     ImGui::BeginDisabled();
     ImGui::InputFloat2("Pressure Force Density", glm::value_ptr(specimen.PressureForceDensity), "%.3f");
     ImGui::InputFloat2("Viscous Force Density", glm::value_ptr(specimen.ViscousForceDensity), "%.3f");
+    ImGui::InputFloat2("Color Field Gradient", glm::value_ptr(specimen.ColorFieldGradient), "%.3f");
     ImGui::EndDisabled();
 
     ImGui::PopItemWidth();
