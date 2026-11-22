@@ -39,6 +39,9 @@ void main()
 
 layout(location = 0) out vec4 color;
 
+uniform vec3 u_ParticleColor;
+uniform vec3 u_SurfaceParticleColor;
+
 in vec2 v_Local;
 flat in int v_IsSurface;
 
@@ -54,9 +57,9 @@ void main()
 	vec3 base;
 
 	if (v_IsSurface == 1)
-		base = vec3(1.00, 0.55, 0.20);
+		base = u_SurfaceParticleColor;
 	else
-		base = vec3(0.05, 0.20, 0.55);
+		base = u_ParticleColor;
 
 
 	//fake sphere shading: brighter towards the upper-left

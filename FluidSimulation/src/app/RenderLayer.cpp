@@ -45,16 +45,17 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_ArrowVao.SetAttribDivisor(2, 1);
     m_ArrowVao.SetAttribDivisor(3, 1);
 
-    m_PlainParticleShader = ShaderProgram("resources/shaders/2D/PlainParticleShader.shader");
-    m_SpecimenParticleShader = ShaderProgram("resources/shaders/2D/SpecimenParticleShader.shader");
-    m_VelocityParticleShader = ShaderProgram("resources/shaders/2D/VelocityParticleShader.shader");
-    m_SurfaceParticleShader = ShaderProgram("resources/shaders/2D/SurfaceParticleShader.shader");
-    m_KernelRadiusFallOffShader = ShaderProgram("resources/shaders/2D/KernelRadiusFallOffShader.shader");
-    m_KernelRadiusOutlineShader = ShaderProgram("resources/shaders/2D/KernelRadiusOutlineShader.shader");
-    m_BoundingBoxOutlineShader = ShaderProgram("resources/shaders/2D/BoundingBoxOutlineShader.shader");
-    m_BoundaryParticleShader = ShaderProgram("resources/shaders/2D/BoundaryParticleShader.shader");
+    m_PlainParticleShader =     ShaderProgram("resources/shaders/2D/PlainParticleShader.shader");
+    m_SpecimenParticleShader =  ShaderProgram("resources/shaders/2D/SpecimenParticleShader.shader");
+    m_VelocityParticleShader =  ShaderProgram("resources/shaders/2D/VelocityParticleShader.shader");
+    m_SurfaceParticleShader =   ShaderProgram("resources/shaders/2D/SurfaceTensionParticleShader.shader");
+    m_BoundaryParticleShader =  ShaderProgram("resources/shaders/2D/BoundaryParticleShader.shader");
+
+    m_KernelRadiusFallOffShader =   ShaderProgram("resources/shaders/2D/KernelRadiusFallOffShader.shader");
+    m_KernelRadiusOutlineShader =   ShaderProgram("resources/shaders/2D/KernelRadiusOutlineShader.shader");
+    m_BoundingBoxOutlineShader =    ShaderProgram("resources/shaders/2D/BoundingBoxOutlineShader.shader");
+
     m_ArrowShader = ShaderProgram("resources/shaders/2D/ArrowShader.shader");
-    m_RadiusParticleShader = ShaderProgram("resources/shaders/2D/RadiusParticleShader.shader");
 
     m_MatricesUbo = UniformBuffer(sizeof(glm::mat4));
     m_MatricesUbo.BindToPoint(0);
@@ -276,6 +277,8 @@ void RenderLayer::setFluidParticleShaderUniforms(ShaderProgram& shader)
     }
     if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::SurfaceTensionShader)
     {
+        shader.SetUniform3f("u_ParticleColor", m_SceneData->PlainParticleShaderColor);
+        shader.SetUniform3f("u_SurfaceParticleColor", m_SceneData->SurfaceParticleShaderColor);
         shader.SetUniform1f("u_SurfaceTensionThreshold", fluid.SurfaceTensionThreshold);
     }
 

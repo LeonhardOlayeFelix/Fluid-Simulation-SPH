@@ -190,8 +190,16 @@ void ImGuiLayer::DrawVisualisationControlPanel()
             ImGui::PopItemWidth();
         }
         if (shaderIndex == (int)FluidParticleShaderTypes::VelocityShader)
+        {
             ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
-
+        }
+        if (shaderIndex == (int)FluidParticleShaderTypes::SurfaceTensionShader) 
+        {
+            ImGui::PushItemWidth(200);
+            ImGui::ColorEdit3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleShaderColor), ImGuiColorEditFlags_PickerHueWheel);
+            ImGui::ColorEdit3("Surface Particle Color", glm::value_ptr(m_SceneData->SurfaceParticleShaderColor), ImGuiColorEditFlags_PickerHueWheel);
+            ImGui::PopItemWidth();
+        }
 
 
     }
