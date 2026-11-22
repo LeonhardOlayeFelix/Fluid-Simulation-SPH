@@ -194,6 +194,12 @@ void PhysicsSolver::UpdateParticleViscosityForceDensities()
 
 		FluidParticle& pi = particles[i];
 
+		if (!fluid.InfluencedByViscousForce) 
+		{
+			pi.ViscousForceDensity = glm::vec3(0);
+			continue;
+		}
+
 		glm::vec3 summation{};
 
 		ForEachFluidNeighbour(i, [&](const FluidParticle& pj) {

@@ -22,7 +22,9 @@ public:
 	virtual void OnUpdate(double ts) override;
 	virtual void  OnRender() override;
 	void  DrawViewport();
-	void  DrawControlsPanel();
+	void  DrawControlsPanels();
+	void  DrawSimulationControlsControlPanel();
+	void  DrawVisualisationControlPanel();
 	void  DrawInspector();
 	void  DrawStats();
 

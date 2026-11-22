@@ -25,7 +25,7 @@ void ImGuiLayer::OnRender()
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
 	DrawViewport();
-	DrawControlsPanel();
+	DrawControlsPanels();
 	DrawInspector();
 	DrawStats();
 
@@ -51,23 +51,28 @@ void ImGuiLayer::DrawViewport()
     ImGui::End();
 }
 
-void ImGuiLayer::DrawControlsPanel()
+void ImGuiLayer::DrawControlsPanels()
 {
+
+
+    DrawSimulationControlsControlPanel();
+    DrawVisualisationControlPanel();
+
+    
+}
+
+void ImGuiLayer::DrawSimulationControlsControlPanel()
+{
+    ImGui::Begin("Simulation Controls");
+    ImGui::PushItemWidth(100);
+
     PhysicsState& state = *m_SceneData->PhysicsState;
     FluidParameters& fluid = state.FluidParameters;
 
-    ImGui::Begin("Controls");
-    ImGui::PushItemWidth(100);
 
-    //simulation
-    if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        if (ImGui::Button(fluid.SimulationRunning ? "Pause Simulation" : "Begin Simulation"))
-            fluid.SimulationRunning = !fluid.SimulationRunning;
-    }
 
     //scene setup: initial particle layout
-    if (ImGui::CollapsingHeader("Scene Setup", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("Setup", ImGuiTreeNodeFlags_DefaultOpen))
     {
         bool a = ImGui::DragInt("Count", &fluid.FluidParticleCount, 1.0, 1, 10000);
 
@@ -86,6 +91,7 @@ void ImGuiLayer::DrawControlsPanel()
         ImGui::Checkbox("Influenced by Pressure", &fluid.InfluencedByPressure);
         ImGui::Checkbox("Influenced by Surface Tension", &fluid.InfluencedBySurfaceTension);
         ImGui::Checkbox("Influenced by Boundary Particles", &fluid.InfluencedByBoundaryParticles);
+        ImGui::Checkbox("Influenced by Viscous Force", &fluid.InfluencedByViscousForce);
 
 
         ImGui::SeparatorText("Coefficients");
@@ -110,9 +116,6 @@ void ImGuiLayer::DrawControlsPanel()
                 state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
         }
 
-
-
-
         ImGui::SeparatorText("Derived");
         ImGui::BeginDisabled();
         ImGui::DragFloat("Particle Mass (m)", &fluid.ParticleMass);
@@ -122,7 +125,25 @@ void ImGuiLayer::DrawControlsPanel()
         ImGui::EndDisabled();
     }
 
+    //simulation
+    if (ImGui::CollapsingHeader("State", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::Button(fluid.SimulationRunning ? "Pause Simulation" : "Begin Simulation"))
+            fluid.SimulationRunning = !fluid.SimulationRunning;
+    }
+
+    ImGui::PopItemWidth();
+    ImGui::End();
+
+
+
+}
+
+void ImGuiLayer::DrawVisualisationControlPanel()
+{
     //visualisation... no effect on physics
+    ImGui::Begin("Visualisation Controls");
+    ImGui::PushItemWidth(100);
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::SeparatorText("Fluid Particles");
@@ -148,7 +169,7 @@ void ImGuiLayer::DrawControlsPanel()
 
 void ImGuiLayer::DrawInspector()
 {
-    ImGui::Begin("Inspector");
+    ImGui::Begin("Particle Inspector");
 
     std::vector<FluidParticle>& particles = m_SceneData->PhysicsState->FluidParticles;
     if (particles.empty()) {

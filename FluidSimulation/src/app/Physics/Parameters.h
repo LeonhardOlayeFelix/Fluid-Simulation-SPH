@@ -16,6 +16,7 @@ struct FluidParameters {
 	bool InfluencedByGravity = true;
 	bool InfluencedBySurfaceTension = true;
 	bool InfluencedByPressure = true;
+	bool InfluencedByViscousForce = true;
 
 	bool ClampPressure = true;
 
