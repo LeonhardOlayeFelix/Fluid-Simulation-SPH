@@ -252,6 +252,7 @@ void RenderLayer::setFluidParticleShaderUniforms(ShaderProgram& shader)
     const FluidParameters& fluid = m_SceneData->PhysicsState->FluidParameters;
     const std::vector<FluidParticle>& fluidParticles = m_SceneData->PhysicsState->FluidParticles;
     const float ballRadius = m_SceneData->MatchBallSizeToSpacing ? fluid.ParticleSpacing / 2 : PhysicsSolver::FluidParticleRadius;
+    size_t specimenIndex = std::min((size_t)m_SceneData->SpecimenIndex, fluidParticles.size() - 1);
 
     if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::PlainShader)
     {
@@ -262,8 +263,12 @@ void RenderLayer::setFluidParticleShaderUniforms(ShaderProgram& shader)
     {
         shader.SetUniform3f("u_ParticleColor", m_SceneData->PlainParticleShaderColor);
         shader.SetUniform3f("u_SpecimenColor", m_SceneData->SpecimenParticleShaderColor);
-        shader.SetUniform1i("u_SpecimenIndex", m_SceneData->SpecimenIndex);
+        shader.SetUniform3f("u_SmoothingRadiusHighlightColor", m_SceneData->SpecimenSmoothingRadiusHighlightColor);
+        shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
         shader.SetUniform1f("u_SpecimenBallRadius", fluid.ParticleSpacing / 2);
+        shader.SetUniform1i("u_HighlightParticlesWithinSmoothingRadiusOfSpecimen", m_SceneData->HighlightParticlesWithinSmoothingRadiusOfSpecimen);
+        shader.SetUniform1f("u_SmoothingRadiusSquared", fluid.SmoothingRadius * fluid.SmoothingRadius);
+        shader.SetUniform3f("u_SpecimenPosition", fluidParticles[specimenIndex].Position);
     }
     if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::VelocityShader)
     {

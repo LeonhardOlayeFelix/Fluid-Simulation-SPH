@@ -37,6 +37,8 @@ struct SceneData
 	FluidParticleShaderTypes FluidParticleShader = FluidParticleShaderTypes::VelocityShader;
 	glm::vec3 PlainParticleShaderColor{ 0.05, 0.20, 0.55 };
 	glm::vec3 SpecimenParticleShaderColor{ 1.00, 0.55, 0.20 };
+	glm::vec3 SpecimenSmoothingRadiusHighlightColor{ 0.92 };
+	bool HighlightParticlesWithinSmoothingRadiusOfSpecimen = true;
 
 
 	SceneData();
