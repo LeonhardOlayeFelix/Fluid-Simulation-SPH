@@ -257,19 +257,21 @@ void RenderLayer::setFluidParticleShaderUniforms(ShaderProgram& shader)
 
     if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::PlainShader)
     {
-        shader.SetUniform3f("u_ParticleColor", m_SceneData->PlainParticleShaderColor);
+        shader.SetUniform3f("u_ParticleColor", m_SceneData->PlainParticleColor);
         shader.SetUniform1f("u_BallRadius", (m_SceneData->MatchBallSizeToSpacing ? fluid.ParticleSpacing / 2 : PhysicsSolver::FluidParticleRadius));
     }
     if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::SpecimenShader)
     {
-        shader.SetUniform3f("u_ParticleColor", m_SceneData->PlainParticleShaderColor);
-        shader.SetUniform3f("u_SpecimenColor", m_SceneData->SpecimenParticleShaderColor);
-        shader.SetUniform3f("u_SmoothingRadiusHighlightColor", m_SceneData->SpecimenSmoothingRadiusHighlightColor);
         shader.SetUniform1i("u_SpecimenIndex", specimenIndex);
-        shader.SetUniform1f("u_SpecimenBallRadius", fluid.ParticleSpacing / 2);
-        shader.SetUniform1i("u_HighlightParticlesWithinSmoothingRadiusOfSpecimen", m_SceneData->HighlightParticlesWithinSmoothingRadiusOfSpecimen);
-        shader.SetUniform1f("u_SmoothingRadiusSquared", fluid.SmoothingRadius * fluid.SmoothingRadius);
+        shader.SetUniform1i("u_HighlightNeighbors", m_SceneData->HighlightSpecimenNeighbors);
+
+        shader.SetUniform3f("u_ParticleColor", m_SceneData->PlainParticleColor);
+        shader.SetUniform3f("u_SpecimenColor", m_SceneData->SpecimenParticleColor);
+        shader.SetUniform3f("u_NeighborColor", m_SceneData->SpecimenNeighborColor);
         shader.SetUniform3f("u_SpecimenPosition", fluidParticles[specimenIndex].Position);
+
+        shader.SetUniform1f("u_SmoothingRadiusSquared", fluid.SmoothingRadius * fluid.SmoothingRadius);
+        shader.SetUniform1f("u_SpecimenBallRadius", fluid.ParticleSpacing / 2);
     }
     if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::VelocityShader)
     {
@@ -277,8 +279,8 @@ void RenderLayer::setFluidParticleShaderUniforms(ShaderProgram& shader)
     }
     if (m_SceneData->FluidParticleShader == FluidParticleShaderTypes::SurfaceTensionShader)
     {
-        shader.SetUniform3f("u_ParticleColor", m_SceneData->PlainParticleShaderColor);
-        shader.SetUniform3f("u_SurfaceParticleColor", m_SceneData->SurfaceParticleShaderColor);
+        shader.SetUniform3f("u_ParticleColor", m_SceneData->PlainParticleColor);
+        shader.SetUniform3f("u_SurfaceParticleColor", m_SceneData->SurfaceParticleColor);
         shader.SetUniform1f("u_SurfaceTensionThreshold", fluid.SurfaceTensionThreshold);
     }
 

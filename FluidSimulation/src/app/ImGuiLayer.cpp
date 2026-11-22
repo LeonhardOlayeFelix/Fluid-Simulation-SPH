@@ -174,18 +174,18 @@ void ImGuiLayer::DrawVisualisationControlPanel()
         if (shaderIndex == (int)FluidParticleShaderTypes::PlainShader) 
         {
             ImGui::PushItemWidth(200);
-            ImGui::ColorEdit3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleShaderColor), ImGuiColorEditFlags_PickerHueWheel);
+            ImGui::ColorEdit3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleColor), ImGuiColorEditFlags_PickerHueWheel);
             ImGui::PopItemWidth();
         }
         if (shaderIndex == (int)FluidParticleShaderTypes::SpecimenShader) 
         {
             ImGui::PushItemWidth(200);
-            ImGui::ColorEdit3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleShaderColor), ImGuiColorEditFlags_PickerHueWheel);
-            ImGui::ColorEdit3("Specimen Particle Color", glm::value_ptr(m_SceneData->SpecimenParticleShaderColor), ImGuiColorEditFlags_PickerHueWheel);
-            ImGui::Checkbox("Highlight Particles Within Smoothing Radius (h)", &m_SceneData->HighlightParticlesWithinSmoothingRadiusOfSpecimen);
+            ImGui::ColorEdit3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleColor), ImGuiColorEditFlags_PickerHueWheel);
+            ImGui::ColorEdit3("Specimen Particle Color", glm::value_ptr(m_SceneData->SpecimenParticleColor), ImGuiColorEditFlags_PickerHueWheel);
+            ImGui::Checkbox("Highlight Neighbors (h)", &m_SceneData->HighlightSpecimenNeighbors);
 
-            if (m_SceneData->HighlightParticlesWithinSmoothingRadiusOfSpecimen)
-                ImGui::ColorEdit3("Highlight Color", glm::value_ptr(m_SceneData->SpecimenSmoothingRadiusHighlightColor), ImGuiColorEditFlags_PickerHueWheel);
+            if (m_SceneData->HighlightSpecimenNeighbors)
+                ImGui::ColorEdit3("Highlight Color", glm::value_ptr(m_SceneData->SpecimenNeighborColor), ImGuiColorEditFlags_PickerHueWheel);
 
             ImGui::PopItemWidth();
         }
@@ -196,8 +196,8 @@ void ImGuiLayer::DrawVisualisationControlPanel()
         if (shaderIndex == (int)FluidParticleShaderTypes::SurfaceTensionShader) 
         {
             ImGui::PushItemWidth(200);
-            ImGui::ColorEdit3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleShaderColor), ImGuiColorEditFlags_PickerHueWheel);
-            ImGui::ColorEdit3("Surface Particle Color", glm::value_ptr(m_SceneData->SurfaceParticleShaderColor), ImGuiColorEditFlags_PickerHueWheel);
+            ImGui::ColorEdit3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleColor), ImGuiColorEditFlags_PickerHueWheel);
+            ImGui::ColorEdit3("Surface Particle Color", glm::value_ptr(m_SceneData->SurfaceParticleColor), ImGuiColorEditFlags_PickerHueWheel);
             ImGui::PopItemWidth();
         }
 

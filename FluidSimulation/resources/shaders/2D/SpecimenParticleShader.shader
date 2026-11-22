@@ -11,15 +11,18 @@ layout (std140, binding = 0) uniform Matrices
 };
 
 uniform int u_SpecimenIndex;
+uniform int u_HighlightSpecimenNeighbors;
+
 uniform float u_BallRadius;
 uniform float u_SpecimenBallRadius;
-uniform int u_HighlightParticlesWithinSmoothingRadiusOfSpecimen;
 uniform float u_SmoothingRadiusSquared;
+
 uniform vec3 u_SpecimenPosition;
 
 out vec2 v_Local;
+
 flat out int v_IsSpecimen;
-flat out int v_WithinRadius;
+flat out int v_IsNeighbor;
 
 void main()
 {
@@ -27,7 +30,7 @@ void main()
 	v_IsSpecimen = int(gl_InstanceID == u_SpecimenIndex);
 
 	vec3 d = a_Translation - u_SpecimenPosition; 
-	v_WithinRadius = dot(d, d) <= u_SmoothingRadiusSquared ? 1 : 0;
+	v_IsNeighbor = dot(d, d) <= u_SmoothingRadiusSquared ? 1 : 0;
 
 	float radius = v_IsSpecimen == 1 ? u_SpecimenBallRadius : u_BallRadius;
 
@@ -41,13 +44,13 @@ layout(location = 0) out vec4 color;
 
 uniform vec3 u_ParticleColor;
 uniform vec3 u_SpecimenColor;
-uniform vec3 u_SmoothingRadiusHighlightColor;
-uniform int u_HighlightParticlesWithinSmoothingRadiusOfSpecimen;
+uniform vec3 u_NeighborColor;
+uniform int u_HighlightNeighbors;
 uniform int u_SpecimenIndex;
 
 in vec2 v_Local;
 flat in int v_IsSpecimen;
-flat in int v_WithinRadius;
+flat in int v_IsNeighbor;
 
 void main()
 {
@@ -62,8 +65,8 @@ void main()
 
 	if (v_IsSpecimen == 1)
 		base = u_SpecimenColor;
-	else if (v_WithinRadius == 1 && u_HighlightParticlesWithinSmoothingRadiusOfSpecimen == 1)
-		base = u_SmoothingRadiusHighlightColor;
+	else if (v_IsNeighbor == 1 && u_HighlightNeighbors == 1)
+		base = u_NeighborColor;
 	else
 		base = u_ParticleColor;
 
