@@ -25,6 +25,8 @@ void main()
 
 layout(location = 0) out vec4 color;
 
+uniform vec3 u_ParticleColor;
+
 in vec2 v_Local;
 
 void main()
@@ -36,7 +38,7 @@ void main()
 	float alpha = 1.0 - smoothstep(0.92 - edge, 0.92, d);
 	if (alpha <= 0.0) discard;
 
-	vec3 base = vec3(0.05, 0.20, 0.55);
+	vec3 base = u_ParticleColor;
 
 	//fake sphere shading: brighter towards the upper-left
 	float z = sqrt(max(1.0 - d * d, 0.0));

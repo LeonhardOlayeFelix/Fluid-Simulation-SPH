@@ -163,7 +163,7 @@ void ImGuiLayer::DrawVisualisationControlPanel()
             ImGui::DragFloat("Boundary Particle Radius", &PhysicsSolver::BoundaryParticleRadius, 0.1f, 0.1f, 50.0f);
 
         ImGui::SeparatorText("Shading");
-        static const char* particleShaderNames[] = { "Plain Shader", "Velocity Shader", "Surface Tension Shader" };
+        static const char* particleShaderNames[] = { "Plain Shader", "Specimen Shader", "Velocity Shader", "Surface Tension Shader" };
 
         ImGui::PushItemWidth(200);
         int shaderIndex = (int)m_SceneData->FluidParticleShader;
@@ -171,8 +171,16 @@ void ImGuiLayer::DrawVisualisationControlPanel()
             m_SceneData->FluidParticleShader = (FluidParticleShaderTypes)shaderIndex;
         ImGui::PopItemWidth();
 
+        if (shaderIndex == (int)FluidParticleShaderTypes::PlainShader)
+            ImGui::ColorPicker3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleShaderColor));
+        if (shaderIndex == (int)FluidParticleShaderTypes::SpecimenShader) 
+        {
+            ImGui::ColorPicker3("Fluid Particle Color", glm::value_ptr(m_SceneData->PlainParticleShaderColor));
+            ImGui::ColorPicker3("Specimen Particle Color", glm::value_ptr(m_SceneData->SpecimenParticleShaderColor));
+        }
         if (shaderIndex == (int)FluidParticleShaderTypes::VelocityShader)
             ImGui::DragFloat("Speed Max", &m_SceneData->VMax, 1, 20, 1000);
+
 
 
     }
@@ -191,12 +199,11 @@ void ImGuiLayer::DrawInspector()
         return;
     }
 
-    int specimenIndex = (int)particles.size() / 2;
-    FluidParticle& specimen = particles[specimenIndex];
+    FluidParticle& specimen = particles[m_SceneData->SpecimenIndex];
 
     ImGui::PushItemWidth(200);
 
-    ImGui::Text("Particle #%d", specimenIndex);
+    ImGui::DragInt("Particle No.", &m_SceneData->SpecimenIndex, 1, 0, m_SceneData->PhysicsState->FluidParticles.size());
 
     //kinematics
     ImGui::SeparatorText("Kinematics");

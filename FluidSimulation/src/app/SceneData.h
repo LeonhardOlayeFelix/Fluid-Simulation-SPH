@@ -7,6 +7,7 @@
 
 enum class FluidParticleShaderTypes {
 	PlainShader,
+	SpecimenShader,
 	VelocityShader,
 	SurfaceTensionShader,
 };
@@ -34,6 +35,9 @@ struct SceneData
 	float VMax = 100;
 
 	FluidParticleShaderTypes FluidParticleShader = FluidParticleShaderTypes::VelocityShader;
+	glm::vec3 PlainParticleShaderColor{ 0.05, 0.20, 0.55 };
+	glm::vec3 SpecimenParticleShaderColor{ 1.00, 0.55, 0.20 };
+
 
 	SceneData();
 };

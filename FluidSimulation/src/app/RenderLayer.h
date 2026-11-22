@@ -74,12 +74,13 @@ private:
 
 	ShaderProgram m_RadiusParticleShader;
 	ShaderProgram m_PlainParticleShader;
+	ShaderProgram m_SpecimenParticleShader;
 	ShaderProgram m_VelocityParticleShader;
 	ShaderProgram m_SurfaceParticleShader;
 	ShaderProgram m_KernelRadiusFallOffShader;
 	ShaderProgram m_KernelRadiusOutlineShader;
 	ShaderProgram m_BoundingBoxOutlineShader;
-	ShaderProgram m_WhiteBallShader;
+	ShaderProgram m_BoundaryParticleShader;
 	ShaderProgram m_ArrowShader;
 
 	UniformBuffer m_MatricesUbo;
