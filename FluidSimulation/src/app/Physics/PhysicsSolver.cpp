@@ -240,6 +240,7 @@ void PhysicsSolver::UpdateParticleSurfaceTensionForceDensities()
 
 		if (!fluid.InfluencedBySurfaceTension) {
 			pi.SurfaceTensionForceDensity = glm::vec3(0);
+			pi.ColorFieldGradient = glm::vec3(0);
 			continue;
 		}
 
