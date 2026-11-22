@@ -5,7 +5,7 @@ A real-time fluid simulation using **Smoothed Particle Hydrodynamics (SPH)**, wr
 <img width="1916" height="1030" alt="image" src="https://github.com/user-attachments/assets/2b5896bb-742f-4e47-82ef-4705d7a2d103" />
 
 
-> **Status:** early development.
+> **Status:** in development.
 
 ## What is SPH?
 
