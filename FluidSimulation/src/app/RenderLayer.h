@@ -45,6 +45,8 @@ private:
 private:
 	std::shared_ptr<SceneData> m_SceneData;
 
+	bool m_FirstCall = true;
+
 	VertexArray m_CircleVao;
 	VertexArray m_BoundaryCircleVao;
 	VertexArray m_QuadVao;

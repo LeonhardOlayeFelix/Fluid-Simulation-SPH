@@ -60,7 +60,7 @@ RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sce
     m_MatricesUbo = UniformBuffer(sizeof(glm::mat4));
     m_MatricesUbo.BindToPoint(0);
 
-    BoundingBox Viewport = m_SceneData->PhysicsState->BoundaryParameters.Viewport;
+    BoundingBox Viewport = m_SceneData->Viewport;
 
     m_RenderFbo = FrameBuffer(Viewport.width(), Viewport.height(), 6);
     m_RenderFbo.AddAttachment(AttachmentTarget::Color, AttachmentStorage::Texture);
@@ -289,7 +289,7 @@ void RenderLayer::setFluidParticleShaderUniforms(ShaderProgram& shader)
 
 float RenderLayer::getAspectRatio()
 {
-    BoundingBox viewport = m_SceneData->PhysicsState->BoundaryParameters.Viewport;
+    BoundingBox viewport = m_SceneData->Viewport;
 
     return viewport.width() / viewport.height();
 }
@@ -306,17 +306,25 @@ float RenderLayer::getMaxForceLength(const std::vector<FluidParticle>& particles
 
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
-    float d = m_SceneData->PhysicsState->FluidParameters.ParticleSpacing;
+    PhysicsState& state = *m_SceneData->PhysicsState;
 
-    m_SceneData->PhysicsState->BoundaryParameters.Viewport = BoundingBox({0, 0}, {width, height});
-    m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain = BoundingBox({ 0 + 2 * d, 0 + 2 * d }, { width - 2 * d, height - 2 * d });
+    float d = state.FluidParameters.ParticleSpacing;
+
+    BoundingBox& viewportDomain = m_SceneData->Viewport;
+    BoundingBox& particleDomain = state.BoundaryParameters.ParticleDomain;
+
+    viewportDomain = BoundingBox({0, 0}, {width, height});
+    particleDomain = viewportDomain.getInset(2 * d);
 
     glViewport(0, 0, width, height);
     m_RenderFbo.Resize(width, height);
     m_ResolveFbo.Resize(width, height);
 
-    glm::mat4 newProjectionMatrix = glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f);
+    glm::mat4 newProjectionMatrix = glm::ortho(viewportDomain.xmin(), viewportDomain.xmax(), viewportDomain.ymin(), viewportDomain.ymax(), -1.0f, 1.0f);
     m_MatricesUbo.SetData(glm::value_ptr(newProjectionMatrix), sizeof(glm::mat4), 0);
+
+    if (!state.FluidParameters.SimulationRunning && m_SceneData->InGridFormation)
+        m_SceneData->PhysicsState->GridParticleData(state.FluidParameters.FluidParticleCount, d);
 
     OnRender();
 }

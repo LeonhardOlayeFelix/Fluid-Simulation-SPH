@@ -18,6 +18,7 @@ struct SceneData
 
 	std::shared_ptr<PhysicsState> PhysicsState;
 
+	BoundingBox Viewport;
 
 	bool ShowForceArrow = false;
 	bool ShowKernelRadius = false;
@@ -25,6 +26,7 @@ struct SceneData
 	bool ShowParticleDomain = false;
 	bool MatchBallSizeToSpacing = false;
 	bool FlipForceArrow = false;
+	bool InGridFormation;
 
 	int ArrowLengthMax = 40;
 	int ArrowWidth = 2;

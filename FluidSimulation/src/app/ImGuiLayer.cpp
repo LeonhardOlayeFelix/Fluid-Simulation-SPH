@@ -37,9 +37,9 @@ void ImGuiLayer::DrawViewport()
 {
     ImGui::Begin("Viewport");
 
-    BoundingBox oldParticleDomain = m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain;
+    BoundingBox oldViewportSize = m_SceneData->Viewport;
 
-    auto oldSize = oldParticleDomain.size();
+    auto oldSize = oldViewportSize.size();
     ImVec2 currSize = ImGui::GetContentRegionAvail();
     if (currSize.x != oldSize.x || currSize.y != oldSize.y) {
         m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
@@ -76,11 +76,11 @@ void ImGuiLayer::DrawSimulationControlsControlPanel()
     {
         bool a = ImGui::DragInt("Count", &fluid.FluidParticleCount, 1.0, 1, 10000);
 
-        if (a && !fluid.SimulationRunning)
+        if (ImGui::Button("Set") || (a && !fluid.SimulationRunning))
+        {
+            m_SceneData->InGridFormation = true;
             state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
-
-        if (ImGui::Button("Set"))
-            state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
+        }
     }
 
     //fluid's physical parameters
@@ -128,8 +128,11 @@ void ImGuiLayer::DrawSimulationControlsControlPanel()
     //simulation
     if (ImGui::CollapsingHeader("State", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::Button(fluid.SimulationRunning ? "Pause Simulation" : "Begin Simulation"))
+        if (ImGui::Button(fluid.SimulationRunning ? "Pause Simulation" : "Begin Simulation")) 
+        {
+            m_SceneData->InGridFormation = false;
             fluid.SimulationRunning = !fluid.SimulationRunning;
+        }
     }
 
     ImGui::PopItemWidth();
@@ -146,6 +149,7 @@ void ImGuiLayer::DrawVisualisationControlPanel()
     ImGui::PushItemWidth(100);
     if (ImGui::CollapsingHeader("Visualisation", ImGuiTreeNodeFlags_DefaultOpen))
     {
+
         ImGui::SeparatorText("Fluid Particles");
         ImGui::Checkbox("Match Fluid Particle Size to Spacing", &m_SceneData->MatchBallSizeToSpacing);
         ImGui::BeginDisabled(m_SceneData->MatchBallSizeToSpacing);
@@ -183,9 +187,14 @@ void ImGuiLayer::DrawVisualisationControlPanel()
             ImGui::ColorEdit3("Specimen Particle Color", glm::value_ptr(m_SceneData->SpecimenParticleColor), ImGuiColorEditFlags_PickerHueWheel);
             ImGui::Checkbox("Show Kernel Radius (=h)", &m_SceneData->ShowKernelRadius);
             ImGui::Checkbox("Highlight Neighbors (<h)", &m_SceneData->HighlightSpecimenNeighbors);
+
             if (m_SceneData->HighlightSpecimenNeighbors)
                 ImGui::ColorEdit3("Highlight Color", glm::value_ptr(m_SceneData->SpecimenNeighborColor), ImGuiColorEditFlags_PickerHueWheel);
 
+            ImGui::DragInt("Particle No.", &m_SceneData->SpecimenIndex, 1, 0, m_SceneData->PhysicsState->FluidParticles.size());
+            ImGui::SameLine();
+            if (ImGui::Button("Select Middle"))
+                m_SceneData->SpecimenIndex = m_SceneData->PhysicsState->FluidParticles.size() / 2;
 
             ImGui::PopItemWidth();
         }
@@ -218,7 +227,7 @@ void ImGuiLayer::DrawInspector()
         return;
     }
 
-    FluidParticle& specimen = particles[m_SceneData->SpecimenIndex];
+    FluidParticle& specimen = particles[std::min((size_t)m_SceneData->SpecimenIndex, particles.size() - 1)];
 
     ImGui::PushItemWidth(200);
 
@@ -254,7 +263,7 @@ void ImGuiLayer::DrawInspector()
 void ImGuiLayer::DrawStats()
 {
     ImGuiIO& io = ImGui::GetIO();
-    const BoundingBox& viewport = m_SceneData->PhysicsState->BoundaryParameters.Viewport;
+    const BoundingBox& viewport = m_SceneData->Viewport;
 
     int width, height;
     glfwGetWindowSize(Application::Get()->GetWindow()->Handle(), &width, &height);

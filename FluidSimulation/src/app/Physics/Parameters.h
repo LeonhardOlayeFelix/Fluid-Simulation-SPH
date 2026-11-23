@@ -5,8 +5,7 @@
 #include "BoundingBox.h"
 
 struct BoundaryParameters {
-	BoundingBox ParticleDomain;
-	BoundingBox Viewport;
+	BoundingBox ParticleDomain{glm::vec2(0, 0), glm::vec2(300, 300)};
 	bool Stale = false;
 };
 
@@ -20,7 +19,7 @@ struct FluidParameters {
 
 	bool ClampPressure = true;
 
-	int FluidParticleCount = 1500;
+	int FluidParticleCount = 450;
 
 	float RestDensity = 6.0;
 	float ParticleSpacing = 10;
