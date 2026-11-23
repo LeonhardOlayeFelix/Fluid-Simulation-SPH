@@ -109,6 +109,7 @@ void ImGuiLayer::DrawSimulationControlsControlPanel()
         {
             fluid.ParticleMass = fluid.RestDensity * fluid.ParticleSpacing * fluid.ParticleSpacing;
             fluid.SmoothingRadius = 2.50f * fluid.ParticleSpacing;
+            fluid.SurfaceTensionThreshold = 0.75 / fluid.SmoothingRadius;
 
             state.RecalculateBoundaryParticles();
 

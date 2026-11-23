@@ -23,7 +23,7 @@ struct SceneData
 	bool ShowForceArrow = false;
 	bool ShowKernelRadius = false;
 	bool ShowBoundaryParticles = false;
-	bool ShowParticleDomain = false;
+	bool ShowParticleDomain = true;
 	bool MatchBallSizeToSpacing = false;
 	bool FlipForceArrow = false;
 	bool InGridFormation;

@@ -38,7 +38,7 @@ void main()
 	float distance = min(min(leftDistance, rightDistance), min(downDistance, upDistance));
 
 	if (distance < 1.0)
-		color = vec4(0.0, 1.0, 0.0, 1.0);
+		color = vec4(0.92, 0.92, 0.92, 1.0);
 	else
 		discard;
 	
