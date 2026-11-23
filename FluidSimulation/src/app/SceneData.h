@@ -21,7 +21,6 @@ struct SceneData
 	BoundingBox Viewport;
 
 	bool ShowForceArrow = false;
-	bool ShowKernelRadius = false;
 	bool ShowBoundaryParticles = false;
 	bool ShowParticleDomain = true;
 	bool MatchBallSizeToSpacing = false;
@@ -42,6 +41,7 @@ struct SceneData
 	glm::vec3 SpecimenParticleColor{ 1.00, 0.55, 0.20 };
 	glm::vec3 SpecimenNeighborColor{ 0.92 };
 	bool HighlightSpecimenNeighbors = true;
+	bool ShowKernelRadius = true;
 
 
 	SceneData();
