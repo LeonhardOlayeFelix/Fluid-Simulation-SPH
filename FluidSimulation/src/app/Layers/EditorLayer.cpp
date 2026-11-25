@@ -37,10 +37,8 @@ void EditorLayer::DrawViewport()
 {
     ImGui::Begin("Viewport");
 
-    BoundingBox oldViewportSize = m_SceneData->Viewport;
-
-    auto oldSize = oldViewportSize.size();
-    ImVec2 currSize = ImGui::GetContentRegionAvail();
+    auto oldSize = m_SceneData->Viewport.size();
+    auto currSize = ImGui::GetContentRegionAvail();
     if (currSize.x != oldSize.x || currSize.y != oldSize.y) {
         m_SceneData->ContentRegionAvailValue = glm::vec2{ currSize.x, currSize.y };
         m_SceneData->ImGuiViewportSizeChanged = true;
