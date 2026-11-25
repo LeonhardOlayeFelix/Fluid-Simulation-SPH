@@ -1,7 +1,7 @@
 #include "PhysicsData.h"
 #include <random>
 
-void PhysicsData::GridParticleData(int count, float spacing)
+void PhysicsData::OrganiseFluidParticlesIntoGrid(int count, float spacing)
 {
     std::vector<FluidParticle> particles;
     particles.reserve(count);
@@ -23,7 +23,7 @@ void PhysicsData::GridParticleData(int count, float spacing)
     FluidParticles = std::move(particles);
 }
 
-void PhysicsData::RecalculateBoundaryParticles()
+void PhysicsData::OrganiseBoundaryParticles()
 {
     float d = FluidParameters.ParticleSpacing;
     float offset = d / 2;

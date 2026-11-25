@@ -87,8 +87,8 @@ void RenderLayer::OnRender()
 
     ReadSceneData();
 
-    const std::vector<FluidParticle>& fluidParticles = m_SceneData->PhysicsState->FluidParticles;
-    const std::vector<BoundaryParticle>& boundaryParticles = m_SceneData->PhysicsState->BoundaryParticles;
+    const std::vector<FluidParticle>& fluidParticles = m_SceneData->PhysicsData->FluidParticles;
+    const std::vector<BoundaryParticle>& boundaryParticles = m_SceneData->PhysicsData->BoundaryParticles;
 
     if (!fluidParticles.empty())
     {
@@ -108,7 +108,7 @@ void RenderLayer::OnRender()
 
     if (m_SceneData->ShowParticleDomain) 
     {
-        DrawBoundingBox(m_SceneData->PhysicsState->BoundaryParameters.ParticleDomain);
+        DrawBoundingBox(m_SceneData->PhysicsData->BoundaryParameters.ParticleDomain);
     }
 
     if (m_SceneData->ShowBoundaryParticles) 
@@ -124,7 +124,7 @@ void RenderLayer::OnRender()
 
 void RenderLayer::DrawKernelRadiusFallOff(glm::vec3 position)
 {
-    float h = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
+    float h = m_SceneData->PhysicsData->FluidParameters.SmoothingRadius;
 
     glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f));
     m_KernelRadiusFallOffShader.SetUniformMat4f("u_Model", model);
@@ -134,7 +134,7 @@ void RenderLayer::DrawKernelRadiusFallOff(glm::vec3 position)
 
 void RenderLayer::DrawKernelRadiusOutline(glm::vec3 position)
 {
-    float h = m_SceneData->PhysicsState->FluidParameters.SmoothingRadius;
+    float h = m_SceneData->PhysicsData->FluidParameters.SmoothingRadius;
 
     glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(h, h, 1.0f));
     m_KernelRadiusOutlineShader.SetUniformMat4f("u_Model", model);
@@ -251,8 +251,8 @@ ShaderProgram& RenderLayer::selectFluidParticleShader()
 
 void RenderLayer::setFluidParticleShaderUniforms(ShaderProgram& shader)
 {
-    const FluidParameters& fluid = m_SceneData->PhysicsState->FluidParameters;
-    const std::vector<FluidParticle>& fluidParticles = m_SceneData->PhysicsState->FluidParticles;
+    const FluidParameters& fluid = m_SceneData->PhysicsData->FluidParameters;
+    const std::vector<FluidParticle>& fluidParticles = m_SceneData->PhysicsData->FluidParticles;
     const float ballRadius = m_SceneData->MatchBallSizeToSpacing ? fluid.ParticleSpacing / 2 : PhysicsSolver::FluidParticleRadius;
     size_t specimenIndex = std::min((size_t)m_SceneData->SpecimenIndex, fluidParticles.size() - 1);
 
@@ -307,7 +307,7 @@ float RenderLayer::getMaxForceLength(const std::vector<FluidParticle>& particles
 
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
-    PhysicsData& state = *m_SceneData->PhysicsState;
+    PhysicsData& state = *m_SceneData->PhysicsData;
 
     float d = state.FluidParameters.ParticleSpacing;
 
@@ -325,7 +325,7 @@ void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
     m_MatricesUbo.SetData(glm::value_ptr(newProjectionMatrix), sizeof(glm::mat4), 0);
 
     if (!state.FluidParameters.SimulationRunning && m_SceneData->InGridFormation)
-        m_SceneData->PhysicsState->GridParticleData(state.FluidParameters.FluidParticleCount, d);
+        m_SceneData->PhysicsData->OrganiseFluidParticlesIntoGrid(state.FluidParameters.FluidParticleCount, d);
 
     OnRender();
 }

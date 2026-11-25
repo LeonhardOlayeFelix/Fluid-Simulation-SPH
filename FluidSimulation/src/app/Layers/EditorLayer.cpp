@@ -43,7 +43,7 @@ void EditorLayer::DrawViewport()
     ImVec2 currSize = ImGui::GetContentRegionAvail();
     if (currSize.x != oldSize.x || currSize.y != oldSize.y) {
         m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
-        m_SceneData->PhysicsState->RecalculateBoundaryParticles();
+        m_SceneData->PhysicsData->OrganiseBoundaryParticles();
     }
 
     ImGui::Image(reinterpret_cast<void*>(m_SceneData->FramebufferTextureId), currSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -66,7 +66,7 @@ void EditorLayer::DrawSimulationControlsControlPanel()
     ImGui::Begin("Simulation Controls");
     ImGui::PushItemWidth(100);
 
-    PhysicsData& state = *m_SceneData->PhysicsState;
+    PhysicsData& state = *m_SceneData->PhysicsData;
     FluidParameters& fluid = state.FluidParameters;
 
 
@@ -79,7 +79,7 @@ void EditorLayer::DrawSimulationControlsControlPanel()
         if (ImGui::Button("Set") || (a && !fluid.SimulationRunning))
         {
             m_SceneData->InGridFormation = true;
-            state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
+            state.OrganiseFluidParticlesIntoGrid(fluid.FluidParticleCount, fluid.ParticleSpacing);
         }
     }
 
@@ -111,10 +111,10 @@ void EditorLayer::DrawSimulationControlsControlPanel()
             fluid.SmoothingRadius = 2.50f * fluid.ParticleSpacing;
             fluid.SurfaceTensionThreshold = 0.75 / fluid.SmoothingRadius;
 
-            state.RecalculateBoundaryParticles();
+            state.OrganiseBoundaryParticles();
 
             if (!fluid.SimulationRunning)
-                state.GridParticleData(fluid.FluidParticleCount, fluid.ParticleSpacing);
+                state.OrganiseFluidParticlesIntoGrid(fluid.FluidParticleCount, fluid.ParticleSpacing);
         }
 
         ImGui::SeparatorText("Derived");
@@ -192,10 +192,10 @@ void EditorLayer::DrawVisualisationControlPanel()
             if (m_SceneData->HighlightSpecimenNeighbors)
                 ImGui::ColorEdit3("Highlight Color", glm::value_ptr(m_SceneData->SpecimenNeighborColor), ImGuiColorEditFlags_PickerHueWheel);
 
-            ImGui::DragInt("Particle No.", &m_SceneData->SpecimenIndex, 1, 0, m_SceneData->PhysicsState->FluidParticles.size());
+            ImGui::DragInt("Particle No.", &m_SceneData->SpecimenIndex, 1, 0, m_SceneData->PhysicsData->FluidParticles.size());
             ImGui::SameLine();
             if (ImGui::Button("Select Middle"))
-                m_SceneData->SpecimenIndex = m_SceneData->PhysicsState->FluidParticles.size() / 2;
+                m_SceneData->SpecimenIndex = m_SceneData->PhysicsData->FluidParticles.size() / 2;
 
             ImGui::PopItemWidth();
         }
@@ -221,7 +221,7 @@ void EditorLayer::DrawInspector()
 {
     ImGui::Begin("Particle Inspector");
 
-    std::vector<FluidParticle>& particles = m_SceneData->PhysicsState->FluidParticles;
+    std::vector<FluidParticle>& particles = m_SceneData->PhysicsData->FluidParticles;
     if (particles.empty()) {
         ImGui::TextDisabled("No particles");
         ImGui::End();
@@ -232,7 +232,7 @@ void EditorLayer::DrawInspector()
 
     ImGui::PushItemWidth(200);
 
-    ImGui::DragInt("Particle No.", &m_SceneData->SpecimenIndex, 1, 0, m_SceneData->PhysicsState->FluidParticles.size());
+    ImGui::DragInt("Particle No.", &m_SceneData->SpecimenIndex, 1, 0, m_SceneData->PhysicsData->FluidParticles.size());
 
     //kinematics
     ImGui::SeparatorText("Kinematics");
@@ -271,7 +271,7 @@ void EditorLayer::DrawStats()
 
     ImGui::Begin("Stats");
     ImGui::Text("%.1f FPS  |  %.3f ms/frame", io.Framerate, 1000.0f / io.Framerate);
-    ImGui::Text("Particles: %d", (int)m_SceneData->PhysicsState->FluidParticles.size());
+    ImGui::Text("Particles: %d", (int)m_SceneData->PhysicsData->FluidParticles.size());
     ImGui::Text("Window: %d x %d  |  Viewport: %.0f x %.0f", width, height, viewport.width(), viewport.height());
     ImGui::End();
 }

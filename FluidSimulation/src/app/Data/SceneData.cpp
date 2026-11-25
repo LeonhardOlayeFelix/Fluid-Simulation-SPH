@@ -1,7 +1,7 @@
 #include "SceneData.h"
 
 SceneData::SceneData()
-	: PhysicsState(std::make_shared<::PhysicsData>())
+	: PhysicsData(std::make_shared<::PhysicsData>())
 {
 
 }

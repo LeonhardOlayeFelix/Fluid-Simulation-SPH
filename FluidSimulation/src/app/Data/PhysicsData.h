@@ -13,7 +13,7 @@ struct PhysicsData
 	FluidParameters FluidParameters;
 	BoundaryParameters BoundaryParameters;
 
-    void GridParticleData(int count, float spacing);
-	void RecalculateBoundaryParticles();
+    void OrganiseFluidParticlesIntoGrid(int count, float spacing);
+	void OrganiseBoundaryParticles();
 
 };

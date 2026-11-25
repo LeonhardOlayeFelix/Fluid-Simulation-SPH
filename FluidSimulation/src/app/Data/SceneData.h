@@ -17,7 +17,7 @@ enum class FluidParticleShaderTypes {
 struct SceneData
 {
 
-	std::shared_ptr<PhysicsData> PhysicsState;
+	std::shared_ptr<PhysicsData> PhysicsData;
 
 	BoundingBox Viewport;
 
