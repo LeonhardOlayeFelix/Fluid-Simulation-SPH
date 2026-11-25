@@ -8,7 +8,7 @@ class PhysicsSolver;
 class PhysicsLayer : public Layer
 {
 public:
-	PhysicsLayer(std::shared_ptr<PhysicsData> initialState, double fixedTimeStep = 1.0 / 240.0);
+	PhysicsLayer(std::shared_ptr<PhysicsData> initialState, double fixedTimeStep = 1.0 / 160.0);
 
 	~PhysicsLayer();
 

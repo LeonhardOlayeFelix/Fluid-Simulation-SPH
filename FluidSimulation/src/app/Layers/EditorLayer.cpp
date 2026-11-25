@@ -5,7 +5,7 @@
 #include "../../vendor/imgui/imgui_impl_glfw.h"
 #include "../../vendor/imgui/imgui_impl_opengl3.h"
 
-EditorLayer::EditorLayer(std::shared_ptr<SceneData> sceneData, std::shared_ptr<RenderLayer> renderLayer) : m_SceneData(sceneData), m_RenderLayer(renderLayer)
+EditorLayer::EditorLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sceneData)
 {}
 
 EditorLayer::~EditorLayer()
@@ -42,8 +42,8 @@ void EditorLayer::DrawViewport()
     auto oldSize = oldViewportSize.size();
     ImVec2 currSize = ImGui::GetContentRegionAvail();
     if (currSize.x != oldSize.x || currSize.y != oldSize.y) {
-        m_RenderLayer->OnGuiViewportSizeChanged(currSize.x, currSize.y);
-        m_SceneData->PhysicsData->OrganiseBoundaryParticles();
+        m_SceneData->ContentRegionAvailValue = glm::vec2{ currSize.x, currSize.y };
+        m_SceneData->ImGuiViewportSizeChanged = true;
     }
 
     ImGui::Image(reinterpret_cast<void*>(m_SceneData->FramebufferTextureId), currSize, ImVec2(0, 1), ImVec2(1, 0));

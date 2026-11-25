@@ -78,7 +78,8 @@ RenderLayer::~RenderLayer()
 
 void RenderLayer::OnUpdate(double ts)
 {
-    
+    if (m_SceneData->ImGuiViewportSizeChanged)
+        OnGuiViewportSizeChanged();
 }
 
 void RenderLayer::OnRender()
@@ -305,8 +306,11 @@ float RenderLayer::getMaxForceLength(const std::vector<FluidParticle>& particles
     return std::sqrt(max);
 }
 
-void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
+void RenderLayer::OnGuiViewportSizeChanged()
 {
+    int width = m_SceneData->ContentRegionAvailValue.x;
+    int height = m_SceneData->ContentRegionAvailValue.y;
+
     PhysicsData& state = *m_SceneData->PhysicsData;
 
     float d = state.FluidParameters.ParticleSpacing;
@@ -316,6 +320,8 @@ void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 
     viewportDomain = BoundingBox({0, 0}, {width, height});
     particleDomain = viewportDomain.getInset(2 * d);
+
+    m_SceneData->PhysicsData->OrganiseBoundaryParticles();
 
     glViewport(0, 0, width, height);
     m_RenderFbo.Resize(width, height);
@@ -328,5 +334,6 @@ void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
         m_SceneData->PhysicsData->OrganiseFluidParticlesIntoGrid(state.FluidParameters.FluidParticleCount, d);
 
     OnRender();
+    m_SceneData->ImGuiViewportSizeChanged = false;
 }
 

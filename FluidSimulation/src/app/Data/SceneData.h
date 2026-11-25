@@ -24,6 +24,7 @@ struct SceneData
 	bool ShowForceArrow = false;
 	bool ShowBoundaryParticles = false;
 	bool ShowParticleDomain = true;
+	bool ImGuiViewportSizeChanged = true;
 	bool MatchBallSizeToSpacing = false;
 	bool FlipForceArrow = false;
 	bool InGridFormation;
@@ -35,6 +36,8 @@ struct SceneData
 	unsigned int FramebufferTextureId{};
 
 	float VMax = 100;
+
+	glm::vec2 ContentRegionAvailValue{};
 
 	FluidParticleShaderTypes FluidParticleShader = FluidParticleShaderTypes::VelocityShader;
 	glm::vec3 PlainParticleColor{ 0.05, 0.20, 0.55 };

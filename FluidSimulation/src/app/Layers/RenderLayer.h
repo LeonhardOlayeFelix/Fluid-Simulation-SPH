@@ -28,7 +28,7 @@ public:
 	void UpdateBoundaryParticleInstanceBuffers(const std::vector<BoundaryParticle>& particles);
 
 	inline unsigned int GetFrameBufferTextureId() { return m_ResolveFbo.GetColorTexture().GetId(); };
-	void OnGuiViewportSizeChanged(int width, int height);
+	void OnGuiViewportSizeChanged();
 	void DrawFluidParticles(const std::vector<FluidParticle>& particles);
 	void DrawBoundaryParticles(const std::vector<BoundaryParticle>& boundaryParticles);
 	void DrawForceArrows(const std::vector<FluidParticle>& particles);

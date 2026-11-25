@@ -12,10 +12,9 @@ class EditorLayer : public Layer
 {
 private:
 	std::shared_ptr<SceneData> m_SceneData;
-	std::shared_ptr<RenderLayer> m_RenderLayer;
 
 public:
-	EditorLayer(std::shared_ptr<SceneData> sceneData, std::shared_ptr<RenderLayer> renderLayer);
+	EditorLayer(std::shared_ptr<SceneData> sceneData);
 
 	virtual ~EditorLayer() override;
 
