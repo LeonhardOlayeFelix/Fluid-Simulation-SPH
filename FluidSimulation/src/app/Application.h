@@ -6,9 +6,10 @@
 #include <memory>
 
 #include "Window.h"
-#include "RenderLayer.h"
-#include "ImGuiLayer.h"
-#include "Physics/PhysicsSystem.h"
+#include "Layers/RenderLayer.h"
+#include "Layers/EditorLayer.h"
+#include "Layers/PhysicsLayer.h"
+#include "Data/SceneData.h"
 
 struct ApplicationSpec {
 	std::string Title;
@@ -35,9 +36,9 @@ private:
 	std::shared_ptr<Window> m_Window;
 
 	std::shared_ptr<SceneData> m_SceneData;
-	std::shared_ptr<PhysicsSystem> m_PhysicsSystem;
-	std::shared_ptr<RenderLayer> m_SPHRenderLayer;
-	std::shared_ptr<ImGuiLayer> m_ImGuiLayer;
+	std::shared_ptr<PhysicsLayer> m_PhysicsLayer;
+	std::shared_ptr<RenderLayer> m_RenderLayer;
+	std::shared_ptr<EditorLayer> m_EditorLayer;
 
 	void initLogger();
 	void initWindow();

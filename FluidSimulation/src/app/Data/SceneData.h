@@ -3,7 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
-#include "Physics/PhysicsState.h"
+#include "PhysicsData.h"
+#include "BoundingBox.h"
 
 enum class FluidParticleShaderTypes {
 	PlainShader,
@@ -16,7 +17,7 @@ enum class FluidParticleShaderTypes {
 struct SceneData
 {
 
-	std::shared_ptr<PhysicsState> PhysicsState;
+	std::shared_ptr<PhysicsData> PhysicsState;
 
 	BoundingBox Viewport;
 

@@ -4,20 +4,20 @@
 
 #include <memory>
 
-#include "../core/Layer.h"
-#include "SceneData.h"
+#include "../../core/Layer.h"
+#include "../Data/SceneData.h"
 #include "RenderLayer.h"
 
-class ImGuiLayer : public Layer
+class EditorLayer : public Layer
 {
 private:
 	std::shared_ptr<SceneData> m_SceneData;
 	std::shared_ptr<RenderLayer> m_RenderLayer;
 
 public:
-	ImGuiLayer(std::shared_ptr<SceneData> sceneData, std::shared_ptr<RenderLayer> renderLayer);
+	EditorLayer(std::shared_ptr<SceneData> sceneData, std::shared_ptr<RenderLayer> renderLayer);
 
-	virtual ~ImGuiLayer() override;
+	virtual ~EditorLayer() override;
 
 	virtual void OnUpdate(double ts) override;
 	virtual void  OnRender() override;

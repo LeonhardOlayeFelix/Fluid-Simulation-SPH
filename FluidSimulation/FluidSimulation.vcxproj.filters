@@ -87,31 +87,28 @@
     <ClCompile Include="src\app\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\RenderLayer.cpp">
+    <ClCompile Include="src\app\Layers\RenderLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\app\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\ImGuiLayer.cpp">
+    <ClCompile Include="src\app\Layers\EditorLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\app\Physics\PhysicsSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\SceneData.cpp">
+    <ClCompile Include="src\app\Data\SceneData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\Physics\PhysicsSystem.cpp">
+    <ClCompile Include="src\app\Layers\PhysicsLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\Physics\PhysicsState.cpp">
+    <ClCompile Include="src\app\Data\PhysicsData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\abstraction\UniformBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\app\Physics\BoundingBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -194,40 +191,40 @@
     <ClInclude Include="src\core\Layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\RenderLayer.h">
+    <ClInclude Include="src\app\Layers\RenderLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\app\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\ImGuiLayer.h">
+    <ClInclude Include="src\app\Layers\EditorLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\SceneData.h">
+    <ClInclude Include="src\app\Data\SceneData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\app\Physics\PhysicsSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Physics\FluidParticle.h">
+    <ClInclude Include="src\app\Data\FluidParticle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Physics\Parameters.h">
+    <ClInclude Include="src\app\Data\Parameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Physics\PhysicsState.h">
+    <ClInclude Include="src\app\Data\PhysicsData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Physics\PhysicsSystem.h">
+    <ClInclude Include="src\app\Layers\PhysicsLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\abstraction\UniformBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Physics\BoundaryParticle.h">
+    <ClInclude Include="src\app\Data\BoundaryParticle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Physics\BoundingBox.h">
+    <ClInclude Include="src\app\Data\BoundingBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

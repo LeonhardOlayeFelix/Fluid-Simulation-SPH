@@ -7,9 +7,9 @@
 
 #include <memory>
 
-#include "../core/Layer.h"
-#include "../core/abstraction/Includes.h"
-#include "SceneData.h"
+#include "../../core/Layer.h"
+#include "../../core/abstraction/Includes.h"
+#include "../Data/SceneData.h"
 
 
 class RenderLayer : public Layer

@@ -17,9 +17,9 @@ Application::Application(ApplicationSpec appSpec) : m_AppSpec(appSpec)
     initImGui();
 
     m_SceneData = std::make_shared<SceneData>();
-    m_PhysicsSystem = std::make_shared<PhysicsSystem>(m_SceneData->PhysicsState, 1.0 / 160);
-    m_SPHRenderLayer = std::make_shared<RenderLayer>(m_SceneData);
-    m_ImGuiLayer = std::make_shared<ImGuiLayer>(m_SceneData, m_SPHRenderLayer);
+    m_PhysicsLayer = std::make_shared<PhysicsLayer>(m_SceneData->PhysicsState, 1.0 / 160);
+    m_RenderLayer = std::make_shared<RenderLayer>(m_SceneData);
+    m_EditorLayer = std::make_shared<EditorLayer>(m_SceneData, m_RenderLayer);
 }
 
 void Application::Run()
@@ -31,14 +31,14 @@ void Application::Run()
         double timeStep = GetTime() - lastFrame;
         lastFrame = GetTime();
 
-        m_PhysicsSystem->OnUpdate(timeStep);
-        m_SPHRenderLayer->OnUpdate(timeStep);
-        m_ImGuiLayer->OnUpdate(timeStep);
+        m_PhysicsLayer->OnUpdate(timeStep);
+        m_RenderLayer->OnUpdate(timeStep);
+        m_EditorLayer->OnUpdate(timeStep);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        m_SPHRenderLayer->OnRender();
-        m_ImGuiLayer->OnRender();
+        m_RenderLayer->OnRender();
+        m_EditorLayer->OnRender();
 
         m_Window->Update();
 

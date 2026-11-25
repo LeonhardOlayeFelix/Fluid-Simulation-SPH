@@ -1,24 +1,24 @@
-#include "ImGuiLayer.h"
-#include "Application.h"
-#include "Physics/PhysicsSolver.h"
-#include "../vendor/imgui/imgui.h"
-#include "../vendor/imgui/imgui_impl_glfw.h"
-#include "../vendor/imgui/imgui_impl_opengl3.h"
+#include "EditorLayer.h"
+#include "../Application.h"
+#include "../Physics/PhysicsSolver.h"
+#include "../../vendor/imgui/imgui.h"
+#include "../../vendor/imgui/imgui_impl_glfw.h"
+#include "../../vendor/imgui/imgui_impl_opengl3.h"
 
-ImGuiLayer::ImGuiLayer(std::shared_ptr<SceneData> sceneData, std::shared_ptr<RenderLayer> renderLayer) : m_SceneData(sceneData), m_RenderLayer(renderLayer)
+EditorLayer::EditorLayer(std::shared_ptr<SceneData> sceneData, std::shared_ptr<RenderLayer> renderLayer) : m_SceneData(sceneData), m_RenderLayer(renderLayer)
 {}
 
-ImGuiLayer::~ImGuiLayer()
+EditorLayer::~EditorLayer()
 {
 	Destroy();
 }
 
-void ImGuiLayer::OnUpdate(double ts)
+void EditorLayer::OnUpdate(double ts)
 {
 
 }
 
-void ImGuiLayer::OnRender()
+void EditorLayer::OnRender()
 {
 	BeginFrame();
 
@@ -33,7 +33,7 @@ void ImGuiLayer::OnRender()
 	EndFrame();
 }
 
-void ImGuiLayer::DrawViewport()
+void EditorLayer::DrawViewport()
 {
     ImGui::Begin("Viewport");
 
@@ -51,7 +51,7 @@ void ImGuiLayer::DrawViewport()
     ImGui::End();
 }
 
-void ImGuiLayer::DrawControlsPanels()
+void EditorLayer::DrawControlsPanels()
 {
 
 
@@ -61,12 +61,12 @@ void ImGuiLayer::DrawControlsPanels()
     
 }
 
-void ImGuiLayer::DrawSimulationControlsControlPanel()
+void EditorLayer::DrawSimulationControlsControlPanel()
 {
     ImGui::Begin("Simulation Controls");
     ImGui::PushItemWidth(100);
 
-    PhysicsState& state = *m_SceneData->PhysicsState;
+    PhysicsData& state = *m_SceneData->PhysicsState;
     FluidParameters& fluid = state.FluidParameters;
 
 
@@ -143,7 +143,7 @@ void ImGuiLayer::DrawSimulationControlsControlPanel()
 
 }
 
-void ImGuiLayer::DrawVisualisationControlPanel()
+void EditorLayer::DrawVisualisationControlPanel()
 {
     //visualisation... no effect on physics
     ImGui::Begin("Visualisation Controls");
@@ -217,7 +217,7 @@ void ImGuiLayer::DrawVisualisationControlPanel()
     ImGui::End();
 }
 
-void ImGuiLayer::DrawInspector()
+void EditorLayer::DrawInspector()
 {
     ImGui::Begin("Particle Inspector");
 
@@ -261,7 +261,7 @@ void ImGuiLayer::DrawInspector()
     ImGui::End();
 }
 
-void ImGuiLayer::DrawStats()
+void EditorLayer::DrawStats()
 {
     ImGuiIO& io = ImGui::GetIO();
     const BoundingBox& viewport = m_SceneData->Viewport;
@@ -276,20 +276,20 @@ void ImGuiLayer::DrawStats()
     ImGui::End();
 }
 
-void ImGuiLayer::BeginFrame()
+void EditorLayer::BeginFrame()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 }
 
-void ImGuiLayer::EndFrame()
+void EditorLayer::EndFrame()
 {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiLayer::Destroy()
+void EditorLayer::Destroy()
 {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

@@ -3,11 +3,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
-#include "FluidParticle.h"
-#include "Parameters.h"
-#include "PhysicsState.h"
 #include <functional>
 #include <utility>
+
+#include "../Data/FluidParticle.h"
+#include "../Data/Parameters.h"
+#include "../Data/PhysicsData.h"
 
 struct GammaTemplate {
 	std::vector<FluidParticle> FluidParticles;
@@ -26,12 +27,12 @@ public:
 	inline static float BoundaryParticleRadius = 3;
 	inline static constexpr float PI = 3.141592;
 
-	PhysicsSolver(std::shared_ptr<PhysicsState> physicsState);
+	PhysicsSolver(std::shared_ptr<PhysicsData> physicsState);
 
 	void Update(double timeStep);
 
 private:
-	std::shared_ptr<PhysicsState> m_PhysicsState;
+	std::shared_ptr<PhysicsData> m_PhysicsState;
 	std::vector<std::pair<uint32_t, uint32_t>> m_FluidCellEntries;      // (cell key, fluid index) pairs, sorted by key
 	std::vector<uint32_t> m_FluidCellStarts;                            // by cell key: first entry in m_FluidCellEntries, or UINT32_MAX
 	std::vector<std::pair<uint32_t, uint32_t>> m_BoundaryCellEntries;   // (cell key, boundary index) pairs, sorted by key

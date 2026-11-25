@@ -5,7 +5,7 @@
 #include "Parameters.h"
 #include "BoundaryParticle.h"
 
-struct PhysicsState
+struct PhysicsData
 {
 	std::vector<FluidParticle> FluidParticles;
 	std::vector<BoundaryParticle> BoundaryParticles;

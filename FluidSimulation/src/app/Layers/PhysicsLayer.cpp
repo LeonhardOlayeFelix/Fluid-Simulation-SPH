@@ -1,20 +1,20 @@
-#include "PhysicsSystem.h"
-#include "PhysicsSolver.h"
+#include "PhysicsLayer.h"
+#include "../Physics/PhysicsSolver.h"
 
-PhysicsSystem::PhysicsSystem(std::shared_ptr<PhysicsState> initialState, double fixedTimeStep)
+PhysicsLayer::PhysicsLayer(std::shared_ptr<PhysicsData> initialState, double fixedTimeStep)
 	: m_PhysicsState(initialState), m_FixedTimeStep(fixedTimeStep), m_TimeAccumulator(0.0)
 {
 	if (!m_PhysicsState)
-		m_PhysicsState = std::make_shared<PhysicsState>();
+		m_PhysicsState = std::make_shared<PhysicsData>();
 
 	m_Solver = std::make_shared<PhysicsSolver>(m_PhysicsState);
 }
 
-PhysicsSystem::~PhysicsSystem()
+PhysicsLayer::~PhysicsLayer()
 {
 }
 
-void PhysicsSystem::OnUpdate(double deltaTime)
+void PhysicsLayer::OnUpdate(double deltaTime)
 {
 	m_TimeAccumulator += deltaTime;
 
@@ -25,12 +25,12 @@ void PhysicsSystem::OnUpdate(double deltaTime)
 	}
 }
 
-std::shared_ptr<PhysicsState> PhysicsSystem::GetPhysicsState() const
+std::shared_ptr<PhysicsData> PhysicsLayer::GetPhysicsState() const
 {
 	return m_PhysicsState;
 }
 
-void PhysicsSystem::SetFixedTimeStep(double timeStep)
+void PhysicsLayer::SetFixedTimeStep(double timeStep)
 {
 	m_FixedTimeStep = timeStep;
 }

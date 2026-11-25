@@ -1,10 +1,10 @@
-#include "PhysicsSolver.h"
-#include "FluidParticle.h"
 #include <cstdint>
 #include <algorithm>
 #include <utility>
 
-PhysicsSolver::PhysicsSolver(std::shared_ptr<PhysicsState> physicsState) : m_PhysicsState(physicsState)
+#include "PhysicsSolver.h"
+#include "../Data/FluidParticle.h"
+PhysicsSolver::PhysicsSolver(std::shared_ptr<PhysicsData> physicsState) : m_PhysicsState(physicsState)
 {
 }
 

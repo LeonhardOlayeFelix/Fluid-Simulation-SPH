@@ -1,6 +1,7 @@
-#include "RenderLayer.h"
-#include "Physics/PhysicsSolver.h"
 #include <random>
+
+#include "RenderLayer.h"
+#include "../Physics/PhysicsSolver.h"
 
 RenderLayer::RenderLayer(std::shared_ptr<SceneData> sceneData) : m_SceneData(sceneData)
 {
@@ -306,7 +307,7 @@ float RenderLayer::getMaxForceLength(const std::vector<FluidParticle>& particles
 
 void RenderLayer::OnGuiViewportSizeChanged(int width, int height)
 {
-    PhysicsState& state = *m_SceneData->PhysicsState;
+    PhysicsData& state = *m_SceneData->PhysicsState;
 
     float d = state.FluidParameters.ParticleSpacing;
 

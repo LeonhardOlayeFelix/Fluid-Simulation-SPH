@@ -90,14 +90,13 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\app\Physics\BoundingBox.cpp" />
     <ClCompile Include="src\app\Physics\PhysicsSolver.cpp" />
-    <ClCompile Include="src\app\ImGuiLayer.cpp" />
-    <ClCompile Include="src\app\Physics\PhysicsState.cpp" />
-    <ClCompile Include="src\app\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="src\app\RenderLayer.cpp" />
+    <ClCompile Include="src\app\Layers\EditorLayer.cpp" />
+    <ClCompile Include="src\app\Data\PhysicsData.cpp" />
+    <ClCompile Include="src\app\Layers\PhysicsLayer.cpp" />
+    <ClCompile Include="src\app\Layers\RenderLayer.cpp" />
     <ClCompile Include="src\app\Application.cpp" />
-    <ClCompile Include="src\app\SceneData.cpp" />
+    <ClCompile Include="src\app\Data\SceneData.cpp" />
     <ClCompile Include="src\core\abstraction\UniformBuffer.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\core\abstraction\CubeMap.cpp" />
@@ -125,16 +124,16 @@
     <ClCompile Include="src\app\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\app\Physics\BoundingBox.h" />
-    <ClInclude Include="src\app\Physics\BoundaryParticle.h" />
-    <ClInclude Include="src\app\Physics\Parameters.h" />
-    <ClInclude Include="src\app\Physics\FluidParticle.h" />
+    <ClInclude Include="src\app\Data\BoundingBox.h" />
+    <ClInclude Include="src\app\Data\BoundaryParticle.h" />
+    <ClInclude Include="src\app\Data\Parameters.h" />
+    <ClInclude Include="src\app\Data\FluidParticle.h" />
     <ClInclude Include="src\app\Physics\PhysicsSolver.h" />
-    <ClInclude Include="src\app\Physics\PhysicsState.h" />
-    <ClInclude Include="src\app\Physics\PhysicsSystem.h" />
-    <ClInclude Include="src\app\SceneData.h" />
-    <ClInclude Include="src\app\ImGuiLayer.h" />
-    <ClInclude Include="src\app\RenderLayer.h" />
+    <ClInclude Include="src\app\Data\PhysicsData.h" />
+    <ClInclude Include="src\app\Layers\PhysicsLayer.h" />
+    <ClInclude Include="src\app\Data\SceneData.h" />
+    <ClInclude Include="src\app\Layers\EditorLayer.h" />
+    <ClInclude Include="src\app\Layers\RenderLayer.h" />
     <ClInclude Include="src\core\abstraction\UniformBuffer.h" />
     <ClInclude Include="src\core\Layer.h" />
     <ClInclude Include="src\app\Application.h" />

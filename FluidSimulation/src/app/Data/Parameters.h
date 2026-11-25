@@ -19,7 +19,7 @@ struct FluidParameters {
 
 	bool ClampPressure = true;
 
-	int FluidParticleCount = 450;
+	int FluidParticleCount = 1500;
 
 	float RestDensity = 6.0;
 	float ParticleSpacing = 10;
