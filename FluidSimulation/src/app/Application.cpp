@@ -32,8 +32,8 @@ void Application::Run()
         lastFrame = GetTime();
 
         m_PhysicsLayer->OnUpdate(timeStep);
-        m_RenderLayer->OnUpdate(timeStep);
-        m_EditorLayer->OnUpdate(timeStep);
+        m_RenderLayer->OnUpdate(timeStep); //currently doesnt do anything
+        m_EditorLayer->OnUpdate(timeStep); //currently doesnt do anything
 
         glClear(GL_COLOR_BUFFER_BIT);
 
