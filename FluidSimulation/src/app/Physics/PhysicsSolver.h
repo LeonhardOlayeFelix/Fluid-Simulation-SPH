@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "../Data/FluidParticle.h"
-#include "../Data/Parameters.h"
+#include "../Data/ParameterData.h"
 #include "../Data/PhysicsData.h"
 
 struct GammaTemplate {

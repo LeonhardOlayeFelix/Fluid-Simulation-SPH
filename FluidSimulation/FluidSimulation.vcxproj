@@ -126,7 +126,7 @@
   <ItemGroup>
     <ClInclude Include="src\app\Data\BoundingBox.h" />
     <ClInclude Include="src\app\Data\BoundaryParticle.h" />
-    <ClInclude Include="src\app\Data\Parameters.h" />
+    <ClInclude Include="src\app\Data\ParameterData.h" />
     <ClInclude Include="src\app\Data\FluidParticle.h" />
     <ClInclude Include="src\app\Physics\PhysicsSolver.h" />
     <ClInclude Include="src\app\Data\PhysicsData.h" />

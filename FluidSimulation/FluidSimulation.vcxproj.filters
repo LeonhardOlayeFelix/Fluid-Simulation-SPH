@@ -209,7 +209,7 @@
     <ClInclude Include="src\app\Data\FluidParticle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\app\Data\Parameters.h">
+    <ClInclude Include="src\app\Data\ParameterData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\app\Data\PhysicsData.h">

@@ -10,7 +10,7 @@ struct BoundaryParameters {
 };
 
 struct FluidParameters {
-	bool SimulationRunning;
+	bool SimulationRunning = false;
 	bool InfluencedByBoundaryParticles = true;
 	bool InfluencedByGravity = true;
 	bool InfluencedBySurfaceTension = true;

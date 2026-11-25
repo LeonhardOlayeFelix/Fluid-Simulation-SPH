@@ -2,7 +2,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "FluidParticle.h"
-#include "Parameters.h"
+#include "ParameterData.h"
 #include "BoundaryParticle.h"
 
 struct PhysicsData
