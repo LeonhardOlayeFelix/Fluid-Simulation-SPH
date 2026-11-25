@@ -321,7 +321,6 @@ void RenderLayer::OnGuiViewportSizeChanged()
     viewportDomain = BoundingBox({0, 0}, {width, height});
     particleDomain = viewportDomain.getInset(2 * d);
 
-    m_SceneData->PhysicsData->OrganiseBoundaryParticles();
 
     glViewport(0, 0, width, height);
     m_RenderFbo.Resize(width, height);
@@ -332,6 +331,8 @@ void RenderLayer::OnGuiViewportSizeChanged()
 
     if (!state.FluidParameters.SimulationRunning && m_SceneData->InGridFormation)
         m_SceneData->PhysicsData->OrganiseFluidParticlesIntoGrid(state.FluidParameters.FluidParticleCount, d);
+
+    m_SceneData->PhysicsData->OrganiseBoundaryParticles();
 
     OnRender();
     m_SceneData->ImGuiViewportSizeChanged = false;
